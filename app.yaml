@@ -1,0 +1,14 @@
+application: odenkiapi
+version: 2
+runtime: python
+api_version: 1
+
+handlers:
+- url: /stylesheets
+  static_dir: stylesheets
+
+- url: /post
+  script: post.py
+
+- url: /
+  script: index.py

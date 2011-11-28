@@ -1,0 +1,34 @@
+<html>
+	<head>
+		<title>みんなでおでんきウェブAPI</title>
+	</head>
+	<body>
+		<p>
+			みんなでおでんきウェブAPIへようこそ。
+		</p>
+		<p>
+			POSTメソッドの場合は http://odenkiapi.appspot.com/post にJSON形式で、
+			GETメソッドの場合は http://odenkiapi.appspot.com/post に投入してください。
+		</p>
+		<p>
+			JSON形式データの例
+		</p>
+		<pre>
+		{"unitid" : 10,
+		"longitude" : 123,
+		"latitude" : 40,
+		"watt" : 3000}
+		</pre>
+		<form action="/post" method="post">
+			<textarea name="json" rows="10" cols="60"></textarea>
+			<input type="submit" value="GETメソッドでデータ投入"/>
+		</form>
+		
+		<p>
+			<a href="/view">直近に投入されたデータの確認</a>
+		</p>
+		<p>
+			投入されたデータは定期的に処理され<a href="http://notes.windy.cx/odenkiview">Google Fusiont Tables</a>に投入されます。
+		</p>
+	</body>
+</html>
