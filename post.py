@@ -11,17 +11,23 @@ from google.appengine.ext.webapp.util import  run_wsgi_app
 from google.appengine.ext.webapp import  template
 from django.utils import  simplejson as json
 #import json
-import OdenkiApiModels
-
+from Sender import GetSender
+from RawData import GetRawData
+from Data import GetDataList
+from Counter import Counter
+from Metadata import GetMetadata
 
 class PostPage(webapp.RequestHandler):
     
     def get(self):
-        OdenkiApiModels.GetSender(self.request)
-        OdenkiApiModels.GetRawData(self.request)
+        sender = GetSender(self.request)
+        raw_data = GetRawData(self.request)
+        data_list = GetDataList(self.request)
+        metadata = GetMetadata(sender,raw_data, data_list)
         self.data = {}
         
         self.response.headers['Content-Type'] = "text/html"
+        
         for a in self.request.arguments():
             self.data[a] = self.request.get_all(a)
         
@@ -40,8 +46,8 @@ class PostPage(webapp.RequestHandler):
         self.write()
 
     def post(self):
-        OdenkiApiModels.GetSender(self.request)
-        OdenkiApiModels.GetRawData(self.request)
+        GetSender(self.request)
+        GetRawData(self.request)
         self.data = {}
 
         if self.request.arguments() == []:
@@ -62,7 +68,7 @@ class PostPage(webapp.RequestHandler):
     
     def write(self):
         template_values = {}
-        template_values["postid"] = OdenkiApiModels.Counter.GetNextId("postid")
+        template_values["postid"] = Counter.GetNextId("postid")
         template_values["arguments"] = self.request.arguments()
         template_values["body"] = cgi.escape(self.request.body)
         template_values["nvlist"] = {}
