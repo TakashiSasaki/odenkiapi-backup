@@ -17,7 +17,8 @@ import OdenkiApiModels
 class PostPage(webapp.RequestHandler):
     
     def get(self):
-        #logging.log(logging.DEBUG, "PostPage called")
+        OdenkiApiModels.GetSender(self.request)
+        OdenkiApiModels.GetRawData(self.request)
         self.data = {}
         
         self.response.headers['Content-Type'] = "text/html"
@@ -36,11 +37,13 @@ class PostPage(webapp.RequestHandler):
         #self.response.out.write("</table>")
         #self.response.out.write("arguments = %s" % self.request.arguments())
         #self.response.out.write("</body></html>")
-        OdenkiApiModels.GetSender(self.request)
         self.write()
 
     def post(self):
+        OdenkiApiModels.GetSender(self.request)
+        OdenkiApiModels.GetRawData(self.request)
         self.data = {}
+
         if self.request.arguments() == []:
             #self.templateValues["body"] = cgi.escape(self.request.body)
             try:

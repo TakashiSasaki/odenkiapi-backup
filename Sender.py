@@ -1,36 +1,40 @@
+from google.appengine.ext import db
+from google.appengine.ext.webapp import Request
 import logging
-import cgi
-from google.appengine.ext import webapp
-from google.appengine.ext.webapp.util import  run_wsgi_app
-#from google.appengine.api import users
-from google.appengine.ext.webapp import  template
-from django.utils import  simplejson as json
-#import json
-import OdenkiApiModels
+from urlparse import urlparse
+from Counter import Counter
 
+class Sender(db.Model):       
+    senderId = db.IntegerProperty()
+    ipAddress = db.StringProperty()
+    port = db.IntegerProperty()
+    protocol = db.StringProperty()
 
-class SenderRequestHandler(webapp.RequestHandler):
-    
-    def get(self):
-        senders = OdenkiApiModels.Sender.all()
-        template_values = {}
-        template_values["senders"] = []
-        for sender in senders:
-            template_values["senders"].append(
-                                           {"senderId": sender.senderId,
-                                            "protocol":sender.protocol,
-                                            "ipAddress": sender.ipAddress,
-                                            "port":sender.port})
-        
-        self.response.out.write(template.render("html/Sender.html", template_values))
-
-
-application = webapp.WSGIApplication([('/Sender', SenderRequestHandler)], debug=True)
-
-
-def main():
-    logging.getLogger().setLevel(logging.DEBUG)
-    run_wsgi_app(application)
-
-if __name__ == "__main__":
-    main()
+def GetSender(request):
+    logging.info(("GetSender", request.url))
+    assert isinstance(request, Request)
+    ip_address = request.remote_addr
+    parsed_url = urlparse(request.url)
+    if parsed_url.scheme == "http":
+        protocol = "http"
+        port = 80
+    elif parsed_url["scheme"] == "https":
+        protocol = "https"
+        port = 443
+    else:
+        protocol = ""
+        port = -1
+    logging.info((ip_address, port, protocol))
+    gql_query = Sender.gql("WHERE ipAddress = :1 AND port = :2 AND protocol = :3", ip_address, port, protocol)
+    existing_sender = gql_query.get()
+    logging.info(existing_sender)
+    if existing_sender is not None:
+        logging.info((existing_sender.senderId, existing_sender.ipAddress, existing_sender.port, existing_sender.protocol))
+        return existing_sender
+    else:
+        sender = Sender()
+        sender.senderId = Counter.GetNextId("senderId")
+        sender.ipAddress = ip_address
+        sender.port = port
+        sender.protocol = protocol
+        return sender.put() 

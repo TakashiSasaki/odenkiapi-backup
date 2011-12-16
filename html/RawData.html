@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>RawData</title>
+	</head>
+	<body>
+		<table border="1px">
+			<tr>
+				<th>rawDataId</th><th>path</th><th>parameters</th><th>query</th><th>fragment</th><th>body</th>
+			</tr>
+			{% for raw_data in all_raw_data %}
+			<tr>
+				<td>{{ raw_data.rawDataId }}</td>
+				<td>{{ raw_data.path }}</td>
+				<td>{{ raw_data.parameters }}</td>
+				<td>{{ raw_data.query }}</td>
+				<td>{{ raw_data.fragment }}</td>
+				<td>{{ raw_data.body }}</td>
+			</tr>
+			{% endfor %}
+		</table>
+		{% include "footer.html" %}
+	</body>
+</html>

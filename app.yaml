@@ -11,8 +11,10 @@ handlers:
   script: post.py
 
 - url: /Sender
-  script: Sender.py
+  script: SenderRequestHandler.py
+  
+- url: /RawData
+  script: RawDataRequestHandler.py
   
 - url: /
   script: index.py
-
