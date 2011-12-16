@@ -5,7 +5,7 @@ from Counter import Counter
 
 class Data(db.Model):
     dataId = db.IntegerProperty()
-    name = db.StringProperty
+    field = db.StringProperty()
     string = db.StringProperty()
 
 def GetData(k,v):
@@ -14,7 +14,7 @@ def GetData(k,v):
         return existing
     data = Data()
     data.dataId = Counter.GetNextId("dataId")
-    data.name = k
+    data.field = k
     data.string = v
     return data.put()
     

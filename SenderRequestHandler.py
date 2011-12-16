@@ -22,7 +22,7 @@ class SenderRequestHandler(webapp.RequestHandler):
                                             "protocol":sender.protocol,
                                             "ipAddress": sender.ipAddress,
                                             "port":sender.port})
-        
+            logging.info(template_values)
         self.response.out.write(template.render("html/Sender.html", template_values))
 
 

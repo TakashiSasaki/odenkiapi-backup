@@ -15,11 +15,11 @@
 			</tr>
 			{% for metadata in all_metadata %}
 			<tr>
-				<td>{{ metadata.metadataId }}</td>
-				<td>{{ metadata.receivedDateTime }}</td>
-				<td>{{ metadata.sender }}</td>
-				<td>{{ metadata.rawData }}</td>
-				<td>{% for data in metadata.dataList %}{{ data }} {% endfor %}</td>
+				<td>{{ metadata.metadataId|escape }}</td>
+				<td>{{ metadata.receivedDateTime|escape }}</td>
+				<td>{{ metadata.sender|escape }}</td>
+				<td>{{ metadata.rawData|escape }}</td>
+				<td>{% for data in metadata.dataList %}{{ data|escape }} {% endfor %}</td>
 			</tr>
 			{% endfor %}
 		</table>

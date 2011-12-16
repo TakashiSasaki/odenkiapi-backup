@@ -10,10 +10,10 @@
 			</tr>
 			{% for sender in senders %}
 			<tr>
-				<td>{{ sender.senderId }}</td>
-				<td>{{ sender.protocol }}</td>
-				<td>{{ sender.ipAddress }}</td>
-				<td>{{ sender.port }}</td>
+				<td>{{ sender.senderId|escape }}</td>
+				<td>{{ sender.protocol|escape }}</td>
+				<td>{{ sender.ipAddress|escape }}</td>
+				<td>{{ sender.port|escape }}</td>
 			</tr>
 			{% endfor %}
 		</table>

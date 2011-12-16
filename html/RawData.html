@@ -15,12 +15,12 @@
 			</tr>
 			{% for raw_data in all_raw_data %}
 			<tr>
-				<td>{{ raw_data.rawDataId }}</td>
-				<td>{{ raw_data.path }}</td>
-				<td>{{ raw_data.parameters }}</td>
-				<td>{{ raw_data.query }}</td>
-				<td>{{ raw_data.fragment }}</td>
-				<td>{{ raw_data.body }}</td>
+				<td>{{ raw_data.rawDataId|escape }}</td>
+				<td>{{ raw_data.path|escape }}</td>
+				<td>{{ raw_data.parameters|escape }}</td>
+				<td>{{ raw_data.query|escape }}</td>
+				<td>{{ raw_data.fragment|escape }}</td>
+				<td>{{ raw_data.body|escape }}</td>
 			</tr>
 			{% endfor %}
 		</table>
