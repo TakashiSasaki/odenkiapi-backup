@@ -11,7 +11,9 @@ from Sender import Sender
 class SenderRequestHandler(webapp.RequestHandler):
     
     def get(self):
-        senders = Sender.all()
+        gql = Sender.gql("ORDER BY senderId DESC")
+        #senders = Sender.all()
+        senders = gql.run()
         template_values = {}
         template_values["senders"] = []
         for sender in senders:

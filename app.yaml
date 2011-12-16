@@ -16,5 +16,11 @@ handlers:
 - url: /RawData
   script: RawDataRequestHandler.py
   
+- url: /Metadata
+  script: MetadataRequestHandler.py
+  
+- url: /Data
+  script: DataRequestHandler.py
+
 - url: /
   script: index.py

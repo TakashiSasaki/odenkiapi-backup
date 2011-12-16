@@ -13,7 +13,9 @@ class RawDataRequestHandler(webapp.RequestHandler):
     def get(self):
         template_values = {}
         template_values["all_raw_data"] = []
-        all_raw_data = RawData.all()
+        gql = RawData.gql("ORDER BY rawDataId DESC LIMIT 100")
+        all_raw_data = gql.run()
+        #all_raw_data = RawData.all()
         for raw_data in all_raw_data:
             raw_data_dict = {"rawDataId": raw_data.rawDataId,
                             "path":raw_data.path,

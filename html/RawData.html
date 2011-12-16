@@ -5,6 +5,10 @@
 		<title>RawData</title>
 	</head>
 	<body>
+		{% include "header.html" %}
+		<p>
+			RawDataテーブルの内容を、最近登録されたものから順に表示しています。過去に登録されたものと同一のデータは再利用されますので上位には表示されません。
+		</p>
 		<table border="1px">
 			<tr>
 				<th>rawDataId</th><th>path</th><th>parameters</th><th>query</th><th>fragment</th><th>body</th>

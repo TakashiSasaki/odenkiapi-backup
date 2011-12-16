@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>Metadata</title>
+	</head>
+	<body>
+		{% include "header.html" %}
+		<p>
+			Metadataテーブルの内容を、最近登録されたものから順に表示しています。過去に登録されたものと同一のデータは再利用されますので上位には表示されません。
+		</p>
+		<table border="1px">
+			<tr>
+				<th>metadataId</th><th>receivedDateTime</th><th>senderId</th><th>rawDataId</th><th>dataList</th>
+			</tr>
+			{% for metadata in all_metadata %}
+			<tr>
+				<td>{{ metadata.metadataId }}</td>
+				<td>{{ metadata.receivedDateTime }}</td>
+				<td>{{ metadata.sender }}</td>
+				<td>{{ metadata.rawData }}</td>
+				<td>{% for data in metadata.dataList %}{{ data }} {% endfor %}</td>
+			</tr>
+			{% endfor %}
+		</table>
+		{% include "footer.html" %}
+	</body>
+</html>
