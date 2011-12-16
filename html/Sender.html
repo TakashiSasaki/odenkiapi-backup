@@ -1,0 +1,20 @@
+<html>
+	<head>
+		<title>Sender</title>
+	</head>
+	<body>
+		<table>
+			<tr>
+				<th>senderId</th><th>protocol</th><th>ipAddress</th><th>port</th>
+			</tr>
+			{% for sender in senders %}
+			<tr>
+				<td>{{ sender.senderId }}</td>
+				<td>{{ sender.protocol }}</td>
+				<td>{{ sender.ipAddress }}</td>
+				<td>{{ sender.port }}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</body>
+</html>

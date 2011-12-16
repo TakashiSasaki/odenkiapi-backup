@@ -10,5 +10,9 @@ handlers:
 - url: /post
   script: post.py
 
+- url: /Sender
+  script: Sender.py
+  
 - url: /
   script: index.py
+

@@ -36,6 +36,7 @@ class PostPage(webapp.RequestHandler):
         #self.response.out.write("</table>")
         #self.response.out.write("arguments = %s" % self.request.arguments())
         #self.response.out.write("</body></html>")
+        OdenkiApiModels.GetSender(self.request)
         self.write()
 
     def post(self):
