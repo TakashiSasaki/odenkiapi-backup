@@ -2,6 +2,8 @@ from google.appengine.ext import db
 from google.appengine.ext.webapp import Request
 import types,logging
 from Counter import Counter
+#import json
+from django.utils import simplejson
 
 class Data(db.Model):
     dataId = db.IntegerProperty()
@@ -29,4 +31,17 @@ def GetDataList(request):
             data = GetData(k,v)
             if data is None: continue
             data_list.append(data)
+            
+    try:
+        parsed_json = simplejson.loads(request.body)
+    except ValueError:
+        parsed_json = None
+
+    if (parsed_json != None) :
+        for k, v in parsed_json.iteritems() :
+            logging.log(logging.INFO, type(v))
+            data = GetData(k,v)
+            if data is None: continue
+            data_list.append(data)
+
     return data_list

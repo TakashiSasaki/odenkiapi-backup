@@ -1,83 +1,167 @@
+<!DOCTYPE html>
 <html>
 	<head>
-		<title>‚İ‚ñ‚È‚Å‚¨‚Å‚ñ‚«ƒEƒFƒuAPI</title>
+		<meta charset="utf-8"/>
+		<title>ã¿ã‚“ãªã§ãŠã§ã‚“ãã‚¦ã‚§ãƒ–API</title>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	</head>
 	<body>
+		{% include "header.html" %}
 		<p>
-			‚İ‚ñ‚È‚Å‚¨‚Å‚ñ‚«ƒEƒFƒuAPI‚Ö‚æ‚¤‚±‚»B
+			ã“ã®ãƒšãƒ¼ã‚¸ã‹ã‚‰æ‰‹å‹•ã§ãƒ‡ãƒ¼ã‚¿ã‚’æŠ•å…¥ã™ã‚‹ã“ã¨ãŒã§ãã¾ã™ã€‚
+			ãƒ‡ãƒ¼ã‚¿æŠ•å…¥ç”¨URLã¯POST/GETå…±é€š http://odenkiapi.appspot.com/post ã§ã™ã€‚
+			POSTãƒ¡ã‚½ãƒƒãƒ‰ã®å ´åˆã¯JSONå½¢å¼ã§æŠ•å…¥ã™ã‚‹ã“ã¨ã‚‚å¯èƒ½ã§ã™ã€‚
+			ãã®å ´åˆURLã®ã‚¯ã‚¨ãƒªéƒ¨åˆ†ã§æŒ‡å®šã—ãŸãƒ‡ãƒ¼ã‚¿ã¨ãƒãƒ¼ã‚¸ã•ã‚Œã¾ã™ã€‚
+		</p>
+		<script>
+			function OnChangedEventHandler() {
+				query_string = "";
+				field1 = $("#field1").get()[0].value;
+				string1 = $("#string1").get()[0].value;
+				field2 = $("#field2").get()[0].value;
+				string2 = $("#string2").get()[0].value;
+				field3 = $("#field3").get()[0].value;
+				string3 = $("#string3").get()[0].value;
+				field4 = $("#field4").get()[0].value;
+				string4 = $("#string4").get()[0].value;
+				field5 = $("#field5").get()[0].value;
+				string5 = $("#string5").get()[0].value;
+				if(field1 != "" && string1 != "") {
+					query_string = field1 + "=" + string1;
+				}
+				if(field2 != "" && string2 != "") {
+					query_string += '&' + field2 + "=" + string2;
+				}
+				if(field3 != "" && string3 != "") {
+					query_string += '&' + field3 + "=" + string3;
+				}
+				if(field4 != "" && string4 != "") {
+					query_string += '&' + field4 + "=" + string4;
+				}
+				if(field5 != "" && string5 != "") {
+					query_string += '&' + field5 + "=" + string5;
+				}
+				$("#query_string").get()[0].value = query_string;
+			}
+
+			function Post() {
+				var xhr = false;
+				if(window.XMLHttpRequest) {
+					xhr = new XMLHttpRequest();
+				} else if(window.ActiveXObject) {
+					try {
+						xhr = new ActiveXObject("Msxml2.XMLHTTP");
+					} catch(e) {
+						xhr = new ActiveXObject("Microsoft.XMLHTTP");
+					}
+				}
+				//if
+				//xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+				xhr.onreadystatechange = function() {
+					if(this.readyState == 4) {
+						$("#response").get()[0].value = this.responseText;
+					} else {
+						//$("#response").get()[0].value = this.readyState;
+					}//if
+				}//function
+				//alert($("#query_string").get()[0].value);
+				xhr.open("POST", "/post?"+$("#query_string").get()[0].value);
+				xhr.send($("#postbody").val());
+			}//Post
+
+			function Get() {
+				var xhr = false;
+				if(window.XMLHttpRequest) {
+					xhr = new XMLHttpRequest();
+				} else if(window.ActiveXObject) {
+					try {
+						xhr = new ActiveXObject("Msxml2.XMLHTTP");
+					} catch(e) {
+						xhr = new ActiveXObject("Microsoft.XMLHTTP");
+					}
+				}
+				//if
+				//xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+				xhr.onreadystatechange = function() {
+					if(this.readyState == 4) {
+						$("#response").get()[0].value = this.responseText;
+					} else {
+						//$("#response").get()[0].value = this.readyState;
+					}//if
+				}//function
+				//alert($("#query_string").get()[0].value);
+				xhr.open("GET", "/post?"+$("#query_string").get()[0].value);
+				xhr.send($("#postbody").get()[0].value);
+			}//Post
+
+		</script>
+		<table>
+			<tr>
+				<td>
+				<input name="name" id="field1" onKeyUp="OnChangedEventHandler()"
+				placeholder="unitid"/>
+				</td>
+				<td>
+				<input name="value"id="string1" onKeyUp="OnChangedEventHandler()"
+				placeholder="10"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+				<input name="name" id="field2" onKeyUp="OnChangedEventHandler()"
+				placeholder="longitude"/>
+				</td>
+				<td>
+				<input name="value" id="string2" onKeyUp="OnChangedEventHandler()"
+				placeholder="123"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+				<input name="name" id="field3" onKeyUp="OnChangedEventHandler()"
+				placeholder="latitude"/>
+				</td>
+				<td>
+				<input name="value" id="string3" onKeyUp="OnChangedEventHandler()"
+				placeholder="40"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+				<input name="name" id="field4" onKeyUp="OnChangedEventHandler()"
+				placeholder="watt"/>
+				</td>
+				<td>
+				<input name="value" id="string4" onKeyUp="OnChangedEventHandler()"
+				placeholder="3000"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+				<input name="name" id="field5" onKeyUp="OnChangedEventHandler()"/>
+				</td>
+				<td>
+				<input name="value" id="string5" onKeyUp="OnChangedEventHandler()"/>
+				</td>
+			</tr>
+		</table>
+		<p>
+			<textarea rows="10" cols="60" id="postbody"
+				placeholder='{"unitid" : 10, "longitude" : 123, "latitude" : 40, "watt" : 3000}'></textarea>
 		</p>
 		<p>
-			POSTƒƒ\ƒbƒh‚Ìê‡‚Í http://odenkiapi.appspot.com/post ‚ÉJSONŒ`®‚ÅA
-			GETƒƒ\ƒbƒh‚Ìê‡‚Í http://odenkiapi.appspot.com/post ‚É“Š“ü‚µ‚Ä‚­‚¾‚³‚¢B
+			ãƒ‡ãƒ¼ã‚¿ã‚’æŠ•å…¥ã™ã‚‹ãŸã‚ã®URLã¯ http://odenkiapi.appspot.com/post?
+			<input type="text" size="70" id="query_string" placeholder="ä¸Šã®ãƒ•ã‚©ãƒ¼ãƒ ã«è¨˜å…¥ã™ã‚‹ã¨è‡ªå‹•çš„ã«ç”Ÿæˆã•ã‚Œã¾ã™" />ã§ã™ã€‚
 		</p>
 		<p>
-			JSONŒ`®ƒf[ƒ^‚Ì—á
-		</p>
-		<pre>
-		{"unitid" : 10,
-		"longitude" : 123,
-		"latitude" : 40,
-		"watt" : 3000}
-		</pre>
-		<form action="/post" method="post">
-			<p>
-				<textarea rows="10" cols="60"></textarea>
-			</p>
-			<input type="submit" value="POSTƒƒ\ƒbƒh‚Åƒf[ƒ^“Š“ü"/>
-		</form>
-		<form action="/post" method="get">
-			<table>
-				<tr>
-					<th>name</th><th>value</th>
-				</tr>
-				<tr>
-					<td>
-					<input name="name"/>
-					</td>
-					<td>
-					<input name="value"/>
-					</td>
-				</tr>
-				<tr>
-					<td>
-					<input name="name"/>
-					</td>
-					<td>
-					<input name="value"/>
-					</td>
-				</tr>
-				<tr>
-					<td>
-					<input name="name"/>
-					</td>
-					<td>
-					<input name="value"/>
-					</td>
-				</tr>
-				<tr>
-					<td>
-					<input name="name"/>
-					</td>
-					<td>
-					<input name="value"/>
-					</td>
-				</tr>
-				<tr>
-					<td>
-					<input name="name"/>
-					</td>
-					<td>
-					<input name="value"/>
-					</td>
-				</tr>
-			</table>
-			<input type="submit" value="GETƒƒ\ƒbƒh‚Åƒf[ƒ^“Š“ü"/>
-		</form>
-		<p>
-			<a href="/view">’¼‹ß‚É“Š“ü‚³‚ê‚½ƒf[ƒ^‚ÌŠm”F</a>
+			<input type="button" value="GETãƒ¡ã‚½ãƒƒãƒ‰ã§ãƒ‡ãƒ¼ã‚¿ã‚’æŠ•å…¥" onclick="Get()"/>
+			<input type="button" value="POSTãƒ¡ã‚½ãƒƒãƒ‰ã§ãƒ‡ãƒ¼ã‚¿ã‚’æŠ•å…¥" onclick="Post()"/>
 		</p>
 		<p>
-			“Š“ü‚³‚ê‚½ƒf[ƒ^‚Í’èŠú“I‚Éˆ—‚³‚ê<a href="http://notes.windy.cx/odenkiview">Google Fusiont Tables</a>‚É“Š“ü‚³‚ê‚Ü‚·B
+			<textarea rows="10" cols="60" id="response" placeholder="GETãƒ¡ã‚½ãƒƒãƒ‰ã‚‚ã—ãã¯POSTãƒ¡ã‚½ãƒƒãƒ‰ã§ãƒ‡ãƒ¼ã‚¿ã‚’æŠ•å…¥ã™ã‚‹ã¨ã€ã‚µãƒ¼ãƒã‹ã‚‰ã®å¿œç­”ãŒã“ã“ã«è¡¨ç¤ºã•ã‚Œã¾ã™ã€‚"></textarea>
+		</p>
+		<p>
+			æŠ•å…¥ã•ã‚ŒãŸãƒ‡ãƒ¼ã‚¿ã¯å®šæœŸçš„ã«å‡¦ç†ã•ã‚Œ<a href="http://notes.windy.cx/odenkiview">Google Fusiont Tables</a>ã«æŠ•å…¥ã•ã‚Œã¾ã™ã€‚
 		</p>
 	</body>
 </html>
