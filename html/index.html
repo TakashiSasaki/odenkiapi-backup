@@ -20,10 +20,59 @@
 		"watt" : 3000}
 		</pre>
 		<form action="/post" method="post">
-			<textarea name="json" rows="10" cols="60"></textarea>
+			<p>
+				<textarea rows="10" cols="60"></textarea>
+			</p>
+			<input type="submit" value="POSTメソッドでデータ投入"/>
+		</form>
+		<form action="/post" method="get">
+			<table>
+				<tr>
+					<th>name</th><th>value</th>
+				</tr>
+				<tr>
+					<td>
+					<input name="name"/>
+					</td>
+					<td>
+					<input name="value"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+					<input name="name"/>
+					</td>
+					<td>
+					<input name="value"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+					<input name="name"/>
+					</td>
+					<td>
+					<input name="value"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+					<input name="name"/>
+					</td>
+					<td>
+					<input name="value"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+					<input name="name"/>
+					</td>
+					<td>
+					<input name="value"/>
+					</td>
+				</tr>
+			</table>
 			<input type="submit" value="GETメソッドでデータ投入"/>
 		</form>
-		
 		<p>
 			<a href="/view">直近に投入されたデータの確認</a>
 		</p>

@@ -19,13 +19,26 @@ class Counter(db.Model):
             return obj.count
         return db.run_in_transaction(txn)
     
-class Source(db.Model):
-    postid = db.IntegerProperty()
+class Sender(db.Model):
+    senderId = db.IntegerProperty()
     ipaddress = db.StringProperty()
-    datetime = db.DateTimeProperty()
+    port = db.StringProperty()
+    protocol = db.StringProperty()
 
-class Values(db.Model):
-    postid = db.IntegerProperty()
+class RawData(db.Model):
+    path = db.StringProperty()
+    query = db.StringProperty()
+    fragment = db.StringProperty()
+    body = db.StringProperty 
+    
+class Data(db.Model):
+    dataId = db.IntegerProperty()
     name = db.StringProperty
-    string = db.StringProperty()
-    number = db.FloatProperty()
+    strings = db.StringListProperty()
+    number = db.ListProperty(float)
+
+class Metadata(db.Model):
+    receivedDateTime = db.DateTimeProperty()
+    sender = db.ReferenceProperty(Sender)
+    rawData = db.ReferenceProperty(RawData)
+    data = db.ReferenceProperty(Data)

@@ -1,0 +1,32 @@
+<html>
+	<head>
+		<title>posted data</title>
+	</head>
+	<body>
+		<p>
+			postid = {{postid}}
+		</p>
+		<p>
+			posted argument(s) = {% for a in arguments %}
+			{{a}}
+			{% endfor %}
+		</p>
+		<p>
+			posted body
+		</p>
+		<pre>
+			{{body}}
+		</pre>
+		<p>
+			accepted data
+		</p>
+		<table border='1'>
+			{% for n,vlist in nvlist %}
+			<tr>
+				<td>{{n}}</td>
+				<td>{% for v in vlist %}{{v}}{% endfor %}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</body>
+</html>
