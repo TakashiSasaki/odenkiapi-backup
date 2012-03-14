@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>Last</title>
+	</head>
+	<body>
+		{% include "header.html" %}
+		<p>
+			最後に投入されたデータをGoogleマップ上に表示しています。
+		</p>
+		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+		<div id="map" style="width: 740px; height: 400px;"></div>
+		<script type="text/javascript">
+			function attachMessage(marker, msg) {
+				google.maps.event.addListener(marker, 'click', function(event) {
+					new google.maps.InfoWindow({
+						content : msg
+					}).open(marker.getMap(), marker);
+				});
+			}
+
+			// 位置情報と表示データの組み合わせ
+			var data = new Array();
+			data.push({
+				position : new google.maps.LatLng({{ latitude }}, {{ longitude }}),
+				content : '{{ all_data_string }}'
+			});
+
+			var myMap = new google.maps.Map(document.getElementById('map'), {
+				zoom : 14,
+				center : new google.maps.LatLng({{ latitude }}, {{ longitude }}),
+				scrollwheel : false,
+				mapTypeId : google.maps.MapTypeId.ROADMAP
+			});
+
+			for( i = 0; i < data.length; i++) {
+				var myMarker = new google.maps.Marker({
+					position : data[i].position,
+					map : myMap
+				});
+				attachMessage(myMarker, data[i].content);
+			}
+		</script>
+		{% include "footer.html" %}
+	</body>
+</html>

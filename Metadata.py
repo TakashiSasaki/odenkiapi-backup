@@ -25,3 +25,4 @@ def GetMetadata(sender_, raw_data, data_list):
     metadata.rawData = raw_data
     metadata.dataList = data_list
     return metadata.put()
+

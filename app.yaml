@@ -1,5 +1,5 @@
 application: odenkiapi
-version: 3
+version: 4
 runtime: python
 api_version: 1
 
@@ -21,6 +21,9 @@ handlers:
   
 - url: /Data
   script: DataRequestHandler.py
+
+- url: /Last
+  script: LastRequestHandler.py
 
 - url: /
   script: index.py
