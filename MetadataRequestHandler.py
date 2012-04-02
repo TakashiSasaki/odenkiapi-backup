@@ -6,7 +6,7 @@ from google.appengine.ext.webapp.util import  run_wsgi_app
 from google.appengine.ext.webapp import  template
 from django.utils import  simplejson as json
 #import json
-from Metadata import Metadata
+from Metadata import Metadata, getDataIds
 from google.appengine.ext import db
 
 class MetadataRequestHandler(webapp.RequestHandler):
@@ -19,16 +19,13 @@ class MetadataRequestHandler(webapp.RequestHandler):
         #all_raw_data = RawData.all()
         logging.info(recent)
         for metadata in recent:
-            data_list = []
-            for key in metadata.dataList:
-                data = db.get(key)
-                data_list.append(data.dataId)
+
             logging.info(type(metadata.receivedDateTime)) 
             metadata_dict = {"metadataId": metadata.metadataId,
                             "receivedDateTime":metadata.receivedDateTime,
                             "sender": metadata.sender.senderId,
                             "rawData": metadata.rawData.rawDataId,
-                            "dataList": data_list }
+                            "dataList": getDataIds(metadata) }
             logging.info(metadata_dict)
             template_values["all_metadata"].append(metadata_dict)
         

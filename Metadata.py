@@ -7,6 +7,7 @@ from RawData import RawData
 from Data import Data
 import datetime
 from Counter import Counter
+from google.appengine.api import memcache
 
 class Metadata(db.Model):
     metadataId = db.IntegerProperty()
@@ -14,6 +15,7 @@ class Metadata(db.Model):
     sender = db.ReferenceProperty(Sender)
     rawData = db.ReferenceProperty(RawData)
     dataList = db.ListProperty(db.Key)
+    
 
 def GetMetadata(sender_, raw_data, data_list):
     metadata = Metadata()
@@ -26,3 +28,28 @@ def GetMetadata(sender_, raw_data, data_list):
     metadata.dataList = data_list
     return metadata.put()
 
+memcache_client = memcache.Client()
+
+def getMetadata(key):
+    metadata_entity = memcache_client.get(str(key))
+    if metadata_entity is None:
+        metadata_entity = db.get(key)
+    return metadata_entity
+
+def getDataIds(metadata):
+    assert isinstance(metadata, Metadata)
+    data_ids = []
+    for data_key in metadata.dataList:
+        data_ids.append(getDataId(data_key))
+    return data_ids
+
+def getDataId(key):
+    key_string = str(key)+"dataId"
+    data_id = memcache_client.get(key_string)
+    if data_id is not None:
+        return data_id
+    data_entity = db.get(key)
+    assert isinstance(data_entity, db.Model)
+    assert data_entity.kind() == "Data"
+    memcache_client.set(key_string, data_entity.dataId)
+    return data_entity.dataId
