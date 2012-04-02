@@ -8,6 +8,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api import users
 from google.appengine.ext.webapp import template
+import os
 
 class MainPage(webapp.RequestHandler):
     
@@ -16,7 +17,7 @@ class MainPage(webapp.RequestHandler):
         self.response.headers['Content-Type'] = 'text/html'
         #self.response.out.write('Hello, webapp World!')
         current_user = users.GetCurrentUser()
-        template_values = {}
+        template_values = {"version": os.environ['CURRENT_VERSION_ID']}
         self.response.out.write(template.render("html/index.html", template_values))        
 
 

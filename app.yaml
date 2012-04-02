@@ -25,5 +25,8 @@ handlers:
 - url: /Last
   script: LastRequestHandler.py
 
+- url: /sandbox/hello
+  script: sandbox/hello.py
+
 - url: /
   script: index.py
