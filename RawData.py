@@ -12,7 +12,7 @@ class RawData(db.Model):
     fragment = db.StringProperty()
     body = db.StringProperty()
     
-def GetRawData(request):
+def putRawData(request):
     logging.info(("GetRawData", request.url))
     assert isinstance(request, Request)
     parsed_url = urlparse(request.url)

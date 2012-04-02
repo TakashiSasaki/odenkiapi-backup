@@ -12,8 +12,6 @@ from google.appengine.ext.webapp.util import  run_wsgi_app
 from google.appengine.ext.webapp import  template
 from django.utils import  simplejson as json
 from Sender import Sender
-from RawData import GetRawData
-from Data import GetDataList
 from Counter import Counter
 from Metadata import Metadata
 from google.appengine.ext import db

@@ -11,19 +11,18 @@ from google.appengine.ext.webapp.util import  run_wsgi_app
 from google.appengine.ext.webapp import  template
 from django.utils import  simplejson as json
 from Sender import GetSender
-from RawData import GetRawData
-from Data import GetDataList
-from Counter import Counter
-from Metadata import GetMetadata
+from RawData import putRawData
+from Data import putDataList
+from Metadata import putMetadata
 from google.appengine.ext import db
 
 class PostPage(webapp.RequestHandler):
-    
+
     def get(self):
         self.sender = GetSender(self.request)
-        self.raw_data = GetRawData(self.request)
-        self.data_list = GetDataList(self.request)
-        self.metadata = GetMetadata(self.sender, self.raw_data, self.data_list)
+        self.raw_data = putRawData(self.request)
+        self.data_list = putDataList(self.request)
+        self.metadata = putMetadata(self.sender, self.raw_data, self.data_list)
         
         self.response.headers['Content-Type'] = "text/plain"
         for key in self.data_list:

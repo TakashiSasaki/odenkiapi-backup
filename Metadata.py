@@ -15,9 +15,10 @@ class Metadata(db.Model):
     sender = db.ReferenceProperty(Sender)
     rawData = db.ReferenceProperty(RawData)
     dataList = db.ListProperty(db.Key)
-    
+    executedCommandIds = db.ListProperty(int)
+    executedResults = db.StringListProperty()
 
-def GetMetadata(sender_, raw_data, data_list):
+def putMetadata(sender_, raw_data, data_list):
     metadata = Metadata()
     metadata.metadataId = Counter.GetNextId("metadataId")
     now = datetime.datetime.now()

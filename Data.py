@@ -10,7 +10,7 @@ class Data(db.Model):
     field = db.StringProperty()
     string = db.StringProperty()
 
-def GetData(k,v):
+def putData(k,v):
     existing = Data.gql("WHERE name = :1 AND string = :2", k, v).get()
     if existing is not None:
         return existing
@@ -20,7 +20,7 @@ def GetData(k,v):
     data.string = v
     return data.put()
     
-def GetDataList(request):
+def putDataList(request):
     assert isinstance(request, Request)
     data_list = []
     for k in request.arguments():
@@ -28,7 +28,7 @@ def GetDataList(request):
         logging.info((k,vlist))
         assert isinstance(vlist, list)
         for v in vlist:
-            data = GetData(k,v)
+            data = putData(k,v)
             if data is None: continue
             data_list.append(data)
             
@@ -40,7 +40,7 @@ def GetDataList(request):
     if (parsed_json != None) :
         for k, v in parsed_json.iteritems() :
             logging.log(logging.INFO, type(v))
-            data = GetData(k,v)
+            data = putData(k,v)
             if data is None: continue
             data_list.append(data)
 
