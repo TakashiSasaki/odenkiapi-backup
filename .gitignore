@@ -6,4 +6,6 @@
 *.pyo
 .bzr
 .deployables
+credentials.py
+google686f6b490a533df7.py
 .~*~
