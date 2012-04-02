@@ -8,11 +8,14 @@ from Data import Data
 import datetime
 from Counter import Counter
 from google.appengine.api import memcache
+from datetime import datetime
 
 class Command(db.Model):
     commandId = db.IntegerProperty()
     equipmentId = db.StringProperty()
     userId = db.StringProperty()
-    commands = db.StringListProperty()
+    command = db.StringProperty()
+    result = db.StringProperty()
     queuedDateTime = db.DateTimeProperty()
+    attemptDateTimes = db.ListProperty(datetime)
     executedDateTime = db.DateTimeProperty()

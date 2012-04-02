@@ -28,5 +28,14 @@ handlers:
 - url: /sandbox/hello
   script: sandbox/hello.py
 
+- url: /Equipment
+  script: Equipment.py
+  
+- url: /login
+  script: login.py
+
+- url: /google686f6b490a533df7.html
+  script: google686f6b490a533df7.py 
+
 - url: /
   script: index.py
