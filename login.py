@@ -60,5 +60,7 @@ class _RequestHandler(RequestHandler):
         
 if __name__ == "__main__":
     logging.getLogger().setLevel(logging.DEBUG)
-    application = WSGIApplication([('/login', _RequestHandler)], debug=True)
+    application = WSGIApplication([('/login', _RequestHandler),
+                                   ('/google_login', _RequestHandler),
+                                   ('/twitter_login',_RequestHandler)], debug=True)
     run_wsgi_app(application)

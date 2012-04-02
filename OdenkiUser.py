@@ -1,6 +1,9 @@
 from google.appengine.ext.db import Model, Query
 from google.appengine.api.users import User as GoogleUser
 from google.appengine.ext.db import StringProperty, URLProperty
+from google.appengine.ext.webapp.util import run_wsgi_app
+from google.appengine.ext.webapp import WSGIApplication, RequestHandler
+
 import logging
 
 class OdenkiUser(Model):
@@ -25,3 +28,13 @@ def getByGoogleId(google_id):
         return result.next()
     except:
         return None
+
+class _RequestHandler(RequestHandler):
+    def get(self):
+        pass
+
+if __name__ == "__main__":
+    logging.getLogger().setLevel(logging.DEBUG)
+    application = WSGIApplication([('/OdenkiUser', _RequestHandler)]
+                                   , debug=True)
+    run_wsgi_app(application)
