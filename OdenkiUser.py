@@ -10,6 +10,7 @@ from Counter import Counter
 
 
 import logging
+import google
 
 class OdenkiUser(Model):
     odenkiId = IntegerProperty()
@@ -46,7 +47,15 @@ def getByOdenkiId(odenki_id):
         return result.next()
     except:
         return None
-   
+
+def getCurrentUser():
+    # Currently user authentication relies on Google Account.
+    # We will separate Odenki Account and Google Account later.
+    google_user = users.get_current_user()
+    if google_user is None: 
+        return None
+    return getByGoogleId(google_user.user_id())
+
 class _RequestHandler(RequestHandler):
     def get(self):
         v = {}
