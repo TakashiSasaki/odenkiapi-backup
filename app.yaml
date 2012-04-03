@@ -37,5 +37,8 @@ handlers:
 - url: /google686f6b490a533df7.html
   script: google686f6b490a533df7.py 
 
+- url: /OdenkiUser
+  script: OdenkiUser.py
+
 - url: /
   script: index.py

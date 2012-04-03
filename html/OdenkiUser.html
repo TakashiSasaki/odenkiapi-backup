@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>みんなでおでんきウェブAPI</title>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	</head>
+	<body>
+		{% include "header.html" %}
+		みんなでおでんきウェブAPIはGoogleアカウント、Twitterアカウント、Facebookアカウントと関連付けて利用することができます。
+		現在はまずGoogleアカウントが必要ですので、ユーザーにとってはGoogleアカウントとTwitterアカウントもしくはFacebookアカウントを関連付けられるリスクがあります。
+		<table border="1px">
+			<tr>
+				<td>みんなでおでんきユーザー番号</td><td>{{ odenkiId }}</td>
+				<td><a href="{{ google_logout_url }}">logout</a></td>
+			</tr>
+			<tr>
+				<td>みんなでおでんきニックネーム</td><td>{{ odenkiNickname }}</td>
+				<td><a href="{{ google_logout_url }}">logout</a></td>
+			</tr>
+			<tr>
+				<td>ログイン中のGoogleアカウントのメールアドレス</td><td>{{ googleEmail }}</td>
+				<td><a href="{{ google_logout_url }}">logout</a></td>
+			</tr>
+			<tr>
+				<td>ログイン中のGoogleアカウントのユーザー番号</td><td>{{ googleId }}</td>
+				<td><a href="{{ google_user_id }}">logout</a></td>
+			</tr>
+			<tr>
+				<td>ログイン中のGoogleアカウントのニックネーム</td><td>{{ googleNickname }}</td>
+				<td><a href="{{ google_logout_url }}">logout</a></td>
+			</tr>
+			<tr>
+				<td>Google Docsにアクセスするためのリクエストトークン</td>
+				<td>{{ docsRequestToken }}</td>
+				<td><a href="">削除</a></td>
+			</tr>
+		</table>
+		{% include "footer.html" %}
+	</body>
+</html>
