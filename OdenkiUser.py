@@ -19,6 +19,8 @@ class OdenkiUser(Model):
     googleNickname = StringProperty()
     googleId = StringProperty()
     docsRequestToken = StringProperty()
+    docsCollectionId = StringProperty()
+    docsSpreadsheetId = StringProperty()
     twitterId = StringProperty()
     twitterScreen_name = StringProperty()
     twitterPlaceName = StringProperty()
@@ -26,6 +28,9 @@ class OdenkiUser(Model):
     twitterProfileImage = URLProperty()
     twitterOauthToken = StringProperty()
     twitterOauthTokenSecret = StringProperty()
+    
+class OdenkiUserNotFound(Exception):
+    pass
 
 def getByGoogleId(google_id):
     query = OdenkiUser.all()
@@ -52,7 +57,7 @@ def getCurrentUser():
     # We will separate Odenki Account and Google Account later.
     google_user = users.get_current_user()
     if google_user is None: 
-        return None
+        raise OdenkiUserNotFound()
     return getByGoogleId(google_user.user_id())
 
 class _RequestHandler(MyRequestHandler):
