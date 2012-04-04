@@ -24,22 +24,27 @@ class Command(db.Model):
     executedDateTime = db.DateTimeProperty()
 
 class _RequestHandler(MyRequestHandler):
-    query = Command.all()
-    query.order("-queuedDateTime")
-    result = query.run()
-    vv = []
-    for x in result:
-        v = {}
-        v["commandId"] = x.commandId
-        v["equipmentId"] = x.equipmentId
-        v["userId"] = x.userId
-        v["command"] = x.command
-        v["result"] = x.result
-        v["queuedDateTime"] = x.queuedDateTime
-        v["attemptedDateTimes"] = x.attemptDateTimes.join()
-        v["executedDateTime"] = x.executedDateTime
-    pass
-
+    def get(self):
+        query = Command.all()
+        query.order("-queuedDateTime")
+        result = query.run()
+        vv = []
+        for x in result:
+            v = {}
+            v["commandId"] = x.commandId
+            v["equipmentId"] = x.equipmentId
+            v["userId"] = x.userId
+            v["command"] = x.command
+            v["result"] = x.result
+            v["queuedDateTime"] = x.queuedDateTime
+            v["attemptedDateTimes"] = x.attemptDateTimes.join()
+            v["executedDateTime"] = x.executedDateTime
+            vv.append(v)
+        self.writeWithTemplate({"commands": vv}, "Command")
+        
+    def post(self):
+        pass
+        
 if __name__ == "__main__":
     application = WSGIApplication([('/Command', _RequestHandler)], debug=True)
     run_wsgi_app(application)

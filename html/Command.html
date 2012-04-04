@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>コマンド</title>
+	</head>
+	<body>
+		{% include "header.html" %}
+		<p>
+			登録済みのコマンドを実行済みのものも含めて新しいものから順に表示します。
+			実行されていないコマンドを変更したり新規のコマンドを登録することもできます。
+		</p>
+		<table border="1px">
+			<tr>
+				<th>commandId</th><th>equipmentId</th><th>userId</th><th>command</th><th>result</th>
+				<th>queuedDateTime</th><th>attemptedDateTimes</th><th>executedDateTime</th>
+			</tr>
+			{% for command in commands %}
+			<tr>
+				<td>{{ command.commandId|escape }}</td>
+				<td>{{ command.equipmentId|escape }}</td>
+				<td>{{ command.userId|escape }}</td>
+				<td>{{ command.command|escape }}</td>
+				<td>{{ command.result|escape }}</td>
+				<td>{{ command.queuedDateTime|escape }}</td>
+				<td>{% for attempted_date_time in command.attemptedDateTimes %}}
+					{{ attempted_date_time|escape }}{% endfor %}</td>
+				<td>{{ command.executedDateTime }}</td>
+			</tr>
+			{% endfor %}
+		</table>
+		{% include "footer.html" %}
+	</body>
+</html>
