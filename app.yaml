@@ -31,8 +31,8 @@ handlers:
 - url: /Equipment
   script: Equipment.py
   
-- url: /login
-  script: login.py
+- url: /GoogleDocs
+  script: GoogleDocs.py
 
 - url: /google686f6b490a533df7.html
   script: google686f6b490a533df7.py 

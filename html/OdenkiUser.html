@@ -31,9 +31,10 @@
 				<td><a href="{{ google_logout_url }}">logout</a></td>
 			</tr>
 			<tr>
-				<td>Google Docsにアクセスするためのリクエストトークン</td>
-				<td>{{ docsRequestToken }}</td>
-				<td><a href="">削除</a></td>
+				<td>Google Docsにアクセスするためのトークン</td>
+				<td>{{ docsAccessToken|default:"<a href='/GoogleDocs'>取得</a>していません。" }}</td>
+				<td><a href="/GoogleDocs?revoke=1">破棄</a>する。（不安な方は<a href="https://accounts.google.com/b/0/IssuedAuthSubTokens">Googleアカウントの許諾管理ページ</a>から
+					削除することもできます。<a href=""></a>）</td>
 			</tr>
 		</table>
 		{% include "footer.html" %}

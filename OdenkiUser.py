@@ -1,5 +1,4 @@
 from google.appengine.ext.db import Model, Query
-from google.appengine.api.users import User as GoogleUser
 from google.appengine.ext.db import StringProperty, URLProperty, IntegerProperty
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import WSGIApplication, RequestHandler
@@ -7,7 +6,7 @@ from google.appengine.api import oauth
 from google.appengine.api import users
 from google.appengine.ext.webapp import  template
 from Counter import Counter
-
+from GoogleDocs import loadAccessToken
 
 import logging
 import google
@@ -95,7 +94,11 @@ class _RequestHandler(RequestHandler):
         v["googleEmail"]  = odenki_user.googleEmail
         v["googleId"] = odenki_user.googleId
         v["googleNickname"] = odenki_user.googleNickname
-        v["docsRequestToken"] = odenki_user.docsRequestToken
+        try:
+            v["docsAccessToken"] = loadAccessToken().token
+        except:
+            pass
+        
         self.response.out.write(template.render("html/OdenkiUser.html", v))
 
 if __name__ == "__main__":
