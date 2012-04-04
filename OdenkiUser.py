@@ -21,6 +21,7 @@ class OdenkiUser(Model):
     docsRequestToken = StringProperty()
     docsCollectionId = StringProperty()
     docsSpreadsheetId = StringProperty()
+    docsCommandWorksheetId = StringProperty()
     twitterId = StringProperty()
     twitterScreen_name = StringProperty()
     twitterPlaceName = StringProperty()

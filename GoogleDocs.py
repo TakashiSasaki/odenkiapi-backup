@@ -4,13 +4,15 @@ from google.appengine.ext.webapp import WSGIApplication, RequestHandler
 from google.appengine.api import users
 from gdata.gauth import OAuthHmacToken
 from gdata.docs.client import DocsClient
+from gdata.spreadsheets.client import SpreadsheetsClient
 from gdata.docs.data import ResourceFeed, Resource
 from credentials import GOOGLE_OAUTH_CONSUMER_KEY, GOOGLE_OAUTH_CONSUMER_SECRET
 from gdata.gauth import AeSave, AeLoad, AuthorizeRequestToken, AeDelete
 from gdata.client import Unauthorized
 
 GOOGLE_OAUTH_SCOPES = ['https://docs.google.com/feeds/',
-                       'https://www.google.com/calendar/feeds/']
+                       'https://www.google.com/calendar/feeds/',
+                       'https://spreadsheets.google.com/feeds/']
 
 def saveRequestToken(request_token):
     #odenki_user = getCurrentUser()
@@ -45,15 +47,23 @@ def deleteAccessToken():
     google_user = users.get_current_user()
     return AeDelete(str(google_user.user_id()) + "AccessToken")
 
-def getClient():
+def getDocsClient():
     client = DocsClient(source='odenkiapi')
     access_token = loadAccessToken()
     if access_token is not None: 
         client.auth_token = access_token
     return client
-    
+
+def getSpreadsheetsClient():
+    client = SpreadsheetsClient(source='odenkiapi')
+    access_token = loadAccessToken()
+    if access_token is not None: 
+        assert isinstance(access_token, OAuthHmacToken)
+        client.auth_token = access_token
+    return client
+
 def getResources():
-    client = getClient()
+    client = getDocsClient()
     assert isinstance(client, DocsClient)
     resource_feed =  client.get_resources(show_root = True)
     return resource_feed
@@ -72,7 +82,7 @@ class _RequestHandler(RequestHandler):
             return
         
         if loadRequestToken() is None:
-            gdata_client = getClient() 
+            gdata_client = getDocsClient() 
             request_token = gdata_client.GetOAuthToken(
                 GOOGLE_OAUTH_SCOPES,
                 'http://%s/GoogleDocs' % self.request.host,
@@ -90,7 +100,7 @@ class _RequestHandler(RequestHandler):
             assert isinstance(request_token, OAuthHmacToken)
             authorized_request_token = AuthorizeRequestToken(request_token, self.request.url)
             assert isinstance(authorized_request_token, OAuthHmacToken)
-            gdata_client = getClient()
+            gdata_client = getDocsClient()
             try:
                 access_token = gdata_client.GetAccessToken(authorized_request_token)
                 assert isinstance(access_token, OAuthHmacToken)
