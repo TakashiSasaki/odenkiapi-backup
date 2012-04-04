@@ -6,22 +6,21 @@ Created on 2012/03/14
 
 import logging
 import cgi
-from google.appengine.ext import webapp
+from google.appengine.ext.webapp import WSGIApplication
 from google.appengine.ext.webapp.util import  run_wsgi_app
 #from google.appengine.api import users
-from google.appengine.ext.webapp import  template
 from django.utils import  simplejson as json
 from Sender import Sender
-from Counter import Counter
 from Metadata import Metadata
 from google.appengine.ext import db
 from google.appengine.ext.db import Key
 from Data import Data
+from MyRequestHandler import MyRequestHandler
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
-class LastRequestHandler(webapp.RequestHandler):
+class LastRequestHandler(MyRequestHandler):
     
     def get(self):
         gql_query = Metadata.gql("ORDER BY receivedDateTime DESC");
@@ -46,14 +45,11 @@ class LastRequestHandler(webapp.RequestHandler):
 
         all_data_string = "received at " + str(metadata.receivedDateTime) + "<br/>" + all_data_string
         template_values = {"longitude": all_data["longitude"], "latitude": all_data["latitude"], "all_data":all_data, "all_data_string": all_data_string}
-        logging.debug(str(template_values))        
-        self.response.out.write(template.render("html/Last.html", template_values))
-
-application = webapp.WSGIApplication([('/Last', LastRequestHandler)], debug=True)
-
-def main():
-    logging.getLogger().setLevel(logging.DEBUG)
-    run_wsgi_app(application)
+        logging.debug(str(template_values))
+                
+        self.writeWithTemplate(template_values, "Last")
 
 if __name__ == "__main__":
-    main()
+    logging.getLogger().setLevel(logging.DEBUG)
+    application = WSGIApplication([('/Last', LastRequestHandler)], debug=True)
+    run_wsgi_app(application)

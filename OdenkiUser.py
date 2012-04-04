@@ -1,12 +1,12 @@
 from google.appengine.ext.db import Model, Query
 from google.appengine.ext.db import StringProperty, URLProperty, IntegerProperty
 from google.appengine.ext.webapp.util import run_wsgi_app
-from google.appengine.ext.webapp import WSGIApplication, RequestHandler
+from google.appengine.ext.webapp import WSGIApplication
 from google.appengine.api import oauth
 from google.appengine.api import users
-from google.appengine.ext.webapp import  template
 from Counter import Counter
 from GoogleDocs import loadAccessToken
+from MyRequestHandler import MyRequestHandler
 
 import logging
 import google
@@ -55,7 +55,7 @@ def getCurrentUser():
         return None
     return getByGoogleId(google_user.user_id())
 
-class _RequestHandler(RequestHandler):
+class _RequestHandler(MyRequestHandler):
     def get(self):
         v = {}
         v["google_logout_url"] = users.create_logout_url("/OdenkiUser")
@@ -74,7 +74,7 @@ class _RequestHandler(RequestHandler):
         odenki_user = getByGoogleId(google_user.user_id())
         if odenki_user is None:
             odenki_user = OdenkiUser()
-            odenki_user.odenkiNickname =~ google_user.nickname()
+            odenki_user.odenkiNickname = google_user.nickname()
             odenki_user.odenkiId = Counter.GetNextId("odenkiId")
             odenki_user.googleEmail = google_user.email()
             odenki_user.googleId = google_user.user_id()
@@ -98,8 +98,7 @@ class _RequestHandler(RequestHandler):
             v["docsAccessToken"] = loadAccessToken().token
         except:
             pass
-        
-        self.response.out.write(template.render("html/OdenkiUser.html", v))
+        self.writeWithTemplate(v, "OdenkiUser")
 
 if __name__ == "__main__":
     logging.getLogger().setLevel(logging.DEBUG)

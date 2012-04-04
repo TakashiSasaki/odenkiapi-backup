@@ -8,8 +8,9 @@ from django.utils import  simplejson as json
 #import json
 from Data import Data
 from google.appengine.ext import db
+from MyRequestHandler import MyRequestHandler
 
-class DataRequestHandler(webapp.RequestHandler):
+class DataRequestHandler(MyRequestHandler):
     
     def get(self):
         template_values = {}
@@ -25,15 +26,9 @@ class DataRequestHandler(webapp.RequestHandler):
             logging.info(data_dict)
             template_values["all_data"].append(data_dict)
         
-        self.response.out.write(template.render("html/Data.html", template_values))
-
-
-application = webapp.WSGIApplication([('/Data', DataRequestHandler)], debug=True)
-
-
-def main():
-    logging.getLogger().setLevel(logging.DEBUG)
-    run_wsgi_app(application)
+        self.writeWithTemplate(template_values, "Data")
 
 if __name__ == "__main__":
-    main()
+    logging.getLogger().setLevel(logging.DEBUG)
+    application = webapp.WSGIApplication([('/Data', DataRequestHandler)], debug=True)
+    run_wsgi_app(application)

@@ -7,25 +7,18 @@ import logging
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api import users
-from google.appengine.ext.webapp import template
-import os
+from MyRequestHandler import MyRequestHandler
 
-class MainPage(webapp.RequestHandler):
-    
-    
+class MainPage(MyRequestHandler):
+
     def get(self):
         self.response.headers['Content-Type'] = 'text/html'
         #self.response.out.write('Hello, webapp World!')
         current_user = users.GetCurrentUser()
-        template_values = {"version": os.environ['CURRENT_VERSION_ID']}
-        self.response.out.write(template.render("html/index.html", template_values))        
-
-
-application = webapp.WSGIApplication([('/', MainPage)], debug=True)
-
-def main():
-    logging.getLogger().setLevel(logging.DEBUG)
-    run_wsgi_app(application)
+        template_values = {}
+        self.writeWithTemplate(template_values, "index")
 
 if __name__ == "__main__":
-    main()
+    logging.getLogger().setLevel(logging.DEBUG)
+    application = webapp.WSGIApplication([('/', MainPage)], debug=True)
+    run_wsgi_app(application)

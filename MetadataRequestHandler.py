@@ -3,13 +3,13 @@ import cgi
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import  run_wsgi_app
 #from google.appengine.api import users
-from google.appengine.ext.webapp import  template
 from django.utils import  simplejson as json
 #import json
 from Metadata import Metadata, getDataIds
 from google.appengine.ext import db
+from MyRequestHandler import MyRequestHandler
 
-class MetadataRequestHandler(webapp.RequestHandler):
+class MetadataRequestHandler(MyRequestHandler):
     
     def get(self):
         template_values = {}
@@ -29,15 +29,9 @@ class MetadataRequestHandler(webapp.RequestHandler):
             logging.info(metadata_dict)
             template_values["all_metadata"].append(metadata_dict)
         
-        self.response.out.write(template.render("html/Metadata.html", template_values))
-
-
-application = webapp.WSGIApplication([('/Metadata', MetadataRequestHandler)], debug=True)
-
-
-def main():
-    logging.getLogger().setLevel(logging.DEBUG)
-    run_wsgi_app(application)
+        self.writeWithTemplate(template_values, "Metadata")
 
 if __name__ == "__main__":
-    main()
+    logging.getLogger().setLevel(logging.DEBUG)
+    application = webapp.WSGIApplication([('/Metadata', MetadataRequestHandler)], debug=True)
+    run_wsgi_app(application)

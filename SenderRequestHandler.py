@@ -7,8 +7,9 @@ from google.appengine.ext.webapp import  template
 from django.utils import  simplejson as json
 #import json
 from Sender import Sender
+from MyRequestHandler import MyRequestHandler
 
-class SenderRequestHandler(webapp.RequestHandler):
+class SenderRequestHandler(MyRequestHandler):
     
     def get(self):
         gql = Sender.gql("ORDER BY senderId DESC")
@@ -23,15 +24,9 @@ class SenderRequestHandler(webapp.RequestHandler):
                                             "ipAddress": sender.ipAddress,
                                             "port":sender.port})
             logging.info(template_values)
-        self.response.out.write(template.render("html/Sender.html", template_values))
-
-
-application = webapp.WSGIApplication([('/Sender', SenderRequestHandler)], debug=True)
-
-
-def main():
-    logging.getLogger().setLevel(logging.DEBUG)
-    run_wsgi_app(application)
+        self.writeWithTemplate(template_values, "Sender")
 
 if __name__ == "__main__":
-    main()
+    logging.getLogger().setLevel(logging.DEBUG)
+    application = webapp.WSGIApplication([('/Sender', SenderRequestHandler)], debug=True)
+    run_wsgi_app(application)

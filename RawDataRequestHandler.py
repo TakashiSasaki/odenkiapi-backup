@@ -7,8 +7,9 @@ from google.appengine.ext.webapp import  template
 from django.utils import  simplejson as json
 #import json
 from RawData import RawData
+from MyRequestHandler import MyRequestHandler
 
-class RawDataRequestHandler(webapp.RequestHandler):
+class RawDataRequestHandler(MyRequestHandler):
     
     def get(self):
         template_values = {}
@@ -26,15 +27,9 @@ class RawDataRequestHandler(webapp.RequestHandler):
             logging.info(raw_data_dict)
             template_values["all_raw_data"].append(raw_data_dict)
         
-        self.response.out.write(template.render("html/RawData.html", template_values))
-
-
-application = webapp.WSGIApplication([('/RawData', RawDataRequestHandler)], debug=True)
-
-
-def main():
-    logging.getLogger().setLevel(logging.DEBUG)
-    run_wsgi_app(application)
+        self.writeWithTemplate(template_values, "RawData")
 
 if __name__ == "__main__":
-    main()
+    logging.getLogger().setLevel(logging.DEBUG)
+    application = webapp.WSGIApplication([('/RawData', RawDataRequestHandler)], debug=True)
+    run_wsgi_app(application)

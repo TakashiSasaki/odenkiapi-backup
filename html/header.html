@@ -1,6 +1,6 @@
 <table>
 	<p>
-		「みんなでおでんき」ウェブAPI（version {{ version }})へようこそ 
+		「みんなでおでんき」ウェブAPI（version {{ version }} {{ version_datetime }}版)へようこそ 
 		{% if user_email %}{{ user_email }}さん{% endif %}
 	</p>
 	<tr>
@@ -11,6 +11,7 @@
 		<td><a href="/RawData">RawData</a></td>
 		<td><a href="/Data">Data</a></td>
 		<td><a href="/Last">Last</a></td>
+		<td><a href="/OdenkiUser">ユーザー情報</a>
 	</tr>
 </table>
 <hr/>
