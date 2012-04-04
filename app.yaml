@@ -1,5 +1,5 @@
 application: odenkiapi
-version: python-0004
+version: python-0005
 runtime: python
 api_version: 1
 
@@ -39,6 +39,9 @@ handlers:
 
 - url: /OdenkiUser
   script: OdenkiUser.py
+
+- url: /Spreadsheet
+  script: Spreadsheet.py
 
 - url: /
   script: index.py
