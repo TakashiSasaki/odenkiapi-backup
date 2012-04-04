@@ -49,9 +49,11 @@ def getByOdenkiId(odenki_id):
     query.filter("odenkiId = ", odenki_id)
     result = query.run()
     try:
-        return result.next()
+        odenki_user = result.next()
+        assert isinstance(odenki_user, OdenkiUser)
+        return odenki_user
     except:
-        return None
+        raise OdenkiUserNotFound()
 
 def getCurrentUser():
     # Currently user authentication relies on Google Account.
