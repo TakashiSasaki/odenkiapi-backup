@@ -3,36 +3,115 @@
 	<head>
 		<meta charset="utf-8"/>
 		<title>コマンド</title>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+		<script type="text/javascript" src="/js/jquery.json-2.3.min.js"></script>
+		<script type='text/javascript' src='https://www.google.com/jsapi'></script>
 	</head>
-	<body>
+	<body onLoad="OnChangedEventHandler()">
 		{% include "header.html" %}
+		<script>
+			function OnChangedEventHandler() {
+				var form = $("form");
+				var param = {};
+				$(form.serializeArray()).each(function(i, v) {
+					param[v.name] = v.value;
+				});
+				var json = $.toJSON(param);
+				$("#json").get()[0].value = json;
+			}
+
+			function Post() {
+				var xhr = false;
+				if(window.XMLHttpRequest) {
+					xhr = new XMLHttpRequest();
+				} else if(window.ActiveXObject) {
+					try {
+						xhr = new ActiveXObject("Msxml2.XMLHTTP");
+					} catch(e) {
+						xhr = new ActiveXObject("Microsoft.XMLHTTP");
+					}
+				}
+				//if
+				//xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+				xhr.onreadystatechange = function() {
+					if(this.readyState == 4) {
+						$("#response").get()[0].value = this.responseText;
+					} else {
+						//$("#response").get()[0].value = this.readyState;
+					}//if
+				}//function
+				//alert($("#query_string").get()[0].value);
+				xhr.open("POST", "/Command");
+				xhr.send($("#json").val());
+			}//Post
+		</script>
 		<p>
 			登録済みのコマンドを実行済みのものも含めて新しいものから順に表示します。
 			実行されていないコマンドを変更したり新規のコマンドを登録することもできます。
 		</p>
 		<table border="1px">
 			<tr>
-				<th>commandId</th><th>equipmentId</th><th>userId</th><th>command</th><th>result</th>
+				<th>commandId</th><th>gatewayId</th><th>equipmentId</th><th>userId</th><th>command</th><th>result</th>
 				<th>queuedDateTime</th><th>attemptedDateTimes</th><th>executedDateTime</th>
 			</tr>
 			{% for command in commands %}
 			<tr>
 				<td>{{ command.commandId|escape }}</td>
+				<td>{{ command.gatewayId|escape }}</td>
 				<td>{{ command.equipmentId|escape }}</td>
 				<td>{{ command.userId|escape }}</td>
 				<td>{{ command.command|escape }}</td>
 				<td>{{ command.result|escape }}</td>
 				<td>{{ command.queuedDateTime|escape }}</td>
 				<td>{% for attempted_date_time in command.attemptedDateTimes %}}
-					{{ attempted_date_time|escape }}{% endfor %}</td>
+				{{ attempted_date_time|escape }}{% endfor %}</td>
 				<td>{{ command.executedDateTime }}</td>
 			</tr>
 			{% endfor %}
 		</table>
-		<p>新しいコマンドを一つ登録する</p>
-		<form>
+		<p>
+			新しいコマンドを一つ登録する
+		</p>
+		<form method="post" action="/Command" id="form">
+			<table border="1px">
+				<tr>
+					<td>
+					<input name="gatewayId" id="gatewayId"
+					placeholder="ホームゲートウェイID"
+					onKeyUp="OnChangedEventHandler()"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+					<input name="equipmentId" id="equipmentId"
+					placeholder="機器ID"
+					onKeyUp="OnChangedEventHandler()"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+					<input name="userId" id="userId"
+					placeholder="ユーザーIDは自動的に入力されます。" disabled
+					{% if odenkiId %}value="{{ odenkiId }}"{% endif %}
+					onKeyUp="OnChangedEventHandler()"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+					<input name="command" id="command"
+					placeholder="コマンドとして任意の文字列を指定できます。"
+					onKeyUp="OnChangedEventHandler()"/>
+					</td>
+				</tr>
+			</table>
+			<div>
+				<textarea id="json" cols="80" rows="5" disabled></textarea>
+			</div>
+			<input type="button" value="コマンドを1つ予約する" onclick="Post()"/>
 		</form>
-		<p>Googleスプレッドシートを利用して実行されていないコマンドを変更したり複数のコマンドを登録したりする。</p>
+		<p>
+			Googleスプレッドシートを利用して実行されていないコマンドを変更したり複数のコマンドを登録したりする。
+		</p>
 		{% include "footer.html" %}
 	</body>
 </html>

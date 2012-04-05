@@ -1,11 +1,9 @@
 from  google.appengine.ext import db
-from  google.appengine.ext.webapp import Request
 from urlparse import urlparse
-import logging
+from logging import debug, getLogger, DEBUG
 from Sender import  Sender
 from RawData import RawData
 from Data import Data
-import datetime
 from Counter import Counter
 from google.appengine.api import memcache
 from datetime import datetime
@@ -15,9 +13,11 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from OdenkiUser import getCurrentUser, OdenkiUser
 from simplejson import loads
 from Counter import Counter
+from webob import MIMEAccept
 
 class Command(db.Model):
     commandId = db.IntegerProperty()
+    gatewayId = db.StringProperty()
     equipmentId = db.StringProperty()
     userId = db.StringProperty()
     command = db.StringProperty()
@@ -45,41 +45,54 @@ def registerNewCommand(dict):
 def renewCommand(dict):
     command = getCommandById(dict["commandId"])
     assert isinstance(command, Command)
+    command.gatewayId = dict["gatewayId"]
     command.equipmentId = dict["equipmentId"]
     command.userId = dict["userId"]
     command.command = dict["command"]
-    command.queuedDateTime = datetime.datetime.now()
+    command.queuedDateTime = datetime.datetime.today()
     command.put()
 
 def registerCommand(dict):
     command = Command()
     assert isinstance(command, Command)
     command.commandId = Counter.GetNextId("commandId")
+    command.gatewayId = dict["gatewayId"]
     command.equipmentId = dict["equipmentId"]
-    command.userId = dict["userId"]
+    command.userId = str(dict["userId"])
     command.command = dict["command"]
-    command.queuedDateTime = datetime.datetime.now()
+    command.queuedDateTime = datetime.today()
     command.put()
-
+    
 class _RequestHandler(MyRequestHandler):
     def get(self):
+        debug(self.request.accept)
+        assert isinstance(self.request.accept, MIMEAccept)
+        odenki_user = getCurrentUser()
+        assert isinstance(odenki_user, OdenkiUser)
         query = Command.all()
         query.order("-queuedDateTime")
         result = query.run()
-        vv = []
+        self.resource = {}
+        self.resource["commands"] = []
         for x in result:
             v = {}
             v["commandId"] = x.commandId
+            v["gatewayId"] = x.gatewayId
             v["equipmentId"] = x.equipmentId
             v["userId"] = x.userId
             v["command"] = x.command
             v["result"] = x.result
-            v["queuedDateTime"] = x.queuedDateTime
-            v["attemptedDateTimes"] = x.attemptDateTimes.join()
-            v["executedDateTime"] = x.executedDateTime
-            vv.append(v)
-        self.writeWithTemplate({"commands": vv}, "Command")
-        
+            v["queuedDateTime"] = str(x.queuedDateTime)
+            v["attemptedDateTimes"] = str(x.attemptDateTimes[-1]) if x.attemptDateTimes is not None and len(x.attemptDateTimes) > 0 else None
+            v["executedDateTime"] = str(x.executedDateTime)
+            self.resource["commands"].append(v)
+        self.resource["odenkiId"] = odenki_user.odenkiId
+
+        if self.request.accept.accept_html():
+            self.writeWithTemplate(self.resource, "Command")
+        else:
+            self.writeJson(self.resource)
+            
     def post(self):
         odenki_user = getCurrentUser()
         assert isinstance(odenki_user, OdenkiUser)
@@ -87,9 +100,10 @@ class _RequestHandler(MyRequestHandler):
         parsed_json["userId"] = odenki_user.odenkiId
         try:
             renewCommand(parsed_json)
-        except CommandNotFound:
+        except (CommandNotFound, KeyError):
             registerCommand(parsed_json)
         
 if __name__ == "__main__":
+    getLogger().setLevel(DEBUG)
     application = WSGIApplication([('/Command', _RequestHandler)], debug=True)
     run_wsgi_app(application)

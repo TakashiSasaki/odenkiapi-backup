@@ -2,6 +2,7 @@ from google.appengine.ext.webapp import RequestHandler
 from google.appengine.ext.webapp import  template
 from datetime import datetime
 from logging import debug
+from json import dumps
 
 class MyRequestHandler(RequestHandler):
     def writeWithTemplate(self, values, html_file_name):
@@ -11,3 +12,6 @@ class MyRequestHandler(RequestHandler):
         values["version_datetime"] = datetime.fromtimestamp(timestamp).strftime("%Y/%m/%d %X UTC")
         self.response.out.write(template.render("html/" + html_file_name + ".html", values))
         
+    def writeJson(self, dictionary):
+        self.response.content_type = "application/json"
+        self.response.out.write(dumps(dictionary))
