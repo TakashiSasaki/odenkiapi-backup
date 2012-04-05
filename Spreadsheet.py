@@ -126,6 +126,12 @@ def getWorksheetGid(worksheet_id):
 
 class _RequestHandler(MyRequestHandler):
     def get(self):
+        try:
+            getCurrentUser()
+        except:
+            self.response.set_status(401)
+            self.redirect("/OdenkiUser")
+            return
         folder = getOdenkiFolder()
         assert isinstance(folder, Resource)
         spreadsheet = getOdenkiSpreadsheet()
