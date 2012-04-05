@@ -2,7 +2,7 @@ from google.appengine.ext.webapp import RequestHandler
 from google.appengine.ext.webapp import  template
 from datetime import datetime
 from logging import debug
-from json import dumps
+from simplejson import dumps
 
 class MyRequestHandler(RequestHandler):
     def writeWithTemplate(self, values, html_file_name):
