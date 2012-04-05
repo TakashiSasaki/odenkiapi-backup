@@ -11,9 +11,11 @@
 		<td><a href="/RawData">RawData</a></td>
 		<td><a href="/Data">Data</a></td>
 		<td><a href="/Last">Last</a></td>
-		<td><a href="/Spreadsheet">機器へのコマンド</a>
+		<td><a href="/Command">機器へのコマンド</a>
 		<td><a href="/Spreadsheet">スプレッドシート</a>
 		<td><a href="/OdenkiUser">ユーザー情報</a>
+		{% if googleLoginUrl %}<a href="{{ googleLoginUrl }}">ログイン</a>{% endif %}
+		{% if googleLogoutUrl %}<a href="{{ googleLogoutUrl }}">ログアウト</a>{% endif %}
 	</tr>
 </table>
 <hr/>

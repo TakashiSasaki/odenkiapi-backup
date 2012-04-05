@@ -10,9 +10,11 @@ from credentials import GOOGLE_OAUTH_CONSUMER_KEY, GOOGLE_OAUTH_CONSUMER_SECRET
 from gdata.gauth import AeSave, AeLoad, AuthorizeRequestToken, AeDelete
 from gdata.client import Unauthorized
 
-GOOGLE_OAUTH_SCOPES = ['https://docs.google.com/feeds/',
-                       'https://www.google.com/calendar/feeds/',
-                       'https://spreadsheets.google.com/feeds/']
+SCOPE_CALENDER = 'https://www.google.com/calendar/feeds/'
+SCOPE_DOCS_LIST = 'https://docs.google.com/feeds/'
+SCOPE_SPREADSHEET = 'https://spreadsheets.google.com/feeds/'
+
+GOOGLE_OAUTH_SCOPES = [SCOPE_DOCS_LIST, SCOPE_SPREADSHEET]
 
 def saveRequestToken(request_token):
     #odenki_user = getCurrentUser()
@@ -65,7 +67,7 @@ def getSpreadsheetsClient():
 def getResources():
     client = getDocsClient()
     assert isinstance(client, DocsClient)
-    resource_feed =  client.get_resources(show_root = True)
+    resource_feed = client.get_resources(show_root=True)
     return resource_feed
 
 class _RequestHandler(RequestHandler):

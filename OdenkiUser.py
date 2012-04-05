@@ -76,7 +76,12 @@ class _RequestHandler(MyRequestHandler):
 
         google_user = users.get_current_user()
         if google_user is None:
-            self.redirect(users.create_login_url())
+            v["odenkiId"] = "You are not logged in."
+            v["odenkiNickname"] = "You are not logged in."
+            v["googleEmail"] = "You are not logged in."
+            v["googleId"]= "You are not logged in."
+            v["googleNickname"]= "You are not logged in."
+            self.writeWithTemplate(v, "OdenkiUser")
             return
         
         odenki_user = getByGoogleId(google_user.user_id())
@@ -102,7 +107,7 @@ class _RequestHandler(MyRequestHandler):
         v["googleEmail"]  = odenki_user.googleEmail
         v["googleId"] = odenki_user.googleId
         v["googleNickname"] = odenki_user.googleNickname
-        try:
+        try: 
             v["docsAccessToken"] = loadAccessToken().token
         except:
             pass
