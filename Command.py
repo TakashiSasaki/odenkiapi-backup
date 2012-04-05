@@ -89,6 +89,7 @@ class _RequestHandler(MyRequestHandler):
         self.resource["odenkiId"] = odenki_user.odenkiId
 
         if self.request.accept.accept_html():
+            self.resource["commands"] = self.resource["commands"][:10];
             self.writeWithTemplate(self.resource, "Command")
         else:
             self.writeJson(self.resource)
@@ -102,6 +103,10 @@ class _RequestHandler(MyRequestHandler):
             renewCommand(parsed_json)
         except (CommandNotFound, KeyError):
             registerCommand(parsed_json)
+        self.get()
+        
+    def delete(self):
+        pass
         
 if __name__ == "__main__":
     getLogger().setLevel(DEBUG)
