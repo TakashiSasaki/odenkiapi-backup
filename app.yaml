@@ -42,6 +42,15 @@ handlers:
 
 - url: /OdenkiUser
   script: OdenkiUser.py
+  
+- url: /Twitter
+  script: Twitter.py
+  
+- url: /Facebook
+  script: Facebook.py
+  
+- url: /Foursquare
+  script: Foursquare.py
 
 - url: /Spreadsheet
   script: Spreadsheet.py
