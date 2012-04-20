@@ -5,7 +5,7 @@ from google.appengine.ext.webapp import WSGIApplication
 from google.appengine.api import oauth
 from google.appengine.api import users
 from Counter import Counter
-from GoogleDocs import loadAccessToken
+from GoogleDocs import GoogleDocs
 from MyRequestHandler import MyRequestHandler
 
 import logging
@@ -108,7 +108,8 @@ class _RequestHandler(MyRequestHandler):
         v["googleId"] = odenki_user.googleId
         v["googleNickname"] = odenki_user.googleNickname
         try: 
-            v["docsAccessToken"] = loadAccessToken().token
+            google_docs = GoogleDocs()
+            v["docsAccessToken"] = google_docs.loadAccessToken().token
         except:
             pass
         self.writeWithTemplate(v, "OdenkiUser")
