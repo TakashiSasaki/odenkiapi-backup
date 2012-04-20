@@ -1,7 +1,7 @@
 import logging
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import WSGIApplication, RequestHandler
-from google.appengine.api import users
+#from google.appengine.api import users
 from gdata.gauth import OAuthHmacToken
 from gdata.docs.client import DocsClient
 from gdata.spreadsheets.client import SpreadsheetsClient
@@ -9,6 +9,7 @@ from gdata.docs.data import ResourceFeed, Resource
 from credentials import GOOGLE_OAUTH_CONSUMER_KEY, GOOGLE_OAUTH_CONSUMER_SECRET
 from gdata.gauth import AeSave, AeLoad, AuthorizeRequestToken, AeDelete
 from gdata.client import Unauthorized
+from OdenkiSession import OdenkiSession
 
 SCOPE_CALENDER = 'https://www.google.com/calendar/feeds/'
 SCOPE_DOCS_LIST = 'https://docs.google.com/feeds/'
@@ -17,26 +18,25 @@ SCOPE_SPREADSHEET = 'https://spreadsheets.google.com/feeds/'
 GOOGLE_OAUTH_SCOPES = [SCOPE_DOCS_LIST, SCOPE_SPREADSHEET]
 
 def saveRequestToken(request_token):
-    #odenki_user = getCurrentUser()
-    google_user = users.get_current_user()
-    AeSave(request_token, str(google_user.user_id()) + "RequestToken")
+    odenki_session = OdenkiSession()
+    AeSave(request_token, odenki_session.getSid() + "RequestToken")
 
 def loadRequestToken():
-    google_user = users.get_current_user()
-    return AeLoad(str(google_user.user_id()) + "RequestToken")
+    odenki_session = OdenkiSession()
+    return AeLoad(odenki_session.getSid() + "RequestToken")
 
 def deleteRequestToken():
-    google_user = users.get_current_user()
-    return AeDelete(str(google_user.user_id()) + "RequestToken")
+    odenki_session = OdenkiSession()
+    return AeDelete(odenki_session + "RequestToken")
 
 def saveAccessToken(access_token):
-    google_user = users.get_current_user()
     logging.debug("Saving access token " + access_token.token)
-    AeSave(access_token, str(google_user.user_id()) + "AccessToken")
+    odenki_session = OdenkiSession()
+    AeSave(access_token, odenki_session.getSid() + "AccessToken")
 
 def loadAccessToken():
-    google_user = users.get_current_user()
-    keystring = str(google_user.user_id()) + "AccessToken"
+    odenki_session = OdenkiSession()
+    keystring = odenki_session.getSid() + "AccessToken"
     logging.debug("Loading access token by keystring " + keystring)
     access_token = AeLoad(keystring)
     if access_token is None:
@@ -46,8 +46,8 @@ def loadAccessToken():
     return access_token
 
 def deleteAccessToken():
-    google_user = users.get_current_user()
-    return AeDelete(str(google_user.user_id()) + "AccessToken")
+    odenki_session = OdenkiSession()
+    return AeDelete(odenki_session.getSid() + "AccessToken")
 
 def getDocsClient():
     client = DocsClient(source='odenkiapi')
@@ -72,17 +72,13 @@ def getResources():
 
 class _RequestHandler(RequestHandler):
     def get(self):
-        google_user = users.get_current_user()
-        if google_user is None:
-            self.redirect(users.create_login_url("/OdenkiUser"))
-            return
-        
+
         if self.request.get("revoke"):
             deleteAccessToken()
             deleteRequestToken()
             self.redirect("/OdenkiUser")
             return
-        
+
         if loadRequestToken() is None:
             gdata_client = getDocsClient() 
             request_token = gdata_client.GetOAuthToken(
