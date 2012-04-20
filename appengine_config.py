@@ -2,5 +2,5 @@
 
 from gaesessions import SessionMiddleware
 def webapp_add_wsgi_middleware(app):
-    app = SessionMiddleware(app, cookie_key="a random and long string")
-    return app
+    newapp = SessionMiddleware(app, cookie_key="oipsadmcfoiuihiuohioh9088uk90u89ku8hiojop,jpoj,opajf932408hga")
+    return newapp

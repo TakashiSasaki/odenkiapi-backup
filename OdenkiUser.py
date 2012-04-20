@@ -8,8 +8,8 @@ from Counter import Counter
 from GoogleDocs import GoogleDocs
 from MyRequestHandler import MyRequestHandler
 
-import logging
-import google
+from logging import debug, DEBUG, getLogger
+getLogger().setLevel(DEBUG)
 
 class OdenkiUser(Model):
     odenkiId = IntegerProperty()
@@ -79,8 +79,8 @@ class _RequestHandler(MyRequestHandler):
             v["odenkiId"] = "You are not logged in."
             v["odenkiNickname"] = "You are not logged in."
             v["googleEmail"] = "You are not logged in."
-            v["googleId"]= "You are not logged in."
-            v["googleNickname"]= "You are not logged in."
+            v["googleId"] = "You are not logged in."
+            v["googleNickname"] = "You are not logged in."
             self.writeWithTemplate(v, "OdenkiUser")
             return
         
@@ -104,18 +104,20 @@ class _RequestHandler(MyRequestHandler):
 
         v["odenkiId"] = odenki_user.odenkiId
         v["odenkiNickname"] = odenki_user.odenkiNickname
-        v["googleEmail"]  = odenki_user.googleEmail
+        v["googleEmail"] = odenki_user.googleEmail
         v["googleId"] = odenki_user.googleId
         v["googleNickname"] = odenki_user.googleNickname
         try: 
             google_docs = GoogleDocs()
+            debug("docsAccessToken = " + google_docs.loadAccessToken().token)
             v["docsAccessToken"] = google_docs.loadAccessToken().token
         except:
+            debug("failed to acquire an instance of GoogleDocs")
             pass
         self.writeWithTemplate(v, "OdenkiUser")
 
 if __name__ == "__main__":
-    logging.getLogger().setLevel(logging.DEBUG)
     application = WSGIApplication([('/OdenkiUser', _RequestHandler)]
                                    , debug=True)
     run_wsgi_app(application)
+    

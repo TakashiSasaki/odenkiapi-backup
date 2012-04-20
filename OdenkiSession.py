@@ -1,14 +1,27 @@
-from gaesessions import get_current_session
+from gaesessions import get_current_session, Session, set_current_session
+from logging import getLogger, debug, DEBUG
+getLogger().setLevel(DEBUG)
 
 class OdenkiSession(object):
+    __slot__=["session"]
     def __init__(self):
-        session = get_current_session() 
-        if session.is_active():
-            assert isinstance(session.sid, str) 
+        try:
+            self.session = get_current_session()
+            debug("session was found ")
+        except:
+            debug("session not found")
+            self.session = Session()
+            self.session.start()
+        if self.session.is_active():
+            debug("session is active")
+            assert isinstance(self.session.sid, str)
         else:
-            session.regenerate_id()
+            debug("session is not active")
+            self.session.start()
+            assert isinstance(self.session.sid, str) 
+
 
     def getSid(self):
-        session = get_current_session()
-        assert isinstance(session.sid, str) 
-        return session.sid
+        debug(type(self.session.sid))
+        assert isinstance(self.session.sid, str) 
+        return self.session.sid
