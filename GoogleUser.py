@@ -1,82 +1,118 @@
-from google.appengine.ext.db import ReferenceProperty, Model, StringProperty
-from MyRequestHandler import MyRequestHandler
-from logging import getLogger, DEBUG
-from google.appengine.ext.webapp import WSGIApplication
-from google.appengine.ext.webapp.util import run_wsgi_app
-from gaesessions import get_current_session
-from OdenkiUser import OdenkiUser
-from google.appengine.api import users
-from google.appengine.api import oauth
+from google.appengine.ext.db import Model, IntegerProperty, StringProperty
+from gdata.gauth import OAuthHmacToken
+from credentials import GOOGLE_OAUTH_CONSUMER_KEY, GOOGLE_OAUTH_CONSUMER_SECRET
+from gdata.gauth import ACCESS_TOKEN
+from gdata.docs.client import DocsClient
+from gdata.spreadsheets.client import SpreadsheetsClient
+#from OdenkiSession import OdenkiSession
+#from google.appengine.api.users import User
+#from Counter import getNewOdenkiId
+from logging import debug, getLogger, DEBUG
+from OdenkiUser import getOdenkiUser, OdenkiUser, createOdenkiUser
+getLogger().setLevel(DEBUG)
+
+def getGoogleUser(google_id):
+    query = GoogleUser.all()
+    query.filter("googleId = ", google_id)
+    result = query.run()
+    try:
+        return result.next()
+    except:
+        return None
+
+def createGoogleUser(user_id, email, nickname):
+    google_user = GoogleUser(googleId = user_id, nickname=nickname, email=email)
+    #google_user.email = email
+    #google_user.nickname = nickname
+    #google_user.userId = user_id
+    google_user.put()
+    return google_user
 
 class GoogleUser(Model):
-    odenkiUser = ReferenceProperty()
-    googleEmail = StringProperty()
-    googleNickname = StringProperty()
-    googleId = StringProperty()
-
-class _RequestHandler(MyRequestHandler):
-    def get(self):
-        v = {}
-        v["google_logout_url"] = users.create_logout_url("/OdenkiUser")
-
-        try:
-            oauth_user = oauth.get_current_user()
-            v["oauth_email"] = oauth_user.email()
-        except oauth.OAuthRequestError, e:
-            v["oauth_email"] = "not authenticated"
-
-        current_user = users.get_current_user()
-        if current_user is None:
-            v["odenkiId"] = "You are not logged in."
-            v["odenkiNickname"] = "You are not logged in."
-            v["googleEmail"] = "You are not logged in."
-            v["googleId"]= "You are not logged in."
-            v["googleNickname"]= "You are not logged in."
-            self.writeWithTemplate(v, "OdenkiUser")
-            return
-        
-        session = get_current_session()
-        if session.is_active():
-            session_user = session.get("odenkiUser")
-            assert isinstance(session_user, OdenkiUser)
-        else:
-            session_user = None
-        
-        google_user = getByGoogleId(google_user.user_id())
-        assert isinstance(google_user, GoogleUser)
-        
-        if odenki_user is None:
-            odenki_user = OdenkiUser()
-            odenki_user.odenkiNickname = google_user.nickname()
-            odenki_user.odenkiId = Counter.GetNextId("odenkiId")
-            odenki_user.googleEmail = google_user.email()
-            odenki_user.googleId = google_user.user_id()
-            odenki_user.googleNickname = google_user.nickname()
-            odenki_user.put()
-
-        if odenki_user.odenkiId is None:
-            odenki_user.odenkiId = Counter.GetNextId("odenkiId")
-            odenki_user.put()
-
-        if odenki_user.odenkiNickname is None:
-            odenki_user.odenkiNickname = odenki_user.googleNickname
-            odenki_user.put()
-
-        v["odenkiId"] = odenki_user.odenkiId
-        v["odenkiNickname"] = odenki_user.odenkiNickname
-        v["googleEmail"]  = odenki_user.googleEmail
-        v["googleId"] = odenki_user.googleId
-        v["googleNickname"] = odenki_user.googleNickname
-        try: 
-            v["docsAccessToken"] = loadAccessToken().token
-        except:
-            pass
-        self.writeWithTemplate(v, "OdenkiUser")
-        
-        pass
+    odenkiId = IntegerProperty()
+    email = StringProperty(required = True)
+    nickname = StringProperty( required = True)
+    googleId = StringProperty( required = True)
+    accessToken = StringProperty()
+    accessTokenSecret = StringProperty()
+    collectionId = StringProperty()
     
-if __name__ == "__main__":
-    getLogger().setLevel(DEBUG)
-    application = WSGIApplication([('/GoogleUser', _RequestHandler)]
-                                   , debug=True)
-    run_wsgi_app(application)
+    def getGoogleId(self):
+        return self.googleId
+        
+    def getOdenkiUser(self):
+        if self.odenkiId is None:
+            return None
+        debug(type(self.odenkiId))
+        return getOdenkiUser(self.odenkiId)
+    
+    def createOdenkiUser(self):
+        assert self.odenkiId is None
+        odenki_user = createOdenkiUser()
+        self.odenkiId = odenki_user.getOdenkiId()
+        self.put()
+    
+    def setOdenkiUser(self, odenki_user):
+        assert isinstance(odenki_user, OdenkiUser)
+        assert self.getOdenkiUser() is None
+        self.odenkiId = odenki_user.getOdenkiId()
+        self.put()
+    
+    def setCanonicalOdenkiId(self, canonical_odenki_id):
+        assert isinstance(canonical_odenki_id, int)
+        odenki_user = self.getOdenkiUser()
+        assert isinstance(odenki_user, OdenkiUser)
+        odenki_user.setCanonicalOdenkiId(canonical_odenki_id)
+    
+    def getCanonicalOdenkiId(self):
+        return self.getOdenkiUser().getCanonicalOdenkiId()
+     
+    def setCollectionId(self, collection_id):
+        self.collectionId = collection_id
+        self.put()
+
+    def getAccessToken(self ):
+        if self.accessToken is None or self.accessTokenSecret is None:
+            return None
+        oauth_hmac_token = OAuthHmacToken(GOOGLE_OAUTH_CONSUMER_KEY, GOOGLE_OAUTH_CONSUMER_SECRET,
+                                          self.accessToken, self.accessTokenSecret, ACCESS_TOKEN)
+        assert isinstance(oauth_hmac_token, OAuthHmacToken)
+        return oauth_hmac_token
+
+    def setAccessToken(self, oauth_hmac_token):
+        assert isinstance(oauth_hmac_token, OAuthHmacToken)
+        assert isinstance(oauth_hmac_token.token, str)
+        assert oauth_hmac_token.auth_state == ACCESS_TOKEN
+        self.accessToken = oauth_hmac_token.token
+        assert isinstance(oauth_hmac_token.token_secret, str)
+        self.accessTokenSecret = oauth_hmac_token.token_secret
+        self.put()
+        
+        
+    def deleteAccessToken(self):
+        self.accessToken = None
+        self.accessTokenSecret = None
+        self.put()
+        
+    def getDocsClient(self):
+        access_token = self.getAccessToken()
+        if access_token is None: return None
+        assert isinstance(access_token, OAuthHmacToken)
+        docs_client = DocsClient()
+        docs_client.auth_token = access_token
+        return docs_client
+    
+    def getSpreadsheetsClient(self):
+        client = SpreadsheetsClient()
+        access_token = self.loadAccessToken()
+        if access_token is not None: 
+            assert isinstance(access_token, OAuthHmacToken)
+            OAuthHmacToken
+            client.auth_token = access_token
+        return client
+    
+    def getResources(self):
+        client = self.getDocsClient()
+        assert isinstance(client, DocsClient)
+        resource_feed = client.get_resources(show_root=True)
+        return resource_feed
