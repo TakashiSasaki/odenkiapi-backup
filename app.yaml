@@ -34,9 +34,6 @@ handlers:
 - url: /Equipment
   script: Equipment.py
   
-- url: /GoogleDocs
-  script: GoogleDocs.py
-
 - url: /google686f6b490a533df7.html
   script: google686f6b490a533df7.py 
 
@@ -57,6 +54,9 @@ handlers:
 
 - url: /Command
   script: Command.py
+  
+- url: /GoogleAuth*
+  script: GoogleAuth.py
   
 - url: /
   script: index.py

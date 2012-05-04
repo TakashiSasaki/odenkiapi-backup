@@ -1,49 +1,56 @@
 from google.appengine.ext.db import Model, Query
-from google.appengine.ext.db import StringProperty, URLProperty, IntegerProperty
+from google.appengine.ext.db import StringProperty, URLProperty, IntegerProperty, DateTimeProperty
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import WSGIApplication
 from google.appengine.api import oauth
 from google.appengine.api import users
-from Counter import Counter
-from GoogleDocs import GoogleDocs
+from datetime import datetime
+from Counter import getNewOdenkiId
+#from GoogleDocs import GoogleDocs
 from MyRequestHandler import MyRequestHandler
 
 from logging import debug, DEBUG, getLogger
 getLogger().setLevel(DEBUG)
 
 class OdenkiUser(Model):
-    odenkiId = IntegerProperty()
-    odenkiIdMergedTo = IntegerProperty()
-    odenkiNickname = StringProperty()
-    googleEmail = StringProperty()
-    googleNickname = StringProperty()
-    googleId = StringProperty()
-    docsRequestToken = StringProperty()
-    docsCollectionId = StringProperty()
-    docsSpreadsheetId = StringProperty()
-    docsCommandWorksheetId = StringProperty()
-    twitterId = StringProperty()
-    twitterScreen_name = StringProperty()
-    twitterPlaceName = StringProperty()
-    twitterPlaceType = StringProperty()
-    twitterProfileImage = URLProperty()
-    twitterOauthToken = StringProperty()
-    twitterOauthTokenSecret = StringProperty()
+    odenkiId = IntegerProperty(required=True)
+    createdDateTime = DateTimeProperty(required=True)
+    invalidatedDateTime = DateTimeProperty()
+    canonicalOdenkiId = IntegerProperty(required=True)
     
-class OdenkiUserNotFound(Exception):
-    pass
+    def getOdenkiId(self):
+        return self.odenkiId
 
-def getByGoogleId(google_id):
-    query = OdenkiUser.all()
-    assert isinstance(query, Query)
-    query.filter("googleId = ", google_id)
-    result = query.run()
-    try:
-        return result.next()
-    except:
-        return None
-
-def getByOdenkiId(odenki_id):
+    def setOdenkiId(self, odenki_id):
+        assert self.odenkiId is None
+        assert isinstance(odenki_id, int)
+        self.odenkiId = odenki_id
+        self.put()
+    
+    def getCanonicalOdenkiId(self):
+        return self.canonicalOdenkiId
+    
+    def setCanonicalOdenkiId(self, canonical_odenki_id):
+        assert isinstance(canonical_odenki_id, int)
+        assert self.odenkiId >= canonical_odenki_id
+        assert self.canonicalOdenkiId > canonical_odenki_id
+        self.canonicalOdenkiId = canonical_odenki_id
+        self.put()
+    
+    def isInvalid(self):
+        if self.invalidatedDateTime:
+            return True
+        else:
+            return False
+    
+    def invalidate(self):
+        assert self.invalidatedDateTime is None
+        self.invalidatedDateTime = datetime.now()
+        assert self.invalidatedDateTime >= self.createdDateTime
+        self.put()
+    
+def getOdenkiUser(odenki_id):
+    assert isinstance(odenki_id, long)
     query = OdenkiUser.all()
     assert isinstance(query, Query)
     query.filter("odenkiId = ", odenki_id)
@@ -53,15 +60,13 @@ def getByOdenkiId(odenki_id):
         assert isinstance(odenki_user, OdenkiUser)
         return odenki_user
     except:
-        raise OdenkiUserNotFound()
+        return None
 
-def getCurrentUser():
-    # Currently user authentication relies on Google Account.
-    # We will separate Odenki Account and Google Account later.
-    google_user = users.get_current_user()
-    if google_user is None: 
-        raise OdenkiUserNotFound()
-    return getByGoogleId(google_user.user_id())
+def createOdenkiUser():
+    odenki_id = getNewOdenkiId()
+    odenki_user = OdenkiUser(odenkiId=odenki_id, canonicalOdenkiId=odenki_id, createdDateTime=datetime.now())
+    odenki_user.put()
+    return odenki_user
 
 class _RequestHandler(MyRequestHandler):
     def get(self):
