@@ -58,5 +58,8 @@ handlers:
 - url: /GoogleAuth*
   script: GoogleAuth.py
   
+- url: /MyRequestHandler*
+  script: MyRequestHandler.py
+  
 - url: /
   script: index.py

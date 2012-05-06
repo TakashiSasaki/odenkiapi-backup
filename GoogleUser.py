@@ -1,4 +1,7 @@
+from google.appengine.ext.webapp import WSGIApplication
+from google.appengine.ext.webapp.util import  run_wsgi_app
 from google.appengine.ext.db import Model, IntegerProperty, StringProperty
+from google.appengine.api import users, oauth
 from gdata.gauth import OAuthHmacToken
 from credentials import GOOGLE_OAUTH_CONSUMER_KEY, GOOGLE_OAUTH_CONSUMER_SECRET
 from gdata.gauth import ACCESS_TOKEN
@@ -9,6 +12,8 @@ from gdata.spreadsheets.client import SpreadsheetsClient
 #from Counter import getNewOdenkiId
 from logging import debug, getLogger, DEBUG
 from OdenkiUser import getOdenkiUser, OdenkiUser, createOdenkiUser
+from google.appengine.ext.webapp._webapp25 import RequestHandler
+from MyRequestHandler import MyRequestHandler
 getLogger().setLevel(DEBUG)
 
 def getGoogleUser(google_id):
@@ -116,3 +121,22 @@ class GoogleUser(Model):
         assert isinstance(client, DocsClient)
         resource_feed = client.get_resources(show_root=True)
         return resource_feed
+
+class LastRequestHandler(MyRequestHandler):
+    def get(self):
+        user = users.get_current_user()
+        if user is None:
+            user = oauth.get_current_user()
+        if user is None:
+            self.writeJson()
+            self.redirect(create_login_url(self.request.path))
+            return
+            
+        if user is None:
+            self.redirect(create_login_url(self.request.path))
+            return
+        assert isinstance(user, User)
+
+if __name__ == "__main__":
+    application = WSGIApplication([('/Last', LastRequestHandler)], debug=True)
+    run_wsgi_app(application)
