@@ -5,7 +5,7 @@ from google.appengine.ext.webapp import WSGIApplication
 from google.appengine.api import oauth
 from google.appengine.api import users
 from datetime import datetime
-from Counter import getNewOdenkiId
+from lib.Counter import getNewOdenkiId
 #from GoogleDocs import GoogleDocs
 from MyRequestHandler import MyRequestHandler
 

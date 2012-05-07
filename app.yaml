@@ -60,6 +60,9 @@ handlers:
   
 - url: /MyRequestHandler*
   script: MyRequestHandler.py
+
+- url: /OdenkiSession*
+  script: OdenkiSession.py
   
 - url: /
   script: index.py

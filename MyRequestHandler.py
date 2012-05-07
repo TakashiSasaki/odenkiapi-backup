@@ -1,5 +1,4 @@
-from google.appengine.ext.webapp import RequestHandler, WSGIApplication, template
-from google.appengine.ext.webapp.util import run_wsgi_app
+from google.appengine.ext.webapp import RequestHandler, template
 from datetime import datetime
 from simplejson import dumps, load, loads, JSONDecodeError
 from google.appengine.api.users import get_current_user, create_login_url, create_logout_url
@@ -30,21 +29,60 @@ def toHttpStatus(json_rpc_error_code):
         return 500
     return None
 
+def getMainModule():
+    from sys import modules
+    return modules["__main__"]
+ 
+def getMainModuleName():
+    from os.path import basename, splitext
+    b = basename(getMainModule().__file__)
+    (stem, ext) = splitext(b)
+    return stem
+
+def getMainModuleRequestHandler():
+    return getMainModule()._RequestHandler
+    
 class MyRequestHandler(RequestHandler):
     __slots__ = ["jsonRequest", "jsonResponse"]
     
-    def writeWithTemplate(self, values, html_file_name):
-        values["version"] = self.request.environ["CURRENT_VERSION_ID"].split('.')[0]
+    def hasNoParam(self):
+        return True if self.request.params.items().__len__() == 0 else False
+        
+    def getTimeStamp(self):
         version_id = self.request.environ["CURRENT_VERSION_ID"].split('.')[1]
-        timestamp = long(version_id) / pow(2, 28) 
-        values["version_datetime"] = datetime.fromtimestamp(timestamp).strftime("%Y/%m/%d %X UTC")
+        timestamp = long(version_id) / pow(2, 28)
+        return timestamp
+    
+    def getTimeStampString(self):
+        timestamp = self.getTimeStamp()
+        return datetime.fromtimestamp(timestamp).strftime("%Y/%m/%d %X UTC")
+
+    def getVersion(self):
+        return self.request.environ["CURRENT_VERSION_ID"].split('.')[0]
+        
+    def writeWithTemplate(self, values, html_file_name):
+        values["version"] = self.getVersion() 
+        values["version_datetime"] = self.getTimeStampString()
         if get_current_user() is None:
             values["googleLoginUrl"] = create_login_url()
         else:
             values["googleLogoutUrl"] = create_logout_url("/OdenkiUser")
-
         self.response.out.write(template.render("html/" + html_file_name + ".html", values))
-
+        
+    def writePage(self, title=None, script="", body=""):
+        if title is None:
+            title = getMainModuleName()
+        assert isinstance(title, str)
+        assert isinstance(script, str)
+        assert isinstance(body, str)
+        v = {}
+        v["title"] = title
+        v["script"] = script
+        v["body"] = body
+        v["version"] = self.getVersion()
+        v["version_datetime"] = self.getTimeStampString()
+        self.response.out.write(template.render("html/MyRequestHandler.html", v))
+        
     def doesAcceptJson(self):
         matched = self.request.accept.best_match(["application/json", "application/json-rpc"])
         return True if matched else False
@@ -128,6 +166,7 @@ class MyRequestHandler(RequestHandler):
             self.setJsonRpc2ErrorResponse(JSON_RPC_ERROR_INVALID_REQUEST,
                                           "%s is unknown HTTP method" % self.request.method)
             return None
+        assert self.jsonRequest is not None
     
     def setJsonResponse(self, dictionary):
         assert isinstance(dictionary, dict)
@@ -156,7 +195,9 @@ class MyRequestHandler(RequestHandler):
         self.jsonResponse["jsonrpc"] = "2.0"
 
 class _RequestHandler(MyRequestHandler):
+    
     def get(self):
+        debug("MyRequestHandler get")
         if self.request.params.items().__len__() == 0:
             self.testPage()
             return
@@ -167,8 +208,9 @@ class _RequestHandler(MyRequestHandler):
         pass
     
     def post(self):
+        debug("MyRequestHandler post")
         self.getJsonRequest()
-        assert isinstance(self.jsonRequest, dict)
+        assert isinstance(self.jsonRequest, dict) or isinstance(self.jsonRequest, list) or self.jsonRequest is None
         self.writeJsonRpc()
     
     def testPage(self):
@@ -250,7 +292,14 @@ some methods to handle JSON-RPC 2.0 over HTTP.</p>
 </html>
         """
         self.response.out.write(html)
+
+def main():
+    debug("MyRequestHandler main")
+    from google.appengine.ext.webapp import WSGIApplication
+    from google.appengine.ext.webapp.util import run_wsgi_app
+    application = WSGIApplication([('/' + getMainModuleName(),
+                                    getMainModuleRequestHandler())], debug=True)
+    run_wsgi_app(application)
     
 if __name__ == "__main__":
-    application = WSGIApplication([('/MyRequestHandler', _RequestHandler)], debug=True)
-    run_wsgi_app(application)
+    main()

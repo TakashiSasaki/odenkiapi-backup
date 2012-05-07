@@ -2,6 +2,8 @@ from gaesessions import get_current_session, Session, set_current_session
 from logging import getLogger, debug, DEBUG
 from GoogleUser import GoogleUser
 from OdenkiUser import getOdenkiUser, OdenkiUser
+
+
 getLogger().setLevel(DEBUG)
 
 class NoOdenkiId(BaseException):
@@ -74,4 +76,16 @@ class OdenkiSession(object):
         except KeyError:
             pass
         self.session["odenkiUser"] = odenki_user
-        
+
+from MyRequestHandler import MyRequestHandler
+class _RequestHandler(MyRequestHandler):
+    def get(self):
+        if self.hasNoParam():
+            self.writePage()
+    
+    def post(self):
+        self.get()
+
+if __name__=="__main__":
+    from MyRequestHandler import main
+    main()
