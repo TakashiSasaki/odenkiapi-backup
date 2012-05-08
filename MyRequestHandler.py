@@ -1,3 +1,9 @@
+from os import environ
+environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+from google.appengine.dist import use_library
+use_library('django', '1.2')
+from google.appengine.api import memcache
+CACHE_BACKEND = 'memcached:///'
 from google.appengine.ext.webapp import RequestHandler, template
 from datetime import datetime
 from simplejson import dumps, load, loads, JSONDecodeError
@@ -215,13 +221,6 @@ class _RequestHandler(MyRequestHandler):
     
     def testPage(self):
         html = """
-<html>
-<head>
-    <script type="text/javascript" src="/js/jquery-1.7.2.min.js"></script>
-    <script type="text/javascript" src="/js/jquery.json-2.3.min.js"></script>
-    <title>MyRequestHandler test page</title>
-</head>
-<body>
 <p>MyRequestHandler is customized version of RequestHandler that implements
 some methods to handle JSON-RPC 2.0 over HTTP.</p>
 <table border="1px">
@@ -230,8 +229,8 @@ some methods to handle JSON-RPC 2.0 over HTTP.</p>
 <tr><td id="request2"/>request2</td><td id="response2">response2</td></tr>
 <tr><td id="request3"/>request3</td><td id="response3">response3</td></tr>
 <tr><td id="request4"/>request4</td><td id="response4">response4</td></tr>
-</table>
-<script>
+</table>"""
+        script = """
     var url = "?id=123&x=1&x=2&method=echo";
     $.ajax({
         datatype: "json",
@@ -287,11 +286,8 @@ some methods to handle JSON-RPC 2.0 over HTTP.</p>
             $("#response4").text(error_thrown);
         }
     });
-</script>
-</body>
-</html>
         """
-        self.response.out.write(html)
+        self.writePage("MyRequestHandler", script, html)
 
 def main():
     debug("MyRequestHandler main")
