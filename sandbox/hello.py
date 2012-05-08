@@ -12,4 +12,4 @@ print __file__
 print __name__
 print __package__
 print dir(__builtins__)
-print os.path.(__file__)
+print os.path.__file__

@@ -96,13 +96,17 @@ class MyRequestHandler(RequestHandler):
     def doesAcceptText(self):
         matched = self.request.accept.best_match(["text/*"])
         return True if matched else False
+    
+    def write(self, content):
+        from lib.CachedContent import getCachedContent, cacheContent
+        self.response.out.write()
         
     def writeJson(self):
         if self.doesAcceptJson():
             self.response.content_type = "application/json"
         else:
             self.response.content_type = "text/json"
-        self.response.out.write(dumps(self.jsonResponse))
+        self.write(dumps(self.jsonResponse))
         
     def writeJsonRpc(self):
         if getattr(self, "jsonResponse", None) is None:
