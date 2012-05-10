@@ -27,9 +27,10 @@ def toHttpStatus(error_code):
         return 500
     return None
 
-def getJsonFromUrl(request):
+def getJsonFromUrl(params):
+    assert isinstance(params, dict)
     json_from_url = {}
-    for k, v in request.params.items():
+    for k, v in params.items():
         if json_from_url.get(k):
             if isinstance(json_from_url[k], list):
                 json_from_url[k].append(v)
@@ -46,8 +47,9 @@ def getJsonFromUrl(request):
     json_from_url["params"] = loads(params)
     return json_from_url
         
-def getJsonFromBody(request):
-    json_from_body = loads(request.body)
+def getJsonFromBody(body):
+    assert isinstance(body, str)
+    json_from_body = loads(body)
     if json_from_body is None:
         json_from_body = {}
     assert isinstance(json_from_body, dict)
@@ -56,22 +58,24 @@ def getJsonFromBody(request):
 
 from lib.CachedContent import CachedContent
 class JsonRpc(object):
-    __slots__ = [ "request", "response", "jsonRequest"]
+    __slots__ = [ "request", "response", "jsonRequest", "requestHandler", "request", "response", "jsonrpc", "method", "params", "id", "result", "error"]
     
     def __init__(self, request_handler):
         self.requestHandler = request_handler
         self.request = request_handler.request
         self.response = request_handler.response
-        self.getJsonRequest()
-        self.jsonrpc = self.jsonRequest.get("jsonrpc", None)
-        self.method = self.jsonRequest.get("method", None)
-        self.params = self.jsonRequest.get("params", None)
-        self.id = self.jsonRequest.get("id", None)
-        self.result = None
         self.error = {}
+        self.getJsonRequest()
+        if self.jsonRequest:
+            self.jsonrpc = self.jsonRequest.get("jsonrpc", None)
+            self.method = self.jsonRequest.get("method", None)
+            self.params = self.jsonRequest.get("params", None)
+            self.id = self.jsonRequest.get("id", None)
+        self.result = None
 
     def setErrorCode(self, error_code):
         assert isinstance(error_code, int)
+        assert isinstance(self.error, dict)
         self.error["code"] = error_code
     
     def getHttpStatus(self):
@@ -120,7 +124,7 @@ class JsonRpc(object):
         if self.result is None:
             assert isinstance(self.error, dict)
             self.response.content_type = "application/json"
-            self.response.set_status = self.getHttpStatus()
+            self.response.set_status(self.getHttpStatus())
             params = {
                       "jsonrpc" : self.jsonrpc,
                       "error" : self.error,

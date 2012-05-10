@@ -3,65 +3,16 @@ from lib.JsonRpc import JsonRpc
 from inspect import getmodulename
 environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 from google.appengine.dist import use_library
-from lib import getMainModuleName
 use_library('django', '1.2')
 from google.appengine.api import memcache
 CACHE_BACKEND = 'memcached:///'
 from google.appengine.ext.webapp import RequestHandler, template
 from datetime import datetime
 from google.appengine.api.users import get_current_user, create_login_url, create_logout_url
-from logging import debug, getLogger, DEBUG
-getLogger().setLevel(DEBUG)
+from lib.BasicPage import BasicPage
 
 
-class MyRequestHandler(RequestHandler):
-    
-    def hasNoParam(self):
-        return True if self.request.params.items().__len__() == 0 else False
-        
-        
-    def write(self, script, html):
-        if get_current_user() is None:
-            self.redirect(create_login_url())
-            return
-        else:
-            self.redirect(create_logout_url(self.request.url))
-            return
-        
-        from lib.CachedContent import CachedContent
-        parameter = {
-                     "script": self.script,
-                     "html" : self.html,
-                     "title" : getMainModuleName()
-                     }
-        cached_content = CachedContent("/MyRequestHandler", parameter, "html/MyRequestHandler.html")
-        cached_content.render()
-        cached_content.write(self)
-        return
-
-    def doesAcceptJson(self):
-        matched = self.request.accept.best_match(["application/json", "application/json-rpc"])
-        return True if matched else False
-        
-    def doesAcceptText(self):
-        matched = self.request.accept.best_match(["text/*"])
-        return True if matched else False
-    
-    def get(self):
-        debug("MyRequestHandler get")
-        if self.request.params.items().__len__() == 0:
-            self.write(self.script, self.html)
-            return
-
-        json_rpc = JsonRpc(self)
-        json_rpc.write()
-        return
-    
-    def post(self):
-        json_rpc = JsonRpc(self)
-        json_rpc.write()
-        return
-    
+class MyRequestHandler(BasicPage):
     html = """
 <p>MyRequestHandler is customized version of RequestHandler that implements
 some methods to handle JSON-RPC 2.0 over HTTP.</p>

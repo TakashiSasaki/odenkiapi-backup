@@ -1,5 +1,6 @@
-from logging import debug, DEBUG, getLogger
-getLogger().setLevel(DEBUG)
+#from lib.debug import *
+#from logging import debug, DEBUG, getLogger
+#getLogger().setLevel(DEBUG)
 
 def getMainModule():
     from sys import modules
@@ -12,7 +13,6 @@ def getMainModuleName():
     return stem
 
 def runWsgiApp(request_handler):
-    debug("MyRequestHandler main")
     from google.appengine.ext.webapp import WSGIApplication
     from google.appengine.ext.webapp.util import run_wsgi_app
     application = WSGIApplication([('/' + getMainModuleName(),
