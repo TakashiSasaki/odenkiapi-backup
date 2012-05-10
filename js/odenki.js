@@ -4,7 +4,7 @@ odenki = {
 		$.ajax({
 			datatype : "json",
 			url : "/Version",
-			type : "POST",
+			type : "GET",
 			data : data,
 			success : function(result_json) {
 				$("#versionString").text(result_json.versionString);
