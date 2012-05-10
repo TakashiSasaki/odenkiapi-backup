@@ -13,6 +13,9 @@ handlers:
 - url: /post
   script: post.py
 
+- url: /Version
+  script: api/Version.py
+
 - url: /Sender
   script: SenderRequestHandler.py
   

@@ -1,6 +1,7 @@
 from os import environ
 environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 from google.appengine.dist import use_library
+from lib import getMainModuleName
 use_library('django', '1.2')
 from google.appengine.api import memcache
 CACHE_BACKEND = 'memcached:///'
@@ -35,36 +36,12 @@ def toHttpStatus(json_rpc_error_code):
         return 500
     return None
 
-def getMainModule():
-    from sys import modules
-    return modules["__main__"]
- 
-def getMainModuleName():
-    from os.path import basename, splitext
-    b = basename(getMainModule().__file__)
-    (stem, ext) = splitext(b)
-    return stem
-
-def getMainModuleRequestHandler():
-    return getMainModule()._RequestHandler
-    
 class MyRequestHandler(RequestHandler):
-    __slots__ = ["jsonRequest", "jsonResponse"]
+    __slots__ = ["jsonRequest", "jsonResponse", "cachedContent"]
     
     def hasNoParam(self):
         return True if self.request.params.items().__len__() == 0 else False
         
-    def getTimeStamp(self):
-        version_id = self.request.environ["CURRENT_VERSION_ID"].split('.')[1]
-        timestamp = long(version_id) / pow(2, 28)
-        return timestamp
-    
-    def getTimeStampString(self):
-        timestamp = self.getTimeStamp()
-        return datetime.fromtimestamp(timestamp).strftime("%Y/%m/%d %X UTC")
-
-    def getVersion(self):
-        return self.request.environ["CURRENT_VERSION_ID"].split('.')[0]
         
     def writeWithTemplate(self, values, html_file_name):
         values["version"] = self.getVersion() 
@@ -85,8 +62,6 @@ class MyRequestHandler(RequestHandler):
         v["title"] = title
         v["script"] = script
         v["body"] = body
-        v["version"] = self.getVersion()
-        v["version_datetime"] = self.getTimeStampString()
         self.response.out.write(template.render("html/MyRequestHandler.html", v))
         
     def doesAcceptJson(self):
@@ -98,15 +73,14 @@ class MyRequestHandler(RequestHandler):
         return True if matched else False
     
     def write(self, content):
-        from lib.CachedContent import getCachedContent, cacheContent
-        self.response.out.write()
+        from lib.CachedContent import CachedContent
+        cached_content = CachedContent(self.request.url, None, None, content)
+        cached_content.write(self)
         
     def writeJson(self):
-        if self.doesAcceptJson():
-            self.response.content_type = "application/json"
-        else:
-            self.response.content_type = "text/json"
-        self.write(dumps(self.jsonResponse))
+        from lib.CachedContent import CachedContent
+        cached_content = CachedContent("/MyRequestHandler", None, self.jsonResponse, None, None, self.response, self.request.if_modifined_since)
+        cached_content.dump()
         
     def writeJsonRpc(self):
         if getattr(self, "jsonResponse", None) is None:
@@ -209,7 +183,14 @@ class _RequestHandler(MyRequestHandler):
     def get(self):
         debug("MyRequestHandler get")
         if self.request.params.items().__len__() == 0:
-            self.testPage()
+            from lib.CachedContent import CachedContent
+            parameter = {
+                         "script": self.script,
+                         "html" : self.html,
+                         "title" : "MyRequestHandler"
+                         }
+            cached_content = CachedContent("/MyRequestHandler", None, parameter, "html/MyRequestHandler.html", None)
+            cached_content.render()
             return
         debug("_RequestHandler.get was called.")
         self.getJsonRequest()
@@ -223,8 +204,7 @@ class _RequestHandler(MyRequestHandler):
         assert isinstance(self.jsonRequest, dict) or isinstance(self.jsonRequest, list) or self.jsonRequest is None
         self.writeJsonRpc()
     
-    def testPage(self):
-        html = """
+    html = """
 <p>MyRequestHandler is customized version of RequestHandler that implements
 some methods to handle JSON-RPC 2.0 over HTTP.</p>
 <table border="1px">
@@ -234,7 +214,7 @@ some methods to handle JSON-RPC 2.0 over HTTP.</p>
 <tr><td id="request3"/>request3</td><td id="response3">response3</td></tr>
 <tr><td id="request4"/>request4</td><td id="response4">response4</td></tr>
 </table>"""
-        script = """
+    script = """
     var url = "?id=123&x=1&x=2&method=echo";
     $.ajax({
         datatype: "json",
@@ -291,15 +271,9 @@ some methods to handle JSON-RPC 2.0 over HTTP.</p>
         }
     });
         """
-        self.writePage("MyRequestHandler", script, html)
-
-def main():
-    debug("MyRequestHandler main")
-    from google.appengine.ext.webapp import WSGIApplication
-    from google.appengine.ext.webapp.util import run_wsgi_app
-    application = WSGIApplication([('/' + getMainModuleName(),
-                                    getMainModuleRequestHandler())], debug=True)
-    run_wsgi_app(application)
     
 if __name__ == "__main__":
-    main()
+    from lib import runWsgiApp
+    runWsgiApp(_RequestHandler)
+
+    

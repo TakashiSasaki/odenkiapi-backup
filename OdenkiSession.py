@@ -1,13 +1,8 @@
 from gaesessions import get_current_session, Session, set_current_session
-from logging import getLogger, debug, DEBUG
 from GoogleUser import GoogleUser
 from OdenkiUser import getOdenkiUser, OdenkiUser
-
-
+from logging import getLogger, debug, DEBUG
 getLogger().setLevel(DEBUG)
-
-class NoOdenkiId(BaseException):
-    pass
 
 class OdenkiSession(object):
     __slot__=["session"]
