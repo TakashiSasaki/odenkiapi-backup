@@ -10,7 +10,7 @@ class Version(RequestHandler):
                      "timeStampString" : self.getTimeStampString(),
                      "versionString" : self.getVersionString()
                      }
-        cached_content = CachedContent("/api/Version", parameter, None)
+        cached_content = CachedContent(self.request.path, parameter, None)
         cached_content.dump()
         cached_content.write(self)
         
@@ -29,4 +29,4 @@ class Version(RequestHandler):
 
 from lib import runWsgiApp
 if __name__ == "__main__":
-    runWsgiApp(Version)
+    runWsgiApp(Version, "/api/Version")

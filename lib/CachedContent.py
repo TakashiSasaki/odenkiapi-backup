@@ -120,7 +120,7 @@ class CachedContent(object):
             self.lastModified = getNow()
         self.save()
 
-    def write(self, request_handler):
+    def write(self, request_handler, max_age = 600, public = False):
         from google.appengine.ext.webapp import RequestHandler
         assert isinstance(request_handler, RequestHandler)
         request = request_handler.request
@@ -134,9 +134,14 @@ class CachedContent(object):
             if if_modified_since >= self.lastModified:
                 response.set_status(304)
                 response.headers['Content-Type'] = self.contentType
-                response.headers['Cache-Control'] = 'private'
+                public_string = 'public' if public else 'private'
+                if max_age:
+                    response.headers['Cache-Control'] = '%s, max-age=%s' % (public_string, max_age)
+                else:
+                    response.headers['Cache-Control'] = '%s' % (public_string)
                 assert isinstance(self.lastModified, datetime.datetime)
                 response.headers['Last-Modified'] = toRfcFormat(self.lastModified)
+                response.headers['Expires'] = toRfcFormat(self.lastModified + datetime.timedelta(seconds = max_age))
                 response.out.write(None)
                 return
         response.set_status(200)
@@ -144,6 +149,7 @@ class CachedContent(object):
         response.headers['Cache-Control'] = 'private'
         assert isinstance(self.lastModified, datetime.datetime)
         response.headers['Last-Modified'] = toRfcFormat(self.lastModified)
+        response.headers['Expires'] = toRfcFormat(self.lastModified + datetime.timedelta(seconds = max_age))
         response.out.write(self.content)
         return
 
