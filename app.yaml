@@ -15,6 +15,9 @@ handlers:
 
 - url: /api/Version
   script: api/Version.py
+  
+- url: /api/Echo
+  script: api/Echo.py
 
 - url: /Sender
   script: SenderRequestHandler.py

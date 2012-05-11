@@ -13,7 +13,6 @@ def getMainModuleName():
     return stem
 
 def runWsgiApp(request_handler, path):
-    debug("MyRequestHandler main")
     from google.appengine.ext.webapp import WSGIApplication
     from google.appengine.ext.webapp.util import run_wsgi_app
     if path is None:

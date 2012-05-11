@@ -1,17 +1,10 @@
 from os import environ
-from lib.JsonRpc import JsonRpc
-from inspect import getmodulename
 environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 from google.appengine.dist import use_library
 use_library('django', '1.2')
-from google.appengine.api import memcache
 CACHE_BACKEND = 'memcached:///'
-from google.appengine.ext.webapp import RequestHandler, template
-from datetime import datetime
-from google.appengine.api.users import get_current_user, create_login_url, create_logout_url
+
 from lib.BasicPage import BasicPage
-
-
 class MyRequestHandler(BasicPage):
     html = """
 <p>MyRequestHandler is customized version of RequestHandler that implements
@@ -84,6 +77,5 @@ some methods to handle JSON-RPC 2.0 over HTTP.</p>
     
 if __name__ == "__main__":
     from lib import runWsgiApp
-    runWsgiApp(MyRequestHandler)
-
+    runWsgiApp(MyRequestHandler, "/MyRequestHandler")
     

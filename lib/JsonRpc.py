@@ -1,5 +1,6 @@
 from encodings.base64_codec import base64_decode
 from simplejson import dumps, load, loads, JSONDecodeError
+from lib.CachedContent import CachedContent
 from logging import debug, getLogger, DEBUG
 getLogger().setLevel(DEBUG)
 
@@ -55,8 +56,6 @@ def getJsonFromBody(body):
     assert isinstance(json_from_body, dict)
     return json_from_body
 
-
-from lib.CachedContent import CachedContent
 class JsonRpc(object):
     __slots__ = [ "request", "response", "jsonRequest", "requestHandler", "request", "response", "jsonrpc", "method", "params", "id", "result", "error"]
     
@@ -66,12 +65,32 @@ class JsonRpc(object):
         self.response = request_handler.response
         self.error = {}
         self.getJsonRequest()
+        debug(self.jsonRequest)
         if self.jsonRequest:
             self.jsonrpc = self.jsonRequest.get("jsonrpc", None)
+            if isinstance(self.jsonrpc, list) and len(self.jsonrpc) == 1:
+                self.jsonrpc = self.jsonrpc[0]
             self.method = self.jsonRequest.get("method", None)
+            if isinstance(self.method, list) and len(self.method) == 1:
+                self.method = self.method[0]
             self.params = self.jsonRequest.get("params", None)
+            if isinstance(self.params, list) and len(self.params) == 1:
+                self.params = self.params[0]
             self.id = self.jsonRequest.get("id", None)
+            if isinstance(self.id, list) and len(self.id) == 1:
+                self.id = self.id[0]
         self.result = None
+        
+    def setResult(self, result):
+        self.result = result
+    
+    def getArgumentDict(self):
+        d = {}
+        for a in self.request.arguments():
+            assert isinstance(a, unicode)
+            d[a] = self.request.get_all(a)
+        debug(str(d))
+        return d
 
     def setErrorCode(self, error_code):
         assert isinstance(error_code, int)
@@ -79,7 +98,12 @@ class JsonRpc(object):
         self.error["code"] = error_code
     
     def getHttpStatus(self):
-        error_code = self.error["code"]
+        try:
+            error_code = self.error["code"]
+        except Exception, e:
+            error_code = JSON_RPC_ERROR_INTERNAL_ERROR
+            self.error["code"] = error_code
+            self.error["message"] = "Error occured but error code was not set. This is an internal error. " + e.message 
         return toHttpStatus(error_code)
     
     def setErrorMessage(self, error_message):
@@ -90,6 +114,8 @@ class JsonRpc(object):
         self.error["data"] = error_data
 
     def getJsonRequest(self):
+        if hasattr(self, "jsonRequest"):
+            return self.jsonRequest
         if self.request.method == "POST" or self.request.method == "PUT":
             # POST can change the state of servers.
             # PUT should be idempotent.
@@ -107,7 +133,7 @@ class JsonRpc(object):
             # GET should not change the state of servers.
             # DELETE should be idempotent.
             try:
-                self.jsonRequest = getJsonFromUrl(self.request.url)
+                self.jsonRequest = getJsonFromUrl(self.getArgumentDict())
                 assert isinstance(self.jsonRequest, dict)
                 return
             except JSONDecodeError, e:
@@ -126,21 +152,20 @@ class JsonRpc(object):
             self.response.content_type = "application/json"
             self.response.set_status(self.getHttpStatus())
             params = {
-                      "jsonrpc" : self.jsonrpc,
                       "error" : self.error,
                       "id" : self.id
                       }
+            if self.jsonrpc == "2.0":
+                params["jsonrpc"] = self.jsonrpc
             self.response.out.write(dumps(params))
             return
         
         if self.id is None:
-            self.response.out.write()
-            self.response.set_status(204)
-            return
+            if self.jsonrpc == "2.0":
+                self.response.set_status(204) #204 means "No content"
+                #self.response.out.write(None)
+                return
         
-        if self.method == "echo" and self.result is None:
-            self.result = self.jsonRequest
-
         params = {
                   "jsonrpc" : self.jsonrpc,
                   "result" : self.result,
