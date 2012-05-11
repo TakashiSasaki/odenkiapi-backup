@@ -49,6 +49,7 @@ def toRfcFormat(dt):
     assert dt.tzinfo is not None
     return dt.strftime("%a, %d %b %Y %H:%M:%S %Z")
 
+from google.appengine.api import memcache
 class CachedContent(object):
     
     __slots__ = ["path", "user", "parameter", "template", "contentType", "content", "lastModified"]
@@ -75,13 +76,11 @@ class CachedContent(object):
     def save(self):
         assert self.content is not None
         key_hash = self.getKeyHash()
-        from google.appengine.api.memcache import add
-        add(key_hash, self)
+        memcache.add(key_hash, self)
         
     def load(self):
         "searches for content in memcache and fill empty members."
-        from google.appengine.api.memcache import get
-        loaded_cached_content = get(self.getKeyHash())
+        loaded_cached_content = memcache.get(self.getKeyHash())
         if loaded_cached_content:
             assert isinstance(loaded_cached_content, CachedContent)
             if self.content is None:

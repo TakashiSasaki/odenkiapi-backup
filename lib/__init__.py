@@ -1,5 +1,6 @@
-from logging import debug, DEBUG, getLogger
-getLogger().setLevel(DEBUG)
+#from lib.debug import *
+#from logging import debug, DEBUG, getLogger
+#getLogger().setLevel(DEBUG)
 
 def getMainModule():
     from sys import modules

@@ -13,6 +13,9 @@ class Version(RequestHandler):
         cached_content = CachedContent(self.request.path, parameter, None)
         cached_content.dump()
         cached_content.write(self)
+    
+    def post(self):
+        self.get()
         
     def getTimeStamp(self):
         version_id = self.request.environ["CURRENT_VERSION_ID"].split('.')[1]
