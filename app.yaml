@@ -4,14 +4,17 @@ runtime: python
 api_version: 1
 
 handlers:
-- url: /stylesheets
-  static_dir: stylesheets
-
 - url: /js
   static_dir: js
 
+- url: /css
+  static_dir: css
+
 - url: /post
   script: post.py
+
+- url: /api/Version
+  script: api/Version.py
 
 - url: /Sender
   script: SenderRequestHandler.py
@@ -60,6 +63,9 @@ handlers:
   
 - url: /MyRequestHandler*
   script: MyRequestHandler.py
+
+- url: /OdenkiSession*
+  script: OdenkiSession.py
   
 - url: /
   script: index.py
