@@ -1,18 +1,18 @@
 odenki = {}
 
-odenki.setVersion = function() {
+odenki.fillVersion = function(parent) {
 	$.ajax({
 		datatype : "json",
 		url : "/api/Version",
 		type : "GET",
 		data : null,
 		success : function(result_json) {
-			$("#versionString").text(result_json.versionString);
-			$("#timeStampString").text(result_json.timeStampString);
+			odenki.fillText(parent, result_json);
+			// $("#versionString").text(result_json.versionString);
+			// $("#timeStampString").text(result_json.timeStampString);
 		},
-		error : function(result_json, text_status, error_thrown) {
-			$("#versionString").text("?");
-			$("#timeStampString").text("?");
+		error : function(xml_http_request, text_status, error_thrown) {
+			odenki.hideElement(parent);
 		}
 	});
 }// getVersion
@@ -69,13 +69,38 @@ odenki.echo = function(method, param_string, body_string, tr_id) {
 	});// ajax
 }// echo
 
+odenki.getEventSourceElement = function(arguments) {
+	return arguments[0].target;
+}
+
 odenki.replaceEventSoruceElement = function(arguments, text) {
-	script_tag = arguments[0].target;
+	script_tag = odenki.getEventSourceElement(arguments);
 	$(script_tag).replaceWith(text);
 }// replaceEventSourceElement
 
-odenki.replaceEventSourceParentElement = function(argument, html) {
-	script_tag = arguments[0].target;
+odenki.replaceEventSourceParentElement = function(arguments, html) {
+	script_tag = odenki.getEventSourceElement(arguments);
 	parent_tag = $(script_tag).parent();
 	parent_tag.replaceWith(html);
 }// replaceEventSourceParemtElement
+
+odenki.fillText = function(parent, dictionary) {
+	if (typeof parent === "string") {
+		for (k in dictionary) {
+			$("#" + parent + " ." + k).text(dictionary[k]);
+		}
+	} else {
+		for (k in dictionary) {
+			e = parent.find("." + k);
+			e.text(dictionary[k]);
+		}
+	}
+}// fillText
+
+odenki.hideElement = function(element) {
+	if (typeof element === "string") {
+		$("#" + element).css("display", "none");
+	} else {
+		$(element).css("display", "none");
+	}
+}// hideElement
