@@ -7,15 +7,22 @@
 		<script type="text/javascript" src="/js/jquery.json-2.3.min.js"></script>
 		<script type="text/javascript" src="/js/jquery.mobile-1.1.0.min.js"></script>
 		<script type="text/javascript" src="/js/odenki.js"></script>
-		<title>BasicPage.html</title>
+		<title>ApiTest.html</title>
 	</head>
 	<body>
-		<div data-role="page" data-theme="b" id="about">
+		<div data-role="page" data-theme="b" id="about" >
 			<header data-role="header" ></header>
 			<script>
 				odenki.setHeader();
 			</script>
 			<article data-role="content">
+				<script>
+					function x(arguments) {
+						script_tag = arguments[0].target;
+						$(script_tag).replaceWith("abc");
+					}
+				</script>
+				<script onload="x(arguments);" src="data:,null"></script>
 				<p>
 					This page is intended to test JSON-RPC library of Odenki API.
 					We use extended version of JSON-RPC 2.0 over HTTP.
@@ -46,7 +53,8 @@
 						<td class="response"></td>
 					</tr>
 					<script>
-						odenki.echo("POST", null, '{"id":3, "method":"echo"}', "test3");</script>
+						odenki.echo("POST", null, '{"id":3, "method":"echo"}', "test3");
+					</script>
 					<tr id="test4">
 						<td class="param_string"></td>
 						<td class="body_string"></td>
