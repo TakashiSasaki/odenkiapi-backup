@@ -7,17 +7,20 @@ handlers:
 - url: /js
   static_dir: js
 
+- url: /html
+  static_dir: html
+
 - url: /css
   static_dir: css
 
+- url: /api/([A-Za-z]+)
+  script: api/\1.py
+  
 - url: /post
   script: post.py
 
-- url: /api/Version
-  script: api/Version.py
-  
-- url: /api/Echo
-  script: api/Echo.py
+- url: /
+  script: index.py
 
 - url: /Sender
   script: SenderRequestHandler.py
@@ -70,5 +73,3 @@ handlers:
 - url: /OdenkiSession*
   script: OdenkiSession.py
   
-- url: /
-  script: index.py

@@ -135,7 +135,7 @@ class CachedContent(object):
                 response.headers['Content-Type'] = self.contentType
                 public_string = 'public' if public else 'private'
                 if max_age:
-                    response.headers['Cache-Control'] = '%s, max-age=%s' % (public_string, max_age)
+                    response.headers['Cache-Control'] = '%s,max-age=%s' % (public_string, max_age)
                 else:
                     response.headers['Cache-Control'] = '%s' % (public_string)
                 assert isinstance(self.lastModified, datetime.datetime)
@@ -148,7 +148,7 @@ class CachedContent(object):
         response.headers['Cache-Control'] = 'private'
         assert isinstance(self.lastModified, datetime.datetime)
         response.headers['Last-Modified'] = toRfcFormat(self.lastModified)
-        response.headers['Expires'] = toRfcFormat(self.lastModified + datetime.timedelta(seconds = max_age))
+        #response.headers['Expires'] = toRfcFormat(self.lastModified + datetime.timedelta(seconds = max_age))
         response.out.write(self.content)
         return
 

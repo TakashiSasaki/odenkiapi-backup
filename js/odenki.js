@@ -1,11 +1,10 @@
 odenki = {
 	"getVersion" : function getVersion() {
-		var data = '{"id": 0, "method":"get"}';
 		$.ajax({
 			datatype : "json",
-			url : "/Version",
+			url : "/api/Version",
 			type : "GET",
-			data : data,
+			data : null,
 			success : function(result_json) {
 				$("#versionString").text(result_json.versionString);
 				$("#timeStampString").text(result_json.timeStampString);
@@ -16,4 +15,28 @@ odenki = {
 			}
 		});
 	}// getVersion
+	,
+	"getFooter" : function getFooter() {
+		$.ajax({
+			datatype : "html",
+			url : "/html/footer.html",
+			type : "GET",
+			data : null,
+			success : function(footer_html) {
+				$("footer").html(footer_html);
+			}
+		})
+	}// getFooter
+	,
+	"getHeader" : function getHeaderer(){
+		$.ajax({
+			datatype: "html",
+			url: "/html/header.html",
+			type : "GET",
+			data: null,
+			success : function(header_html){
+				$("header").html(header_html);
+			}
+		})
+	}
 }// odenki
