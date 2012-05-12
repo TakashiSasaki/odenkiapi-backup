@@ -22,7 +22,7 @@ odenki.setFooter = function() {
 		datatype : "html",
 		url : "/html/footer.html",
 		type : "GET",
-		cache: true,
+		cache : true,
 		data : null,
 		success : function(footer_html) {
 			$("footer").html(footer_html);
@@ -35,7 +35,7 @@ odenki.setHeader = function() {
 		datatype : "html",
 		url : "/html/header.html",
 		type : "GET",
-		cache: true,
+		cache : true,
 		data : null,
 		success : function(header_html) {
 			$("header").html(header_html);
@@ -52,7 +52,7 @@ odenki.echo = function(method, param_string, body_string, tr_id) {
 	}
 	$.ajax({
 		datatype : "json",
-		cache: true,
+		cache : true,
 		url : url,
 		type : method,
 		data : body_string,
@@ -68,3 +68,14 @@ odenki.echo = function(method, param_string, body_string, tr_id) {
 		}// error
 	});// ajax
 }// echo
+
+odenki.replaceEventSoruceElement = function(arguments, text) {
+	script_tag = arguments[0].target;
+	$(script_tag).replaceWith(text);
+}// replaceEventSourceElement
+
+odenki.replaceEventSourceParentElement = function(argument, html) {
+	script_tag = arguments[0].target;
+	parent_tag = $(script_tag).parent();
+	parent_tag.replaceWith(html);
+}// replaceEventSourceParemtElement

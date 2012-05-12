@@ -16,13 +16,7 @@
 				odenki.setHeader();
 			</script>
 			<article data-role="content">
-				<script>
-					function x(arguments) {
-						script_tag = arguments[0].target;
-						$(script_tag).replaceWith("abc");
-					}
-				</script>
-				<script onload="x(arguments);" src="data:,null"></script>
+				<script onload="odenki.replaceEventSoruceElement(arguments, 'aaa');" src="data:,null"></script>
 				<p>
 					This page is intended to test JSON-RPC library of Odenki API.
 					We use extended version of JSON-RPC 2.0 over HTTP.
