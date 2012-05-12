@@ -112,12 +112,15 @@ class JsonRpc(object):
         """
         if hasattr(self, "jsonRequest"):
             return self.jsonRequest
+        debug("abc")
         if self.request.method == "POST" or self.request.method == "PUT":
             # POST can change the state of servers.
             # PUT should be idempotent.
             debug("POST or PUT")
             try:
+                debug("getting json from body")
                 self.jsonRequest = getJsonFromBody(self.request.body)
+                debug(self.jsonRequest)
                 return
             except JSONDecodeError, e:
                 self.jsonRequest = None

@@ -1,9 +1,8 @@
-<script src="/js/odenki.js"></script>
-	<p>
-		「みんなでおでんき」ウェブAPI（version <span id="versionString"></span> <span id="timeStampString"></span>版)へようこそ 
-		{% if user_email %}{{ user_email }}さん{% endif %}
-	</p>
-	<script>odenki.getVersion()</script>
+<p>
+	「みんなでおでんき」ウェブAPI（version <span id="versionString"></span><span id="timeStampString"></span>版)へようこそ
+	{% if user_email %}{{ user_email }}さん{% endif %}
+</p>
+<script>odenki.setVersion();</script>
 <table>
 	<tr>
 		<td><a href="/">Top</a></td>
@@ -13,11 +12,7 @@
 		<td><a href="/RawData">RawData</a></td>
 		<td><a href="/Data">Data</a></td>
 		<td><a href="/Last">Last</a></td>
-		<td><a href="/Command">機器へのコマンド</a>
-		<td><a href="/Spreadsheet">スプレッドシート</a>
-		<td><a href="/OdenkiUser">ユーザー情報</a>
-		<td><a href="https://docs.google.com/open?id=0Bw_QuYgBcuXaZmUyNDQzODgtNzMzMi00YTE0LWE3M2MtYTgxMGZmOGUxNzU3">ドキュメント</a>
-		{% if googleLoginUrl %}<a href="{{ googleLoginUrl }}">ログイン</a>{% endif %}
+		<td><a href="/Command">機器へのコマンド</a><td><a href="/Spreadsheet">スプレッドシート</a><td><a href="/OdenkiUser">ユーザー情報</a><td><a href="https://docs.google.com/open?id=0Bw_QuYgBcuXaZmUyNDQzODgtNzMzMi00YTE0LWE3M2MtYTgxMGZmOGUxNzU3">ドキュメント</a> {% if googleLoginUrl %}<a href="{{ googleLoginUrl }}">ログイン</a>{% endif %}
 		{% if googleLogoutUrl %}<a href="{{ googleLogoutUrl }}">ログアウト</a>{% endif %}
 	</tr>
 </table>

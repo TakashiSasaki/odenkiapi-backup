@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<link rel="stylesheet" href="/css/jquery.mobile-1.1.0.min.css" />
+		<script type="text/javascript" src="/js/jquery-1.7.2.min.js"></script>
+		<script type="text/javascript" src="/js/jquery.json-2.3.min.js"></script>
+		<script type="text/javascript" src="/js/jquery.mobile-1.1.0.min.js"></script>
+		<script type="text/javascript" src="/js/odenki.js"></script>
+		<title>BasicPage.html</title>
+	</head>
+	<body>
+		<div data-role="page" data-theme="b" id="about">
+			<header data-role="header" ></header>
+			<script>
+				odenki.setHeader();
+			</script>
+			<article data-role="content">
+				<p>
+					This page is intended to test JSON-RPC library of Odenki API.
+					We use extended version of JSON-RPC 2.0 over HTTP.
+				</p>
+				<table border="1px">
+					<tr>
+						<th>param_string</th><th>body_string</th><th>response</th>
+					</tr>
+					<tr id="test1">
+						<td class="param_string"></td>
+						<td class="body_string"></td>
+						<td class="response"></td>
+					</tr>
+					<script>
+						odenki.echo("GET", "id=123&x=1&x=2&method=echo", null, "test1");
+					</script>
+					<tr id="test2">
+						<td class="param_string"></td>
+						<td class="body_string"></td>
+						<td class="response"></td>
+					</tr>
+					<script>
+						odenki.echo("POST", null, '{id:3, method:"echo"}', "test2");
+					</script>
+					<tr id="test3">
+						<td class="param_string"></td>
+						<td class="body_string"></td>
+						<td class="response"></td>
+					</tr>
+					<script>
+						odenki.echo("POST", null, '{"id":3, "method":"echo"}', "test3");</script>
+					<tr id="test4">
+						<td class="param_string"></td>
+						<td class="body_string"></td>
+						<td class="response"></td>
+					</tr>
+					<script>
+						odenki.echo("POST", null, "{'id':3, 'method':'echo'}", "test4");
+					</script>
+				</table>
+			</article>
+			<footer data-role="footer"></footer>
+			<script>
+				odenki.setFooter();
+			</script>
+		</div>
+	</body>
+</html>
