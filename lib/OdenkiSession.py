@@ -72,15 +72,17 @@ class OdenkiSession(object):
             pass
         self.session["odenkiUser"] = odenki_user
 
-from MyRequestHandler import MyRequestHandler
-class _RequestHandler(MyRequestHandler):
-    def get(self):
-        if self.hasNoParam():
-            self.writePage()
-    
-    def post(self):
-        self.get()
-
-if __name__=="__main__":
-    from MyRequestHandler import main
-    main()
+#===============================================================================
+# from MyRequestHandler import MyRequestHandler
+# class _RequestHandler(MyRequestHandler):
+#    def get(self):
+#        if self.hasNoParam():
+#            self.writePage()
+#    
+#    def post(self):
+#        self.get()
+# 
+# if __name__=="__main__":
+#    from MyRequestHandler import main
+#    main()
+#===============================================================================

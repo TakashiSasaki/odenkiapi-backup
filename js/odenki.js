@@ -8,14 +8,12 @@ odenki.fillVersion = function(parent) {
 		data : null,
 		success : function(result_json) {
 			odenki.fillText(parent, result_json);
-			// $("#versionString").text(result_json.versionString);
-			// $("#timeStampString").text(result_json.timeStampString);
 		},
 		error : function(xml_http_request, text_status, error_thrown) {
 			odenki.hideElement(parent);
 		}
 	});
-}// getVersion
+}// fillVersion
 
 odenki.setFooter = function() {
 	$.ajax({
@@ -104,3 +102,4 @@ odenki.hideElement = function(element) {
 		$(element).css("display", "none");
 	}
 }// hideElement
+
