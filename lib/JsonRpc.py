@@ -2,7 +2,6 @@ from encodings.base64_codec import base64_decode
 from simplejson import dumps, load, loads, JSONDecodeError
 from lib.CachedContent import CachedContent
 from logging import debug, getLogger, DEBUG
-from google.appengine.api.search.QueryLexer import HAS
 getLogger().setLevel(DEBUG)
 
 
@@ -103,16 +102,22 @@ class JsonRpc(object):
         assert isinstance(self.result, dict)
         self.result.update(result)
         
-    def getParam(self):
-        assert isinstance(self.params, dict)
-        return self.params.get(self)
+    def getParam(self, key):
+        if hasattr(self, "params"):
+            if isinstance(self.params, dict):
+                return self.params.get(key)
+        return self.jsonRequest.get(key)
     
     def getParams(self):
+        assert isinstance(self.params, dict)
         return self.params
     
     def getMethod(self):
         assert isinstance(self.method, str) or isinstance(self.method, None)
         return self.method
+    
+    def getRequest(self):
+        return self.jsonRequest
     
     def getId(self):
         assert isinstance(self.id, None) or isinstance(self.id, int) or isinstance(self.id, long) or isinstance(self.id, str)
@@ -145,6 +150,7 @@ class JsonRpc(object):
         """getJsonRequest is intended to gather as many parameters as possible 
         even if parameters in URL or request body does not meet JSON-RPC 2.0 specification.
         """
+        debug("getjsonrequest")
         if self.request.method == "POST" or self.request.method == "PUT":
             # POST can change the state of servers.
             # PUT should be idempotent.
@@ -164,7 +170,8 @@ class JsonRpc(object):
             # GET should not change the state of servers.
             # DELETE should be idempotent.
             try:
-                self.jsonRequest = _getJsonFromUrl(self._getArgumentDict())
+                argument_dict = self._getArgumentDict()
+                self.jsonRequest = _getJsonFromUrl(argument_dict)
                 assert isinstance(self.jsonRequest, dict)
                 return
             except JSONDecodeError, e:
@@ -186,9 +193,11 @@ class JsonRpc(object):
                 self.setErrorMessage("No result without error code.")
             params = {
                       "error" : self.error,
-                      "id" : self.id
                       }
-            if self.jsonrpc == "2.0":
+            if hasattr(self, "id"):
+                params["id"] = self.id
+
+            if hasattr(self, "jsonrpc") and self.jsonrpc == "2.0":
                 params["jsonrpc"] = self.jsonrpc
             self.response.out.write(dumps(params))
             return

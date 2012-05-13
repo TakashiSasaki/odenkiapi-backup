@@ -15,6 +15,23 @@ odenki.fillVersion = function(parent) {
 	});
 }// fillVersion
 
+odenki.fillSessionInfo = function(element) {
+	$.ajax({
+		datatype : "json",
+		url : "/api/SessionInfo",
+		type : "GET",
+		data : {
+			callback: document.URL
+		},
+		success : function(result_json) {
+			odenki.fillText(element, result_json.result);
+		},
+		error : function(xml_http_request, text_status, error_thrown) {
+			odenki.hideElement(element);
+		}
+	});
+}// fillSessionInfo
+
 odenki.setFooter = function() {
 	$.ajax({
 		datatype : "html",
@@ -85,14 +102,22 @@ odenki.replaceEventSourceParentElement = function(arguments, html) {
 odenki.fillText = function(parent, dictionary) {
 	if (typeof parent === "string") {
 		for (k in dictionary) {
-			$("#" + parent + " ." + k).text(dictionary[k]);
-		}
+			elements = $("#" + parent + " ." + k);
+			for (var i = 0; i< elements.length; ++i) {
+				e = elements[i];
+				if (e.nodeName == "A") {
+					$(e).attr("href", dictionary[k]);
+				} else {
+					$(e).text(dictionary[k]);
+				}// if
+			}// for
+		}// for
 	} else {
 		for (k in dictionary) {
 			e = parent.find("." + k);
 			e.text(dictionary[k]);
-		}
-	}
+		}// for
+	}// if
 }// fillText
 
 odenki.hideElement = function(element) {
@@ -102,4 +127,3 @@ odenki.hideElement = function(element) {
 		$(element).css("display", "none");
 	}
 }// hideElement
-

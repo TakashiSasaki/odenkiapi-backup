@@ -20,8 +20,9 @@ def getGoogleUser(google_id):
     except:
         return None
 
-def createGoogleUser(user_id, email, nickname):
-    google_user = GoogleUser(googleId = user_id, nickname=nickname, email=email)
+def createGoogleUser(google_id, email, nickname):
+    assert getGoogleUser(google_id) is None
+    google_user = GoogleUser(googleId = google_id, nickname=nickname, email=email)
     #google_user.email = email
     #google_user.nickname = nickname
     #google_user.userId = user_id

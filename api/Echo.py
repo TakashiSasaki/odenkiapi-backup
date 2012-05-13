@@ -8,7 +8,7 @@ class Echo(RequestHandler):
     
     def get(self):
         self.jsonRpc = JsonRpc(self)
-        self.jsonRpc.result = self.jsonRpc.getJsonRequest()
+        self.jsonRpc.result = self.jsonRpc.getRequest()
         self.jsonRpc.write()
         return
     

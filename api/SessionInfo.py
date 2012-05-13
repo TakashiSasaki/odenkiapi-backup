@@ -25,10 +25,12 @@ class UserInfo(RequestHandler):
         return
 
     def setLoginLogoutUrl(self):
-        login_url = create_login_url(self.request.path)
-        self.jsonRpc.setResultValule("loginUrl", login_url)
-        logout_url = create_logout_url(self.request.path)
-        self.jsonRpc.setResultValule("logout_url", logout_url)
+        callback = self.jsonRpc.getParam("callback")
+        if callback:
+            login_url = create_login_url(callback)
+            self.jsonRpc.setResultValule("loginUrl", login_url)
+            logout_url = create_logout_url(callback)
+            self.jsonRpc.setResultValule("logoutUrl", logout_url)
     
     def post(self):
         self.get()
