@@ -113,7 +113,8 @@ class JsonRpc(object):
         return self.params
     
     def getMethod(self):
-        assert isinstance(self.method, str) or isinstance(self.method, None)
+        if not hasattr(self, "method"): return None
+        assert isinstance(self.method, str) or isinstance(self.method, unicode)
         return self.method
     
     def getRequest(self):

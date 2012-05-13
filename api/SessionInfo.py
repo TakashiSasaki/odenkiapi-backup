@@ -2,7 +2,6 @@ from google.appengine.ext.webapp import RequestHandler
 from lib.JsonRpc import JsonRpc
 from lib.debug import *
 from lib.OdenkiSession import OdenkiSession
-from GoogleUser import GoogleUser
 from google.appengine.api.users import create_login_url, create_logout_url
 
 class UserInfo(RequestHandler):
@@ -18,7 +17,7 @@ class UserInfo(RequestHandler):
         odenki_user = odenki_session.getOdenkiUser()
         if odenki_user:
             self.jsonRpc.updateResult(odenki_user.getDictionary())
-        google_user = odenki_session.getOdenkiUser()
+        google_user = odenki_session.getGoogleUser()
         if google_user:
             self.jsonRpc.updateResult(google_user.getDictionary())
         self.jsonRpc.write()

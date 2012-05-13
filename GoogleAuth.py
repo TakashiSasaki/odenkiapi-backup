@@ -1,4 +1,5 @@
 from logging import debug, DEBUG, getLogger
+from lib.JsonRpc import JsonRpc
 #from OdenkiUser import getOdenkiUser, NoOdenkiUser
 getLogger().setLevel(DEBUG)
 
@@ -11,10 +12,10 @@ from gdata.gauth import OAuthHmacToken, ACCESS_TOKEN, AUTHORIZED_REQUEST_TOKEN, 
 from credentials import GOOGLE_OAUTH_CONSUMER_KEY, GOOGLE_OAUTH_CONSUMER_SECRET
 from gdata.gauth import AeSave, AeLoad, AuthorizeRequestToken, AeDelete
 #from gdata.client import Unauthorized
-from OdenkiSession import OdenkiSession
+from lib.OdenkiSession import OdenkiSession
 from gdata.docs.client import DocsClient
 #from google.appengine.ext.db import Model, StringProperty, IntegerProperty
-from GoogleUser import getGoogleUser, createGoogleUser, GoogleUser
+from GoogleUser import getGoogleUser, GoogleUser
 from google.appengine.api.users import create_login_url, create_logout_url, get_current_user
 
 SCOPE_CALENDER = 'https://www.google.com/calendar/feeds/'
@@ -65,11 +66,9 @@ REQUEST_TOKEN_KEY = "abc"
 #    resource_feed = client.get_resources(show_root=True)
 #    return resource_feed
 
-from OdenkiSession import OdenkiSession
-
 class _RequestHandler(RequestHandler):
     
-    __slots__ = ['odenkiSession', 'googleUser']
+    __slots__ = ['odenkiSession', 'googleUser', "jsonRpc"]
     
     def get(self):
         if not self.request.accept.accept_html():
@@ -78,8 +77,10 @@ class _RequestHandler(RequestHandler):
             self.response.out.write("Your client should accept text/html; charset=utf-8")
 
         self.odenkiSession = OdenkiSession()
-
-        if self.request.get("revoke"):
+        self.jsonRpc = JsonRpc(self)
+        assert isinstance(self.jsonRpc, JsonRpc)
+        
+        if self.jsonRpc.getMethod() == "revoke":            
             AeDelete(REQUEST_TOKEN_KEY)
             assert AeLoad(REQUEST_TOKEN_KEY) is None
             self.googleUser = self.odenkiSession.getGoogleUser()
@@ -87,35 +88,22 @@ class _RequestHandler(RequestHandler):
                 google_id = self.googleUser.getGoogleId()
                 self.googleUser.delete()
                 assert getGoogleUser(google_id) is None
-            self.odenkiSession.revoke()
-            self.redirect(create_logout_url(self.request.path))
+            self.odenkiSession.deleteGoogleUser()
+            #self.redirect(create_logout_url(self.jsonRpc.getParam("callback")))
+            self.jsonRpc.setResultValule("message", "revoked google account")
+            self.jsonRpc.write()
             return
 
         user = get_current_user()
         if user is None:
-            self.redirect(create_login_url(self.request.path))
+            self.jsonRpc.setResultValule("message", "you are not logged in with google account")
+            self.jsonRpc.write()
             return
         assert isinstance(user, User)
         
-        self.googleUser = getGoogleUser(user.user_id())
-        if self.googleUser is None:
-            self.googleUser = createGoogleUser(user.user_id(), user.email(), user.nickname())
-        
-        if self.odenkiSession.getOdenkiUser() is None:
-            if self.googleUser.getOdenkiUser() is None:
-                self.googleUser.createOdenkiUser()
-            assert isinstance(self.googleUser, GoogleUser)
-            self.odenkiSession.setGoogleUser(self.googleUser)
-        else:
-            if self.googleUser.getOdenkiUser() is None:
-                self.googleUser.setOdenkiUser(self.odenkiSession.getOdenkiUser())
-            else:
-                if self.odenkiSession.getCanonicalOdenkiId() < self.googleUser.getCanonicalOdenkiId():
-                    self.googleUser.setCanonicalOdenkiId(self.odenkiSession.getCanonicalOdenkiId())
-                elif self.odenkiSession.getCacnonicalOdenkiId() > self.googleUser.getCacnonicalOdenkiId():
-                    self.odenkiSession.setCanonicalOdenkiId(self.googleUser.getCanonicalOdenkiId())
-
-        assert self.googleUser.getCanonicalOdenkiId() == self.odenkiSession.getCanonicalOdenkiId()
+        self.googleUser = getGoogleUser(user.user_id(), user.email(), user.nickname())
+        assert isinstance(self.googleUser, GoogleUser)
+        self.odenkiSession.setGoogleUser(self.googleUser)
 
         debug("trying to load access token")
         if self.googleUser.getAccessToken():

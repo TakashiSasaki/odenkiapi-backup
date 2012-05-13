@@ -30,9 +30,6 @@ class OdenkiSession(object):
     def setGoogleUser(self, google_user):
         assert isinstance(google_user, GoogleUser)
         self.session["googleUser"] = google_user
-        if self.getOdenkiUser() is None:
-            odenki_user = google_user.getOdenkiUser()
-            self.setOdenkiUser(odenki_user)
         
     def getGoogleUser(self):
         try:

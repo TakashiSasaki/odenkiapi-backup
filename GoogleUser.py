@@ -8,29 +8,27 @@ from gdata.spreadsheets.client import SpreadsheetsClient
 #from OdenkiSession import OdenkiSession
 #from google.appengine.api.users import User
 #from Counter import getNewOdenkiId
-from OdenkiUser import getOdenkiUser, OdenkiUser, createOdenkiUser
+#from OdenkiUser import getOdenkiUser, OdenkiUser, createOdenkiUser
 from lib.debug import *
 
-def getGoogleUser(google_id):
+def getGoogleUser(google_id, email = None, nickname = None):
     query = GoogleUser.all()
     query.filter("googleId = ", google_id)
     result = query.run()
     try:
-        return result.next()
+        google_user = result.next()
+        if google_user.email != email:
+            google_user.email = email
+            google_user.put()
+        if google_user.nickname != nickname:
+            google_user.nickname = nickname
+            google_user.put()
     except:
-        return None
-
-def createGoogleUser(google_id, email, nickname):
-    assert getGoogleUser(google_id) is None
-    google_user = GoogleUser(googleId = google_id, nickname=nickname, email=email)
-    #google_user.email = email
-    #google_user.nickname = nickname
-    #google_user.userId = user_id
-    google_user.put()
+        google_user = GoogleUser(googleId = google_id, nickname=nickname, email=email)
+        google_user.put()
     return google_user
 
 class GoogleUser(Model):
-    odenkiId = IntegerProperty()
     email = StringProperty(required = True)
     nickname = StringProperty( required = True)
     googleId = StringProperty( required = True)
@@ -38,35 +36,50 @@ class GoogleUser(Model):
     accessTokenSecret = StringProperty()
     collectionId = StringProperty()
     
-    def getGoogleId(self):
-        return self.googleId
+    #===========================================================================
+    # def getGoogleId(self):
+    #    return self.googleId
+    #===========================================================================
         
-    def getOdenkiUser(self):
-        if self.odenkiId is None:
-            return None
-        debug(type(self.odenkiId))
-        return getOdenkiUser(self.odenkiId)
+    def getOdenkiId(self):
+        q = GoogleUser.all()
+        q.filter("googleId=", self.googleId)
+        return self.odenkiId
     
-    def createOdenkiUser(self):
-        assert self.odenkiId is None
-        odenki_user = createOdenkiUser()
-        self.odenkiId = odenki_user.getOdenkiId()
-        self.put()
+    #===========================================================================
+    # def getOdenkiUser(self):
+    #    if self.odenkiId is None:
+    #        return None
+    #    debug(type(self.odenkiId))
+    #    return getOdenkiUser(self.odenkiId)
+    #===========================================================================
     
-    def setOdenkiUser(self, odenki_user):
-        assert isinstance(odenki_user, OdenkiUser)
-        assert self.getOdenkiUser() is None
-        self.odenkiId = odenki_user.getOdenkiId()
-        self.put()
+    #===========================================================================
+    # def createOdenkiUser(self):
+    #    assert self.odenkiId is None
+    #    odenki_user = createOdenkiUser()
+    #    self.odenkiId = odenki_user.getOdenkiId()
+    #    self.put()
+    # 
+    # def setOdenkiUser(self, odenki_user):
+    #    assert isinstance(odenki_user, OdenkiUser)
+    #    assert self.getOdenkiUser() is None
+    #    self.odenkiId = odenki_user.getOdenkiId()
+    #    self.put()
+    #===========================================================================
     
-    def setCanonicalOdenkiId(self, canonical_odenki_id):
-        assert isinstance(canonical_odenki_id, int)
-        odenki_user = self.getOdenkiUser()
-        assert isinstance(odenki_user, OdenkiUser)
-        odenki_user.setCanonicalOdenkiId(canonical_odenki_id)
+    #===========================================================================
+    # def setCanonicalOdenkiId(self, canonical_odenki_id):
+    #    assert isinstance(canonical_odenki_id, int)
+    #    odenki_user = self.getOdenkiUser()
+    #    assert isinstance(odenki_user, OdenkiUser)
+    #    odenki_user.setCanonicalOdenkiId(canonical_odenki_id)
+    #===========================================================================
     
-    def getCanonicalOdenkiId(self):
-        return self.getOdenkiUser().getCanonicalOdenkiId()
+    #===========================================================================
+    # def getCanonicalOdenkiId(self):
+    #    return self.getOdenkiUser().getCanonicalOdenkiId()
+    #===========================================================================
      
     def setCollectionId(self, collection_id):
         self.collectionId = collection_id
