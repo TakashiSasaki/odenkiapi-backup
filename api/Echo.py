@@ -1,16 +1,12 @@
-from google.appengine.ext.webapp import RequestHandler
-from lib.JsonRpc import JsonRpc
+from lib.MethodsHandler import MethodsHandler
 from lib.debug import *
 
-class Echo(RequestHandler):
+class Echo(MethodsHandler):
+    def __init__(self):
+        MethodsHandler.__init__(self)
     
-    __slot__ = ["jsonRpc"]
-    
-    def get(self):
-        self.jsonRpc = JsonRpc(self)
-        self.jsonRpc.result = self.jsonRpc.getRequest()
-        self.jsonRpc.write()
-        return
+    def echo(self, rpc):
+        rpc.result = rpc.getRequest()
     
     def post(self):
         self.get()
