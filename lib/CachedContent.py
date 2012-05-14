@@ -71,7 +71,10 @@ class CachedContent(object):
         assert self.user is None or isinstance(self.user, str)
         assert self.parameter is None or isinstance(self.parameter, dict) or isinstance(self.parameter, list)
         assert self.contentType is None or isinstance(self.contentType, str)
-        return md5(dumps([self.path, self.user, self.parameter, self.contentType])).hexdigest()
+        key_list = [self.path, self.user, self.parameter, self.contentType]
+        key_string = dumps(key_list)
+        digest_string = md5(key_string).hexdigest()
+        return digest_string
     
     def save(self):
         assert self.content is not None
@@ -119,7 +122,7 @@ class CachedContent(object):
             self.lastModified = getNow()
         self.save()
 
-    def write(self, request_handler, max_age = 600, public = False):
+    def write(self, request_handler, max_age=600, public=False):
         from google.appengine.ext.webapp import RequestHandler
         assert isinstance(request_handler, RequestHandler)
         request = request_handler.request
@@ -140,7 +143,7 @@ class CachedContent(object):
                     response.headers['Cache-Control'] = '%s' % (public_string)
                 assert isinstance(self.lastModified, datetime.datetime)
                 response.headers['Last-Modified'] = toRfcFormat(self.lastModified)
-                response.headers['Expires'] = toRfcFormat(self.lastModified + datetime.timedelta(seconds = max_age))
+                response.headers['Expires'] = toRfcFormat(self.lastModified + datetime.timedelta(seconds=max_age))
                 response.out.write(None)
                 return
         response.set_status(200)

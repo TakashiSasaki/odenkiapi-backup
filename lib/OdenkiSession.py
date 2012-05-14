@@ -40,7 +40,8 @@ class OdenkiSession(object):
     
     def deleteGoogleUser(self):
         try:
-            self.session["googleUser"] = None
+            del self.session["googleUser"]
+            #self.session["googleUser"] = None
         except KeyError:
             pass
     

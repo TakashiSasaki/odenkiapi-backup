@@ -21,3 +21,6 @@ def runWsgiApp(request_handler, path):
 
     run_wsgi_app(application)
 
+from GoogleUser import GoogleUser, getGoogleUser, findGoogleUser
+
+RPC_ERROR_USER_AGENT_DOES_NOT_ACCEPT_HTML = 1
