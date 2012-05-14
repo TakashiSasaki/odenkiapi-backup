@@ -1,6 +1,5 @@
 from google.appengine.ext.webapp import RequestHandler
-import lib.JsonRpc
-from lib.debug import *
+import lib
 
 class MethodsHandler(RequestHandler):
     __slot__ = ["methodList", "jsonRpc"]
@@ -34,16 +33,19 @@ class MethodsHandler(RequestHandler):
         
         for k, v in self.methodList.iteritems():
             if isinstance(k, str):
-                debug("key = " + k + " value = " + str(v))
+                lib.debug("key = " + k + " value = " + str(v))
                 self.methodList[k.decode()] = v
     
     def _invokeMethod(self, method_name, json_rpc):
-        self.methodList[method_name](self, json_rpc)
+        try:
+            self.methodList[method_name](self, json_rpc)
+        except KeyError:
+            pass
         
     def get(self):
         self._initMethodList()
         
-        json_rpc = lib.JsonRpc.JsonRpc(self)
+        json_rpc = lib.JsonRpc(self)
         if json_rpc.getErrorCode():
             json_rpc.write()
             return
@@ -55,3 +57,4 @@ class MethodsHandler(RequestHandler):
         self._invokeMethod(method, json_rpc)
         json_rpc.write()
         return
+

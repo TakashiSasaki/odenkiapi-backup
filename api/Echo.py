@@ -1,9 +1,8 @@
-from lib.MethodsHandler import MethodsHandler
-from lib.debug import *
+import lib
 
-class Echo(MethodsHandler):
+class Echo(lib.MethodsHandler):
     def __init__(self):
-        MethodsHandler.__init__(self)
+        lib.MethodsHandler.__init__(self)
     
     def echo(self, rpc):
         rpc.result = rpc.getRequest()

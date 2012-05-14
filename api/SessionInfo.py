@@ -1,7 +1,5 @@
 from google.appengine.ext.webapp import RequestHandler
-from lib.JsonRpc import JsonRpc
-from lib.debug import *
-from lib.OdenkiSession import OdenkiSession
+import lib
 from google.appengine.api.users import create_login_url, create_logout_url
 
 class UserInfo(RequestHandler):
@@ -9,10 +7,10 @@ class UserInfo(RequestHandler):
     __slot__ = ["jsonRpc"]
     
     def get(self):
-        self.jsonRpc = JsonRpc(self)
+        self.jsonRpc = lib.JsonRpc(self)
         self.setLoginLogoutUrl()
 
-        odenki_session = OdenkiSession()
+        odenki_session = lib.OdenkiSession()
         self.jsonRpc.setResultValule("sid", odenki_session.getSid())
         odenki_user = odenki_session.getOdenkiUser()
         if odenki_user:

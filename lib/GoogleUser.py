@@ -1,5 +1,5 @@
-from google.appengine.ext.db import Model, IntegerProperty, StringProperty
-from google.appengine.api import users, oauth
+from google.appengine.ext.db import Model, StringProperty
+#from google.appengine.api import users, oauth
 from gdata.gauth import OAuthHmacToken
 from credentials import GOOGLE_OAUTH_CONSUMER_KEY, GOOGLE_OAUTH_CONSUMER_SECRET
 from gdata.gauth import ACCESS_TOKEN
@@ -9,7 +9,7 @@ from gdata.spreadsheets.client import SpreadsheetsClient
 #from google.appengine.api.users import User
 #from Counter import getNewOdenkiId
 #from OdenkiUser import getOdenkiUser, OdenkiUser, createOdenkiUser
-from lib.debug import *
+#import lib
 
 def getGoogleUser(google_id, email=None, nickname=None):
     """get existing GoogleUser entity or create new one if it does not exist"""
@@ -46,6 +46,15 @@ class GoogleUser(Model):
     accessToken = StringProperty()
     accessTokenSecret = StringProperty()
     collectionId = StringProperty()
+    
+    def getDictionary(self):
+        return {
+                "email": self.email,
+                "nickname":self.nickname,
+                "googleId":self.googleId,
+                "accessToken":self.accessToken,
+                "accessTokenSecret":self.accessTokenSecret,
+                "collectionId":self.collectionId }
     
     def getGoogleId(self):
        return self.googleId
