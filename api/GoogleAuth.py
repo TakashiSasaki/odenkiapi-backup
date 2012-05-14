@@ -1,11 +1,7 @@
 from logging import debug, DEBUG, getLogger
-from lib.JsonRpc import JsonRpc
-#from OdenkiUser import getOdenkiUser, NoOdenkiUser
 getLogger().setLevel(DEBUG)
 
 from google.appengine.api.users import User
-from google.appengine.ext.webapp.util import run_wsgi_app
-from google.appengine.ext.webapp import WSGIApplication, RequestHandler
 #from google.appengine.api import users
 from gdata.gauth import OAuthHmacToken, ACCESS_TOKEN, AUTHORIZED_REQUEST_TOKEN, REQUEST_TOKEN
 #from gdata.docs.data import ResourceFeed, Resource
@@ -15,7 +11,7 @@ from gdata.gauth import AeSave, AeLoad, AuthorizeRequestToken, AeDelete
 from gdata.docs.client import DocsClient
 #from google.appengine.ext.db import Model, StringProperty, IntegerProperty
 import lib
-from google.appengine.api.users import create_login_url, create_logout_url, get_current_user
+from google.appengine.api.users import get_current_user
 
 SCOPE_CALENDER = 'https://www.google.com/calendar/feeds/'
 SCOPE_DOCS_LIST = 'https://docs.google.com/feeds/'
@@ -132,9 +128,9 @@ class _RequestHandler(MethodsHandler):
                 self.googleUser.setAccessToken(access_token)
                 assert isinstance(self.googleUser.getAccessToken(), OAuthHmacToken)
                 assert self.googleUser.getAccessToken().auth_state == ACCESS_TOKEN
-                self.response.set_status(200)
-                self.response.headers["Content-Type"] = "text/plain; charset=ascii"
-                self.response.out.write("Access token was saved.\n")
+                #self.response.set_status(200)
+                #self.response.headers["Content-Type"] = "text/plain; charset=ascii"
+                rpc.addLog("Access token was saved..")
                 return
             except Exception, e:
                 #self.response.set_status(500)
@@ -151,7 +147,7 @@ class _RequestHandler(MethodsHandler):
             docs_client = DocsClient()
             request_token = docs_client.GetOAuthToken(
                 GOOGLE_OAUTH_SCOPES,
-                'http://%s/GoogleAuth' % self.request.host,
+                'http://%s/api/GoogleAuth' % self.request.host,
                 GOOGLE_OAUTH_CONSUMER_KEY,
                 consumer_secret=GOOGLE_OAUTH_CONSUMER_SECRET)
             assert isinstance(request_token, OAuthHmacToken)
@@ -163,7 +159,7 @@ class _RequestHandler(MethodsHandler):
             AeSave(request_token, REQUEST_TOKEN_KEY)
             assert isinstance(AeLoad(REQUEST_TOKEN_KEY), OAuthHmacToken)
             rpc.addLog("request token was saved by AeSave")
-            authorization_url = request_token.generate_authorization_url(google_apps_domain=None)
+            authorization_url = request_token.generate_authorization_url() #google_apps_domain=None
             rpc.setResultValule("authorizationUrl", str(authorization_url))
             rpc.addLog("redirecting to " + str(authorization_url))
             rpc.redirect(str(authorization_url))
@@ -176,7 +172,7 @@ class _RequestHandler(MethodsHandler):
             return
         
         # this code should not be reached.
-        rpc.setResultValule("message", "unexpected state in GoogleAuth module.")
+        rpc.addLog("unexpected state in GoogleAuth module.")
         
         
 if __name__ == "__main__":

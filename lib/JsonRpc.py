@@ -65,7 +65,8 @@ class JsonRpc(object):
         self._getJsonRequest()
         if self.jsonRequest:
             self.jsonrpc = self.jsonRequest.get("jsonrpc")
-            self.method = self.jsonRequest.get("method")
+            if  self.jsonRequest.has_key("method"):
+                self.method = self.jsonRequest.get("method")
             self.params = self.jsonRequest.get("params")
             self.id = self.jsonRequest.get("id")
             if isinstance(self.id, list) and len(self.id) == 1:
@@ -167,7 +168,6 @@ class JsonRpc(object):
         """getJsonRequest is intended to gather as many parameters as possible 
         even if parameters in URL or request body does not meet JSON-RPC 2.0 specification.
         """
-        debug("getjsonrequest")
         if self.request.method == "POST" or self.request.method == "PUT":
             # POST can change the state of servers.
             # PUT should be idempotent.

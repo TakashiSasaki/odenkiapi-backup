@@ -128,7 +128,7 @@ class CachedContent(object):
         request = request_handler.request
         response = request_handler.response
         debug("Last-Modified : " + str(self.lastModified))
-        if request.if_modified_since:
+        if request.if_modified_since and response.status == 200:
             debug("If-Modified-Since : " + str(request.headers["If-Modified-Since"]))
             if_modified_since = getIfModifiedSince(request)
             assert isinstance(if_modified_since, datetime.datetime)
@@ -146,7 +146,7 @@ class CachedContent(object):
                 response.headers['Expires'] = toRfcFormat(self.lastModified + datetime.timedelta(seconds=max_age))
                 response.out.write(None)
                 return
-        response.set_status(200)
+        #response.set_status(200)
         response.headers['Content-Type'] = self.contentType
         response.headers['Cache-Control'] = 'private'
         assert isinstance(self.lastModified, datetime.datetime)
