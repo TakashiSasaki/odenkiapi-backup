@@ -1,6 +1,7 @@
 application: odenkiapi
 version: python-0006
-runtime: python
+#runtime: python
+runtime: python27
 api_version: 1
 
 default_expiration: "1d 1h"

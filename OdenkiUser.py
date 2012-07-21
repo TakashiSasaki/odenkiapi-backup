@@ -1,15 +1,8 @@
 from google.appengine.ext.db import Model, Query
 from google.appengine.ext.db import StringProperty, URLProperty, IntegerProperty, DateTimeProperty
-from google.appengine.ext.webapp.util import run_wsgi_app
-from google.appengine.ext.webapp import WSGIApplication
-from google.appengine.api import oauth
-from google.appengine.api import users
 from datetime import datetime
 from lib.Counter import getNewOdenkiId
 #from GoogleDocs import GoogleDocs
-
-from logging import debug, DEBUG, getLogger
-getLogger().setLevel(DEBUG)
 
 class OdenkiUser(Model):
     odenkiId = IntegerProperty(required=True)

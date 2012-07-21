@@ -1,3 +1,5 @@
+import unittest
+from google.appengine.ext import testbed
 from gaesessions import get_current_session, Session, set_current_session
 from GoogleUser import GoogleUser
 from OdenkiUser import getOdenkiUser, OdenkiUser
