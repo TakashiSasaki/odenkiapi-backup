@@ -1,82 +1,90 @@
-from hashlib import md5
-from simplejson import dumps
-import datetime
-import lib
-
+import unittest
 from google.appengine.api import memcache
+#from google.appengine.ext import db
+from google.appengine.ext import testbed
+
+from hashlib import md5
+import simplejson
+import marshal
+import datetime
+from lib.DateTimeUtil import getNow
+from lib.OdenkiSession import OdenkiSession
+ 
+
 class CachedContent(object):
+    __slots__ = ["path", "user", "parameter", "template", "contentType", "lastModified", "public" , "content"]
     
-    __slots__ = ["path", "user", "parameter", "template", "contentType", "content", "lastModified"]
-    
-    def __init__(self, path, parameter, template=None):
+    def __init__(self, path, user, parameter, template=None, content_type=None):
         assert isinstance(path, str)
         self.path = path
+        assert isinstance(user, str) or isinstance(user, int) or isinstance(user, long)
+        self.user = user
         assert parameter is None or isinstance(parameter, list) or isinstance(parameter, dict)
         self.parameter = parameter
-        assert parameter is None or isinstance(parameter, list) or isinstance(parameter, dict)
-        self.template = template
-        self.content = None
-        self.lastModified = None
+        if template:
+            self.template = template
+        #self.content = None
+        #self.lastModified = None
         # TODO: user should be filled in this constructor
-        self.user = None
+        #self.user = None
+        self._save()
 
-    def getKeyHash(self):
+    def __str__(self):
+        assert isinstance(self.content, str)
+        return self.content
+    
+    def _getKeyHash(self):
         assert isinstance(self.path, str)
-        assert self.user is None or isinstance(self.user, str)
+        #assert self.user is None or isinstance(self.user, str)
         assert self.parameter is None or isinstance(self.parameter, dict) or isinstance(self.parameter, list)
         assert self.contentType is None or isinstance(self.contentType, str)
         key_list = [self.path, self.user, self.parameter, self.contentType]
-        key_string = dumps(key_list)
+        key_string = marshal.dumps(key_list)
         digest_string = md5(key_string).hexdigest()
         return digest_string
     
-    def save(self):
-        assert self.content is not None
-        key_hash = self.getKeyHash()
+    def _save(self):
+        assert not hasattr(self, "content")
+        if hasattr(self, "template"):
+            if not hasattr(self, "contentType"):
+                self.contentType = "text/html; charset=utf-8"
+            self._load()
+            if not hasattr(self, "content"):
+                from google.appengine.ext.webapp import template
+                self.content = template.render(self.template, self.parameter)
+        else:
+            if not hasattr(self, "contentType"):
+                self.contentType = "application/json"
+            self._load()
+            if not hasattr(self, "content"):                
+                self.content = simplejson.dumps(self.parameter)
+
+        if not hasattr(self, "lastModified"):
+            self.lastModified = getNow()
+
+        key_hash = self._getKeyHash()
         memcache.add(key_hash, self)
         
-    def load(self):
+    def _load(self):
         "searches for content in memcache and fill empty members."
-        loaded_cached_content = memcache.get(self.getKeyHash())
+        assert not hasattr(self, "content")
+        loaded_cached_content = memcache.get(self._getKeyHash())
         if loaded_cached_content:
-            assert isinstance(loaded_cached_content, CachedContent)
-            if self.content is None:
-                self.content = loaded_cached_content.content
-            if self.lastModified is None:
-                self.lastModified = loaded_cached_content.lastModified
-    
-    def render(self):
-        self.contentType = "text/html; charset=utf-8"
-        self.load()
-        if self.content is None:
-            from google.appengine.ext.webapp import template
-            self.content = template.render(self.template, self.parameter)
-        if self.lastModified is None:
-            self.lastModified = lib.getNow()
-        self.save()
-        
-    def dump(self):
-        self.contentType = "application/json"
-        self.load()
-        if self.content is None:
-            self.content = dumps(self.parameter)
-        if self.lastModified is None:
-            self.lastModified = lib.getNow()
-        self.save()
-        
-    def text(self):
-        self.contentType = "text/plain; charset=utf-8"
-        self.load()
-        if self.content is None:
-            if self.template is None:
-                self.content = dumps(self.parameter)
-            else:
-                self.content = self.template
-        if self.lastModified is None:
-            self.lastModified = lib.getNow()
-        self.save()
+            assert isinstance(loaded_cached_content, self.__class__)
+            assert self.path == loaded_cached_content.path
+            assert self.parameter == loaded_cached_content.parameter
+            from lib import isEqualIfExists
+            assert isEqualIfExists(self, loaded_cached_content, "template")
+            assert isEqualIfExists(self, loaded_cached_content, "contentType")
+            assert not hasattr(self, "lastModified")
+            self.lastModified = loaded_cached_content.lastModified
+            assert not hasattr(self, "public")
+            self.public = loaded_cached_content.public
+            assert not hasattr(self, "content")
+            self.content = loaded_cached_content.content
 
     def write(self, request_handler, max_age=600, public=False):
+        raise DeprecationWarning
         from google.appengine.ext.webapp import RequestHandler
         assert isinstance(request_handler, RequestHandler)
         request = request_handler.request
@@ -109,10 +117,29 @@ class CachedContent(object):
         response.out.write(self.content)
         return
 
-if __name__ == "__main__":
-    cache_content = CachedContent("/abc", None, "hello")
-    cache_content.save()
-    cache_content = CachedContent("/abc", None)
-    cache_content.load()
-    print cache_content.content
-    print cache_content.lastModified
+class MyTest(unittest.TestCase):
+    __stub__ = ["testbed", "user"]
+    def setUp(self):
+        # First, create an instance of the Testbed class.
+        self.testbed = testbed.Testbed()
+        # Then activate the testbed, which prepares the service stubs for use.
+        self.testbed.activate()
+        # Next, declare which service stubs you want to use.
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+        
+        from lib.OdenkiSession import OdenkiSession
+        odenki_session = OdenkiSession()
+        self.user = odenki_session.getSid()
+    
+    def test(self):
+        cc1 = CachedContent("/abc", "testuser", [1, "abc"], None)
+        print cc1.lastModified
+        cc2 = CachedContent("/abc", "testuser", [1, "abc"], None)
+        print cc2.lastModified
+        
+        pass
+        
+    def tearDown(self):
+        self.testbed.deactivate()
+    
