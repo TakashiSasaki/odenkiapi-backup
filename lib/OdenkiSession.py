@@ -30,9 +30,6 @@ class OdenkiSession(object):
     def setGoogleUser(self, google_user):
         assert isinstance(google_user, GoogleUser)
         self.session["googleUser"] = google_user
-        if self.getOdenkiUser() is None:
-            odenki_user = google_user.getOdenkiUser()
-            self.setOdenkiUser(odenki_user)
         
     def getGoogleUser(self):
         try:
@@ -43,7 +40,8 @@ class OdenkiSession(object):
     
     def deleteGoogleUser(self):
         try:
-            self.session["googleUser"] = None
+            del self.session["googleUser"]
+            #self.session["googleUser"] = None
         except KeyError:
             pass
     
@@ -72,15 +70,17 @@ class OdenkiSession(object):
             pass
         self.session["odenkiUser"] = odenki_user
 
-from MyRequestHandler import MyRequestHandler
-class _RequestHandler(MyRequestHandler):
-    def get(self):
-        if self.hasNoParam():
-            self.writePage()
-    
-    def post(self):
-        self.get()
-
-if __name__=="__main__":
-    from MyRequestHandler import main
-    main()
+#===============================================================================
+# from MyRequestHandler import MyRequestHandler
+# class _RequestHandler(MyRequestHandler):
+#    def get(self):
+#        if self.hasNoParam():
+#            self.writePage()
+#    
+#    def post(self):
+#        self.get()
+# 
+# if __name__=="__main__":
+#    from MyRequestHandler import main
+#    main()
+#===============================================================================

@@ -1,53 +1,7 @@
 from hashlib import md5
-import dateutil.parser
 from simplejson import dumps
 import datetime
-from logging import DEBUG, debug, getLogger
-getLogger().setLevel(DEBUG)
-
-ANCIENT = "Fri, 01 Jan 1990 00:00:00 GMT"
-
-class GMT(datetime.tzinfo):
-    def utcoffset(self, dt):
-        return datetime.timedelta(hours=0)
-    def dst(self, dt):
-        return datetime.timedelta(0)
-    def tzname(self, dt):
-        return "GMT"
-
-def getNow():
-    dt = datetime.datetime.now()
-    assert isinstance(dt, datetime.datetime)
-    dt = dt.replace(tzinfo=GMT())
-    s = toRfcFormat(dt)
-    dt = toDateTime(s)
-    return dt
-
-def getIfModifiedSince(request):
-    from google.appengine.ext.webapp import Request
-    assert isinstance(request, Request)
-    s = request.headers.get("If-Modified-Since", None)
-    return toDateTime(s)
-
-def toDateTime(s):
-    if s is None:
-        dt = dateutil.parser.parse(ANCIENT)
-        assert isinstance(dt, datetime.datetime)
-        assert dt.tzinfo is not None
-        return dt 
-    else:
-        assert isinstance(s, str)
-        dt = dateutil.parser.parse(s)
-        assert isinstance(dt, datetime.datetime)
-        assert dt.tzinfo is not None
-        return dt
-
-def toRfcFormat(dt):
-    if dt is None:
-        return ANCIENT
-    assert isinstance(dt, datetime.datetime)
-    assert dt.tzinfo is not None
-    return dt.strftime("%a, %d %b %Y %H:%M:%S %Z")
+import lib
 
 from google.appengine.api import memcache
 class CachedContent(object):
@@ -71,7 +25,10 @@ class CachedContent(object):
         assert self.user is None or isinstance(self.user, str)
         assert self.parameter is None or isinstance(self.parameter, dict) or isinstance(self.parameter, list)
         assert self.contentType is None or isinstance(self.contentType, str)
-        return md5(dumps([self.path, self.user, self.parameter, self.contentType])).hexdigest()
+        key_list = [self.path, self.user, self.parameter, self.contentType]
+        key_string = dumps(key_list)
+        digest_string = md5(key_string).hexdigest()
+        return digest_string
     
     def save(self):
         assert self.content is not None
@@ -95,7 +52,7 @@ class CachedContent(object):
             from google.appengine.ext.webapp import template
             self.content = template.render(self.template, self.parameter)
         if self.lastModified is None:
-            self.lastModified = getNow()
+            self.lastModified = lib.getNow()
         self.save()
         
     def dump(self):
@@ -104,7 +61,7 @@ class CachedContent(object):
         if self.content is None:
             self.content = dumps(self.parameter)
         if self.lastModified is None:
-            self.lastModified = getNow()
+            self.lastModified = lib.getNow()
         self.save()
         
     def text(self):
@@ -116,18 +73,18 @@ class CachedContent(object):
             else:
                 self.content = self.template
         if self.lastModified is None:
-            self.lastModified = getNow()
+            self.lastModified = lib.getNow()
         self.save()
 
-    def write(self, request_handler, max_age = 600, public = False):
+    def write(self, request_handler, max_age=600, public=False):
         from google.appengine.ext.webapp import RequestHandler
         assert isinstance(request_handler, RequestHandler)
         request = request_handler.request
         response = request_handler.response
-        debug("Last-Modified : " + str(self.lastModified))
-        if request.if_modified_since:
-            debug("If-Modified-Since : " + str(request.headers["If-Modified-Since"]))
-            if_modified_since = getIfModifiedSince(request)
+        lib.debug("Last-Modified : " + str(self.lastModified))
+        if request.if_modified_since and response.status == 200:
+            lib.debug("If-Modified-Since : " + str(request.headers["If-Modified-Since"]))
+            if_modified_since = lib.getIfModifiedSince(request)
             assert isinstance(if_modified_since, datetime.datetime)
             assert isinstance(self.lastModified, datetime.datetime)
             if if_modified_since >= self.lastModified:
@@ -139,25 +96,20 @@ class CachedContent(object):
                 else:
                     response.headers['Cache-Control'] = '%s' % (public_string)
                 assert isinstance(self.lastModified, datetime.datetime)
-                response.headers['Last-Modified'] = toRfcFormat(self.lastModified)
-                response.headers['Expires'] = toRfcFormat(self.lastModified + datetime.timedelta(seconds = max_age))
+                response.headers['Last-Modified'] = lib.toRfcFormat(self.lastModified)
+                response.headers['Expires'] = lib.toRfcFormat(self.lastModified + datetime.timedelta(seconds=max_age))
                 response.out.write(None)
                 return
-        response.set_status(200)
+        #response.set_status(200)
         response.headers['Content-Type'] = self.contentType
         response.headers['Cache-Control'] = 'private'
         assert isinstance(self.lastModified, datetime.datetime)
-        response.headers['Last-Modified'] = toRfcFormat(self.lastModified)
+        response.headers['Last-Modified'] = lib.toRfcFormat(self.lastModified)
         #response.headers['Expires'] = toRfcFormat(self.lastModified + datetime.timedelta(seconds = max_age))
         response.out.write(self.content)
         return
 
 if __name__ == "__main__":
-    now_datetime = getNow()
-    now_string = toRfcFormat(now_datetime)
-    now_datetime2 = toDateTime(now_string)
-    assert now_datetime2 == now_datetime2
-    debug("test finished")
     cache_content = CachedContent("/abc", None, "hello")
     cache_content.save()
     cache_content = CachedContent("/abc", None)
