@@ -1,10 +1,12 @@
 application: odenkiapi
-version: python-0006
+version: python-0007
 #runtime: python
 runtime: python27
 api_version: 1
 
 default_expiration: "1d 1h"
+
+threadsafe: no
 
 handlers:
 - url: /js
@@ -75,4 +77,3 @@ handlers:
 
 - url: /OdenkiSession*
   script: OdenkiSession.py
-  

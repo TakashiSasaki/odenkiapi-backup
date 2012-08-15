@@ -21,13 +21,6 @@ function JsonToArray(json) {
 function Sheet(sheet_id) {
     this.url = "https://spreadsheets.google.com/feeds/cells/0AuFt9cSl5maddEtiOG9rNUstdW80dmlyakRFYnlPeXc/" + sheet_id + "/public/values?callback=?";
 
-    this.callback = function(json) {
-        //alert(json);
-        //alert(json);
-        //if(json == undefined) return;
-        this.array = JsonToArray(json);
-    }
-
     this.fetch = function(callback) {
         this.array = [2];
         //this.callback.bind(this)();
@@ -37,13 +30,10 @@ function Sheet(sheet_id) {
             alt : "json"
         }, callback);
     }// fetch
-
-    this.fetch();
-
 }// Sheet
 
-var ob6 = new Sheet("od6");
-ob6.fetch(function(json) {
+var od6 = new Sheet("od6");
+od6.fetch(function(json) {
     var array = JsonToArray(json);
     var totalElectricityGenerated = new google.visualization.DataTable();
     totalElectricityGenerated.addColumn("datetime", "発電日");
@@ -62,3 +52,37 @@ ob6.fetch(function(json) {
     });
 });
 
+function drawmap() {
+    var od7 = new Sheet("od7");
+    od7.fetch(function(json) {
+        //alert(1);
+        var array = JsonToArray(json);
+        //alert(array);
+        var map = new google.maps.Map(document.getElementById('allGenerators'), {
+            center : new google.maps.LatLng(33, 132),
+            zoom : 10,
+            mapTypeId : 'terrain',
+            height : 500,
+            width : $(window).width() * 0.95
+        });
+        var marker_clusterer = new MarkerClusterer(map, null, {
+            maxZoom : 19
+        });
+        marker_clusterer.addMarker(new google.maps.Marker({
+            position : new google.maps.LatLng(33, 132),
+            title : "松山"
+        }));
+        for (var i = 1; i < array.length; ++i) {
+            var row = array[i];
+            //alert(row);
+            var latlng = new google.maps.LatLng(Number(row[2]), Number(row[3]));
+            var title = row[0];
+            var marker = new google.maps.Marker({
+                position : latlng,
+                title : title
+            });
+            marker_clusterer.addMarker(marker);
+        }
+        marker_clusterer.redraw();
+    });
+}

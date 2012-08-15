@@ -11,11 +11,15 @@
         <script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
         <script src="../js/dummy.js"></script>
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript" src="http://maps.google.com/maps/api/js?key=AIzaSyDYYXbxjq_CZePgdVU2x9AMRPsuX4PBSPE&sensor=false"></script>
+        <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/tags/markermanager/1.0/src/markermanager.js"></script>
+        <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer_compiled.js"></script>
+
         <script type="text/javascript">
             google.load("visualization", "1", {
                 packages : ["corechart"]
             });
-            google.setOnLoadCallback(drawChart);
+            google.setOnLoadCallback(drawmap);
             function drawChart() {
                 //var data = google.visualization.arrayToDataTable([['Year', 'Sales', 'Expenses'], ['2004', 1000, 400], ['2005', 1170, 460], ['2006', 660, 1120], ['2007', 1030, 540]]);
 
@@ -58,10 +62,13 @@
             </div>
             <div data-role="content">
                 <h1 class="ui-hidden-accessible">みんなの発電量</h1>
-                <div id="totalElectricityGenerated">
+                <div id="totalElectricityGenerated" >
                     みんなの発電量の折れ線グラフ
                 </div>
                 <h1>みんなの発電地図</h1>
+                <div id="allGenerators" style="width:96%; height:600px">
+                    すべての発電設備
+                </div>
                 <h1>みんなの発電量のグラフ</h1>
                 <h1>なかまの発電量のランキング</h1>
                 <h1>おしらせ</h1>
