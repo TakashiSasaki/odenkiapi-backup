@@ -9,6 +9,18 @@
         <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css" />
         <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
         <script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+        <script src="../js/dummy.js"></script>
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript">
+            google.load("visualization", "1", {
+                packages : ["corechart"]
+            });
+            google.setOnLoadCallback(drawChart);
+            function drawChart() {
+                //var data = google.visualization.arrayToDataTable([['Year', 'Sales', 'Expenses'], ['2004', 1000, 400], ['2005', 1170, 460], ['2006', 660, 1120], ['2007', 1030, 540]]);
+
+            }
+        </script>
 
     </head>
     <body>
@@ -45,7 +57,10 @@
                 </ul>
             </div>
             <div data-role="content">
-                <h1>みんなの発電量</h1>
+                <h1 class="ui-hidden-accessible">みんなの発電量</h1>
+                <div id="totalElectricityGenerated">
+                    みんなの発電量の折れ線グラフ
+                </div>
                 <h1>みんなの発電地図</h1>
                 <h1>みんなの発電量のグラフ</h1>
                 <h1>なかまの発電量のランキング</h1>
@@ -53,5 +68,7 @@
             </div>
 
         </div>
+
+        <script></script>
     </body>
 </html>
