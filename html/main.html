@@ -1,81 +1,83 @@
 <!DOCTYPE html>
 <html>
-    <head>
+	<head>
 
-        <title>jQuery Mobile page</title>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="../css/odenki-theme.min.css" />
-        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css" />
-        <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-        <script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
-        <script src="../js/dummy.js"></script>
-        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-        <script type="text/javascript" src="http://maps.google.com/maps/api/js?key=AIzaSyDYYXbxjq_CZePgdVU2x9AMRPsuX4PBSPE&sensor=false"></script>
-        <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/tags/markermanager/1.0/src/markermanager.js"></script>
-        <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer_compiled.js"></script>
+		<title>jQuery Mobile page</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="../css/odenki-theme.min.css" />
+		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css" />
+		<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+		<script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+		<script src="../js/dummy.js"></script>
+		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+		<script type="text/javascript" src="http://maps.google.com/maps/api/js?key=AIzaSyDYYXbxjq_CZePgdVU2x9AMRPsuX4PBSPE&sensor=false"></script>
+		<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/tags/markermanager/1.0/src/markermanager.js"></script>
+		<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer_compiled.js"></script>
 
-        <script type="text/javascript">
-            google.load("visualization", "1", {
-                packages : ["corechart"]
-            });
-            google.setOnLoadCallback(drawmap);
-            function drawChart() {
-                //var data = google.visualization.arrayToDataTable([['Year', 'Sales', 'Expenses'], ['2004', 1000, 400], ['2005', 1170, 460], ['2006', 660, 1120], ['2007', 1030, 540]]);
+		<script type="text/javascript">
+			$('#mainPage').live('pagecreate', function(event) {
+				var div = document.getElementById("totalElectricityGenerated");
+				drawTotalElectricityChart(div);
+				drawmap();
+			});
+			google.load("visualization", "1", {
+				packages : ["corechart"]
+			});
+			google.setOnLoadCallback(function() {
+				// triggered just after google javascript libraries are loaded
+			});
+		</script>
+	</head>
+	<body>
+		<div data-role="page" id="mainPage">
+			<div data-role="header" data-position="inline" data-theme="e" >
+				<h1>みんなでおでんき</h1>
+			</div>
+			<div data-role="navbar">
+				<ul>
+					<li>
+						<a href="main.html"  data-ajax="false"  data-icon="home" class="ui-btn-active">
+						<div class="ui-bar-a">
+							みんなのおでんき
+						</div></a>
+					</li>
+					<li >
+						<a href="community.html"  data-ajax="false"  data-icon="star">
+						<div class="ui-bar-b">
+							なかまのおでんき
+						</div></a>
+					</li>
+					<li>
+						<a href="myself.html"  data-ajax="false"  data-icon="info">
+						<div class="ui-bar-c">
+							マイおでんき
+						</div></a>
+					</li>
+					<li>
+						<a href="input.html"  data-ajax="false"  data-icon="gear">
+						<div class="ui-bar-d">
+							入力
+						</div></a>
+					</li>
+				</ul>
+			</div>
+			<div data-role="content">
+				<h1 class="ui-hidden-accessible">みんなの発電量</h1>
+				<div id="totalElectricityGenerated" >
+					みんなの発電量の折れ線グラフ
+				</div>
+				<h1>みんなの発電地図</h1>
+				<div id="allGenerators" style="width:96%; height:600px">
+					すべての発電設備
+				</div>
+				<h1>みんなの発電量のグラフ</h1>
+				<h1>なかまの発電量のランキング</h1>
+				<h1>おしらせ</h1>
+			</div>
 
-            }
-        </script>
+		</div>
 
-    </head>
-    <body>
-        <div data-role="page" >
-            <div data-role="header" data-position="inline" data-theme="e" >
-                <h1>みんなでおでんき</h1>
-            </div>
-            <div data-role="navbar">
-                <ul>
-                    <li>
-                        <a href="main.html"  data-ajax="false"  data-icon="home" class="ui-btn-active">
-                        <div class="ui-bar-a">
-                            みんなのおでんき
-                        </div></a>
-                    </li>
-                    <li >
-                        <a href="community.html"  data-ajax="false"  data-icon="star">
-                        <div class="ui-bar-b">
-                            なかまのおでんき
-                        </div></a>
-                    </li>
-                    <li>
-                        <a href="myself.html"  data-ajax="false"  data-icon="info">
-                        <div class="ui-bar-c">
-                            マイおでんき
-                        </div></a>
-                    </li>
-                    <li>
-                        <a href="input.html"  data-ajax="false"  data-icon="gear">
-                        <div class="ui-bar-d">
-                            入力
-                        </div></a>
-                    </li>
-                </ul>
-            </div>
-            <div data-role="content">
-                <h1 class="ui-hidden-accessible">みんなの発電量</h1>
-                <div id="totalElectricityGenerated" >
-                    みんなの発電量の折れ線グラフ
-                </div>
-                <h1>みんなの発電地図</h1>
-                <div id="allGenerators" style="width:96%; height:600px">
-                    すべての発電設備
-                </div>
-                <h1>みんなの発電量のグラフ</h1>
-                <h1>なかまの発電量のランキング</h1>
-                <h1>おしらせ</h1>
-            </div>
-
-        </div>
-
-        <script></script>
-    </body>
+		<script></script>
+	</body>
 </html>
