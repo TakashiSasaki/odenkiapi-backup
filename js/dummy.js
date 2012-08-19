@@ -127,6 +127,8 @@ function drawRanking(div) {
 			var row = array[i];
 			data_table.addRow([ Number(row[0]), row[1], Number(row[4]), row[5],
 					Number(row[3]) ]);
+			data_table.setFormattedValue(i-1, 1, '<img src="' + row[6]
+					+ '" width="40px" height="40px"></img>' + row[1]);
 		}// for
 		var table = new google.visualization.Table(div);
 		table.draw(data_table, {
