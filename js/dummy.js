@@ -19,9 +19,9 @@ function JsonToArray(json) {
 }// JsonToArray
 
 function Sheet(sheet_id, callback) {
+	// 2x2 array is given to callback
 	this.url = "https://spreadsheets.google.com/feeds/cells/0AuFt9cSl5maddEtiOG9rNUstdW80dmlyakRFYnlPeXc/"
 			+ sheet_id + "/public/values?callback=?";
-	this.callback = callback;
 
 	this.fetch = function() {
 		this.array = [ 2 ];
@@ -30,13 +30,15 @@ function Sheet(sheet_id, callback) {
 		// alert("bind ok");
 		$.getJSON(this.url, {
 			alt : "json"
-		}, this.callback);
+		}, function(json) {
+			var array = JsonToArray(json);
+			callback(json);
+		});
 	}// fetch
 }// Sheet
 
 function drawTotalElectricityChart(div) {
-	var od6 = new Sheet("od6", function(json) {
-		var array = JsonToArray(json);
+	var od6 = new Sheet("od6", function(array) {
 		var totalElectricityGenerated = new google.visualization.DataTable();
 		totalElectricityGenerated.addColumn("datetime", "発電日");
 		totalElectricityGenerated.addColumn("number", "発電量(kWh)");
@@ -58,12 +60,8 @@ function drawTotalElectricityChart(div) {
 }// drawTotalElectricityChart
 
 function drawmap() {
-	var od7 = new Sheet("od7");
-	od7
-			.fetch(function(json) {
-				// alert(1);
-				var array = JsonToArray(json);
-				// alert(array);
+	var od7 = new Sheet("od7",
+			function(array) {
 				var map = new google.maps.Map(document
 						.getElementById('allGenerators'), {
 					center : new google.maps.LatLng(33, 132),
@@ -92,5 +90,7 @@ function drawmap() {
 					marker_clusterer.addMarker(marker);
 				}
 				marker_clusterer.redraw();
+
 			});
+	od7.fetch();
 }
