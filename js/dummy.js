@@ -18,24 +18,24 @@ function JsonToArray(json) {
 	return array;
 }// JsonToArray
 
-function Sheet(sheet_id) {
+function Sheet(sheet_id, callback) {
 	this.url = "https://spreadsheets.google.com/feeds/cells/0AuFt9cSl5maddEtiOG9rNUstdW80dmlyakRFYnlPeXc/"
 			+ sheet_id + "/public/values?callback=?";
+	this.callback = callback;
 
-	this.fetch = function(callback) {
+	this.fetch = function() {
 		this.array = [ 2 ];
 		// this.callback.bind(this)();
 		// this.callback.bind(this)();
 		// alert("bind ok");
 		$.getJSON(this.url, {
 			alt : "json"
-		}, callback);
+		}, this.callback);
 	}// fetch
 }// Sheet
 
 function drawTotalElectricityChart(div) {
-	var od6 = new Sheet("od6");
-	od6.fetch(function(json) {
+	var od6 = new Sheet("od6", function(json) {
 		var array = JsonToArray(json);
 		var totalElectricityGenerated = new google.visualization.DataTable();
 		totalElectricityGenerated.addColumn("datetime", "発電日");
@@ -54,6 +54,7 @@ function drawTotalElectricityChart(div) {
 			width : $(window).width() * 0.95
 		});
 	});
+	od6.fetch();
 }// drawTotalElectricityChart
 
 function drawmap() {
