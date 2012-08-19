@@ -17,9 +17,8 @@
 
 		<script type="text/javascript">
 			$('#mainPage').live('pagecreate', function(event) {
-				var div = document.getElementById("totalElectricityGenerated");
-				drawTotalElectricityChart(div);
-				drawmap();
+				drawTotalElectricityChart(document.getElementById("totalElectricityGenerated"));
+				drawmap(document.getElementById('allGenerators'));
 			});
 			google.load("visualization", "1", {
 				packages : ["corechart"]

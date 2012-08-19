@@ -18,33 +18,55 @@ function JsonToArray(json) {
 	return array;
 }// JsonToArray
 
-function Sheet(sheet_id, callback) {
+function Sheet(sheet_id) {
 	// 2x2 array is given to callback
 	this.url = "https://spreadsheets.google.com/feeds/cells/0AuFt9cSl5maddEtiOG9rNUstdW80dmlyakRFYnlPeXc/"
 			+ sheet_id + "/public/values?callback=?";
 
+	this.array = null;
+
 	this.fetch = function() {
-		this.array = [ 2 ];
 		// this.callback.bind(this)();
 		// this.callback.bind(this)();
-		// alert("bind ok");
+		var self = this;
 		$.getJSON(this.url, {
 			alt : "json"
 		}, function(json) {
-			var array = JsonToArray(json);
-			callback(json);
+			self.array = JsonToArray(json);
 		});
 	}// fetch
+
+	this.getArray = function(callback) {
+		// this is a blocking function, polling interval is 100ms
+		var self = this;
+		if (self.array != null) {
+			// alert("in setTimeout, self.array = " + self.array);
+			// alert("in setTimeout, self.getArray = " + self.getArray);
+			// alert("in setTimeout, callback = " + callback)
+			callback(self.array);
+		} else {
+			setTimeout(function() {
+				// alert("in setTimeout, self.array = " + self.array);
+				// alert("in setTimeout, self.getArray = " + self.getArray);
+				// alert("in setTimeout, callback = " + callback)
+				// alert(self.getArray.call);
+				self.getArray(callback);
+			}, 100);
+		}// if
+	}// getArray
+
+	this.fetch();
+
 }// Sheet
 
 function drawTotalElectricityChart(div) {
-	var od6 = new Sheet("od6", function(array) {
+	var od6 = new Sheet("od6");
+	od6.getArray(function(array) {
 		var totalElectricityGenerated = new google.visualization.DataTable();
 		totalElectricityGenerated.addColumn("datetime", "発電日");
 		totalElectricityGenerated.addColumn("number", "発電量(kWh)");
 		for ( var i = 0; i < array.length; ++i) {
 			var row = array[i];
-			// alert(row[3]);
 			totalElectricityGenerated.addRow([
 					new Date(row[0], row[1], row[2]), Number(row[3]) ]);
 			// totalElectricityGenerated.addRow([new Date(1990,10,10), 100] );
@@ -56,14 +78,13 @@ function drawTotalElectricityChart(div) {
 			width : $(window).width() * 0.95
 		});
 	});
-	od6.fetch();
 }// drawTotalElectricityChart
 
-function drawmap() {
-	var od7 = new Sheet("od7",
-			function(array) {
-				var map = new google.maps.Map(document
-						.getElementById('allGenerators'), {
+function drawmap(div) {
+	var od7 = new Sheet("od7");
+	od7
+			.getArray(function(array) {
+				var map = new google.maps.Map(div, {
 					center : new google.maps.LatLng(33, 132),
 					zoom : 10,
 					mapTypeId : 'terrain',
@@ -79,7 +100,6 @@ function drawmap() {
 				}));
 				for ( var i = 1; i < array.length; ++i) {
 					var row = array[i];
-					// alert(row);
 					var latlng = new google.maps.LatLng(Number(row[2]),
 							Number(row[3]));
 					var title = row[0];
@@ -92,5 +112,4 @@ function drawmap() {
 				marker_clusterer.redraw();
 
 			});
-	od7.fetch();
-}
+}// drawmap
