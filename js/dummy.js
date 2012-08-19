@@ -113,3 +113,24 @@ function drawmap(div) {
 
 			});
 }// drawmap
+
+function drawRanking(div) {
+	var sheet = new Sheet("3");
+	sheet.getArray(function(array) {
+		var data_table = new google.visualization.DataTable();
+		data_table.addColumn("number", "順位");
+		data_table.addColumn("string", "グループ");
+		data_table.addColumn("number", "発電量");
+		data_table.addColumn("string", "コメント");
+		data_table.addColumn("number", "規模");
+		for ( var i = 1; i < array.length; ++i) {
+			var row = array[i];
+			data_table.addRow([ Number(row[0]), row[1], Number(row[4]), row[5],
+					Number(row[3]) ]);
+		}// for
+		var table = new google.visualization.Table(div);
+		table.draw(data_table, {
+			allowHtml : true
+		});
+	});
+}// drawRanking

@@ -19,9 +19,10 @@
 			$('#mainPage').live('pagecreate', function(event) {
 				drawTotalElectricityChart(document.getElementById("totalElectricityGenerated"));
 				drawmap(document.getElementById('allGenerators'));
+				drawRanking(document.getElementById('allRanking'));
 			});
 			google.load("visualization", "1", {
-				packages : ["corechart"]
+				packages : ["corechart", 'table']
 			});
 			google.setOnLoadCallback(function() {
 				// triggered just after google javascript libraries are loaded
