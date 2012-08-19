@@ -10,7 +10,7 @@ class MyRequestHandler(RequestHandler):
         version_id = self.request.environ["CURRENT_VERSION_ID"].split('.')[1]
         timestamp = long(version_id) / pow(2,28) 
         values["version_datetime"] = datetime.fromtimestamp(timestamp).strftime("%Y/%m/%d %X UTC")
-        self.response.out.write(template.render("html/" + html_file_name + ".html", values))
+        self.response.out.write(template.render("template/" + html_file_name + ".html", values))
         
     def writeJson(self, dictionary):
         self.response.content_type = "application/json"
