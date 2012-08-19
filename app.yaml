@@ -1,5 +1,5 @@
 application: odenkiapi
-version: python-0005
+version: python-0005-nhk
 runtime: python
 api_version: 1
 
@@ -10,8 +10,20 @@ handlers:
 - url: /js
   static_dir: js
 
+- url: /html
+  static_dir: html
+
+- url: /css
+  static_dir: css
+
+- url: /api/([A-Za-z]+)
+  script: api/\1.py
+
 - url: /post
   script: post.py
+
+- url: /
+  script: index.py
 
 - url: /Sender
   script: SenderRequestHandler.py
@@ -49,5 +61,3 @@ handlers:
 - url: /Command
   script: Command.py
   
-- url: /
-  script: index.py

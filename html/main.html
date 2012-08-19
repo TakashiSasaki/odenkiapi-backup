@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+	<head>
+
+		<title>jQuery Mobile page</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="../css/odenki-theme.min.css" />
+		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css" />
+		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+		<script type="text/javascript">
+			google.load("visualization", "1", {
+				packages : ["corechart", 'table']
+			});
+		</script>
+		<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+		<script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+		<script src="../js/dummy.js"></script>
+		<script type="text/javascript" src="http://maps.google.com/maps/api/js?key=AIzaSyDYYXbxjq_CZePgdVU2x9AMRPsuX4PBSPE&sensor=false"></script>
+		<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/tags/markermanager/1.0/src/markermanager.js"></script>
+		<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer_compiled.js"></script>
+		<script type="text/javascript">
+			$("#allGeneratorsContainer").live("expand", function(event) {
+				drawmap(document.getElementById('allGenerators'));
+			});
+			setTimeout(function() {
+			}, 10);
+			$('#mainPage').live('pagecreate', function(event) {
+				drawTotalElectricityChart(document.getElementById("totalElectricityGenerated"));
+				drawRanking(document.getElementById('allRanking'));
+			});
+			//google.setOnLoadCallback(function() {
+			// triggered just after google javascript libraries are loaded
+			//});
+		</script>
+	</head>
+	<body>
+		<div data-role="page" id="mainPage">
+			<div data-role="header" data-position="inline" data-theme="e" >
+				<h1>みんなでおでんき</h1>
+			</div>
+			<div data-role="navbar">
+				<ul>
+					<li>
+						<a href="main.html"  data-ajax="false"  data-icon="home" class="ui-btn-active">
+						<div class="ui-bar-a">
+							みんなのおでんき
+						</div></a>
+					</li>
+					<li >
+						<a href="community.html"  data-ajax="false"  data-icon="star">
+						<div class="ui-bar-b">
+							なかまのおでんき
+						</div></a>
+					</li>
+					<li>
+						<a href="myself.html"  data-ajax="false"  data-icon="info">
+						<div class="ui-bar-c">
+							マイおでんき
+						</div></a>
+					</li>
+					<li>
+						<a href="input.html"  data-ajax="false"  data-icon="gear">
+						<div class="ui-bar-d">
+							入力
+						</div></a>
+					</li>
+				</ul>
+			</div>
+			<div data-role="content">
+				<div data-role="collapsible" data-collapsed="true">
+					<h1>「みんなでおでんき」とは</h1>
+					<p>
+						共助による安全安心なエネルギーの利用を目指し、再生可能エネルギーによる発電量を「見せる化」することで
+						コミュニティの形成とモチベーションの維持を支援するプロジェクトです。ただいま準備中です。
+						Twitterアカウント<a href="https://twitter.com/odenki">@odenki</a>をフォローして続報をお待ち下さい。
+					</p><!-- the following elements are created in https://twitter.com/about/resources/buttons#follow
+					<a href="https://twitter.com/odenki" class="twitter-follow-button" data-show-count="false" data-lang="ja">@odenkiさんをフォロー</a>
+					<script>
+					! function(d, s, id) {
+					var js, fjs = d.getElementsByTagName(s)[0];
+					if (!d.getElementById(id)) {
+					js = d.createElement(s);
+					js.id = id;
+					js.src = "//platform.twitter.com/widgets.js";
+					fjs.parentNode.insertBefore(js, fjs);
+					}
+					}(document, "script", "twitter-wjs");
+					</script>-->
+				</div>
+				<div data-role="collapsible" data-collapsed="false">
+					<h1>みんなの発電グラフ</h1>
+					<div id="totalElectricityGenerated" ></div>
+				</div>
+				<div data-role="collapsible" data-collapsed="true" id="allGeneratorsContainer">
+					<h1>みんなの発電地図</h1>
+					<div id="allGenerators" style="width:96%; height:600px" ></div>
+				</div>
+				<script></script>
+				<div data-role="collapsible" data-collapsed="false">
+					<h1>みんなの発電量ランキング</h1>
+					<div id="allRanking"></div>
+				</div>
+				<div data-role="collapsible" data-collapsed="false">
+					<h1> おしらせ </h1>
+					<div id="announce">
+						おしらせ
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
