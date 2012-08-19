@@ -3,6 +3,9 @@ version: python-0005-nhk
 runtime: python
 api_version: 1
 
+inbound_services:
+- warmup
+
 handlers:
 - url: /stylesheets
   static_dir: stylesheets
@@ -22,8 +25,9 @@ handlers:
 - url: /post
   script: post.py
 
-- url: /
+- url: /admin
   script: index.py
+  
 
 - url: /Sender
   script: SenderRequestHandler.py
@@ -61,3 +65,6 @@ handlers:
 - url: /Command
   script: Command.py
   
+- url: /
+  static_files: html/top.html
+  upload: html/top.html

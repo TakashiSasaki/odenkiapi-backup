@@ -20,5 +20,5 @@ class MainPage(MyRequestHandler):
 
 if __name__ == "__main__":
     logging.getLogger().setLevel(logging.DEBUG)
-    application = webapp.WSGIApplication([('/', MainPage)], debug=True)
+    application = webapp.WSGIApplication([('/admin', MainPage)], debug=True)
     run_wsgi_app(application)
