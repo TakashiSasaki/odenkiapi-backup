@@ -42,7 +42,7 @@ class RawDataRequestHandler2(MyRequestHandler):
                 timestring = query_dict["time"][0]
                 results.append([gen_power, timestring[0:4], timestring[4:6], timestring[6:8], timestring[8:10], timestring[10:12], timestring[12:14]])
                 #results.append([gen_power])
-        self.response.out.write(simplejson.dumps(results))
+        self.response.out.write(simplejson.dumps({"timeVsWatt":results}))
 
 if __name__ == "__main__":
     logging.getLogger().setLevel(logging.DEBUG)
