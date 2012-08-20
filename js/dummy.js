@@ -178,8 +178,8 @@ function drawMyGeneratorChart(array) {
 						Number(row[4]), Number(row[5])), Number(row[0]) ]);
 		// totalElectricityGenerated.addRow([new Date(1990,10,10), 100] );
 	}// for
-	var lineChart = new google.visualization.LineChart(div);
-	lineChart.draw(data_table, {
+	var areaChart = new google.visualization.AreaChart(div);
+	areaChart.draw(data_table, {
 		title : '発電量',
 		height : 300,
 		pointSize: 5,
