@@ -35,6 +35,9 @@ handlers:
 - url: /RawData
   script: RawDataRequestHandler.py
   
+- url: /RawData2
+  script: RawDataRequestHandler.py
+
 - url: /Metadata
   script: MetadataRequestHandler.py
   
