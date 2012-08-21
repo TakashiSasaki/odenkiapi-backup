@@ -46,9 +46,7 @@ function Sheet(sheet_id) {
 		$.getJSON(this.url, {
 			alt : "json"
 		}, function(json) {
-
-			// self.array = JsonToArray(json);
-
+			self.array = JsonToArray(json);
 		});
 	}// fetch
 
@@ -170,8 +168,8 @@ function drawMyGeneratorChart(array) {
 	data_table.addColumn("number", "発電量(W)");
 	showMyGeneratorNow(Number(array[0][1]), Number(array[0][2]),
 			Number(array[0][3]), Number(array[0][4]), Number(array[0][5]),
-			Number(array[0][0]));
-	for ( var i = 0; i < 100; ++i) {
+			Number(array[0][0]).toFixed(0));
+	for ( var i = 0; i < 450; ++i) {
 		var row = array[i];
 		data_table.addRow([
 				new Date(Number(row[1]), Number(row[2]), Number(row[3]),
@@ -181,8 +179,8 @@ function drawMyGeneratorChart(array) {
 	var areaChart = new google.visualization.AreaChart(div);
 	areaChart.draw(data_table, {
 		title : '発電量',
-		height : 300,
-		pointSize: 5,
+		height : 350,
+		pointSize: 3,
 		width : $(window).width() * 0.95
 	});
 }

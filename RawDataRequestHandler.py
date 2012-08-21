@@ -32,7 +32,7 @@ class RawDataRequestHandler(MyRequestHandler):
         
 class RawDataRequestHandler2(MyRequestHandler):
     def get(self):
-        gql = RawData.gql("ORDER BY rawDataId DESC LIMIT 1000")
+        gql = RawData.gql("ORDER BY rawDataId DESC LIMIT 5000")
         records = gql.run()
         results = []
         for record in records:
