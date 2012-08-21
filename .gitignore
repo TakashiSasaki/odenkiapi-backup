@@ -1,14 +1,9 @@
-*.BASE.*
-*.OTHER.*
+*.BASE
+*.OTHER
 *.THIS
-*.REMOTE.*
-*.BACKUP.*
-*.LOCAL.*
 *.class
 *.pyc
 *.pyo
-*.bak
-*.orig
 .bzr
 .deployables
 credentials.py
