@@ -1,6 +1,7 @@
-*.BASE
+*.BASE.*
 *.OTHER
 *.THIS
+*.LOCAL.*
 *.class
 *.pyc
 *.pyo
@@ -9,3 +10,7 @@
 credentials.py
 google686f6b490a533df7.py
 .~*~
+*.orig
+*.bak
+*.BACKUP.*
+*.REMOTE.*
