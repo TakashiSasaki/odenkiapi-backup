@@ -30,7 +30,7 @@ class PostPage(webapp.RequestHandler):
             self.response.out.write("field:" + data.field + " string:" + data.string + "\n")
 
     def post(self):
-        logging.info("body="+self.request.body)
+        #logging.info("body="+self.request.body)
         self.get()
 
 application = webapp.WSGIApplication([('/post', PostPage)], debug=True)
