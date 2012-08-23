@@ -32,7 +32,7 @@ handlers:
 - url: /Sender
   script: SenderRequestHandler.py
   
-- url: /RawData
+- url: /RawDataNonCached
   script: RawDataRequestHandler.py
   
 - url: /RawData2
@@ -71,3 +71,6 @@ handlers:
 - url: /
   static_files: html/top.html
   upload: html/top.html
+
+- url: /RawData
+  script: RawDataRequestHandler.py

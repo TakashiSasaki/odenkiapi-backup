@@ -25,7 +25,7 @@ def putDataList(request):
     data_list = []
     for k in request.arguments():
         vlist = request.get_all(k)
-        logging.info((k,vlist))
+        #logging.info((k,vlist))
         assert isinstance(vlist, list)
         for v in vlist:
             data = putData(k,v)
@@ -39,7 +39,7 @@ def putDataList(request):
 
     if (parsed_json != None) :
         for k, v in parsed_json.iteritems() :
-            logging.log(logging.INFO, type(v))
+            #logging.log(logging.INFO, type(v))
             data = putData(k,v)
             if data is None: continue
             data_list.append(data)

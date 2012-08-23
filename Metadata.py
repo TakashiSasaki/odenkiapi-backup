@@ -22,7 +22,7 @@ def putMetadata(sender_, raw_data, data_list):
     metadata = Metadata()
     metadata.metadataId = Counter.GetNextId("metadataId")
     now = datetime.datetime.now()
-    logging.info(now.strftime('%Y/%m/%d %H:%M:%S%z'))
+    #logging.info(now.strftime('%Y/%m/%d %H:%M:%S%z'))
     metadata.receivedDateTime = now 
     metadata.sender = sender_
     metadata.rawData = raw_data
