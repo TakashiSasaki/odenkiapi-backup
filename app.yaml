@@ -74,3 +74,6 @@ handlers:
 
 - url: /RawData
   script: RawDataRequestHandler.py
+
+- url: /RawData2Cached
+  script: RawDataRequestHandler.py
