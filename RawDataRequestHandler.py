@@ -103,44 +103,9 @@ class RawDataRequestHandler2(MyRequestHandler):
                 #results.append([gen_power])
         self.response.out.write(self.request.get("callback") + "(" + simplejson.dumps({"timeVsWatt":results}) + ");")
 
-class RawData2Cached(MyRequestHandler):
-    def get(self):
-        client = memcache.Client()
-        LIMIT = 3000
-        
-        gql_query = GqlQuery("SELECT __key__ FROM RawData ORDER BY rawDataId DESC LIMIT 5000")
-        #query = Query(RawData, keys_only=True)
-        #query.order("-rawDataId")
-
-        results = []
-        hit_count = 0
-        read_count = 0
-        for key in gql_query.run(limit=LIMIT, keys_only=True):
-            query_dict = client.get(str(key), namespace="RawData2Cached")
-            #if query_dict is None:
-            if True:
-                #records = RawData.get([key])
-                #record = records[0]
-                #if not isinstance(record, RawData): continue
-                #query_dict = cgi.parse_qs(record.query)
-                #client.set(str(key), query_dict, namespace="RawData2Cached")
-                read_count += 1
-            else:
-                hit_count += 1
-            
-            #if query_dict.has_key("arduinoid"):
-            #    gen_power = query_dict["gen.power(W)"][0]
-            #    timestring = query_dict["time"][0]
-            #    results.append([gen_power, timestring[0:4], timestring[4:6], timestring[6:8], timestring[8:10], timestring[10:12], timestring[12:14]])
-                #results.append([gen_power])
-        
-        logging.info("hit_count = %s, read_count = %s" % (hit_count, read_count))
-        self.response.out.write(self.request.get("callback") + "(" + simplejson.dumps({"timeVsWatt":results}) + ");")
-
 
 if __name__ == "__main__":
     logging.getLogger().setLevel(logging.DEBUG)
     application = webapp.WSGIApplication([('/RawData', RawDataCached), ('/RawData2', RawDataRequestHandler2), ('/RawDataNonCached', RawDataRequestHandler)
-                                          , ('/RawData2Cached', RawData2Cached)
                                           ], debug=True)
     run_wsgi_app(application)
