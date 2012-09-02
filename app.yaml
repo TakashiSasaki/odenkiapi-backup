@@ -1,5 +1,5 @@
 application: odenkiapi
-version: python-0007
+version: python-0008
 #runtime: python
 runtime: python27
 api_version: 1
@@ -7,8 +7,13 @@ api_version: 1
 default_expiration: "1d 1h"
 
 threadsafe: no
+inbound_services:
+- warmup
 
 handlers:
+- url: /stylesheets
+  static_dir: stylesheets
+
 - url: /js
   static_dir: js
 
@@ -24,15 +29,19 @@ handlers:
 - url: /post
   script: post.py
 
-- url: /
+- url: /admin
   script: index.py
 
 - url: /Sender
   script: SenderRequestHandler.py
   
 - url: /RawData
+- url: /RawDataNonCached
   script: RawDataRequestHandler.py
   
+- url: /RawData2
+  script: RawDataRequestHandler.py
+
 - url: /Metadata
   script: MetadataRequestHandler.py
   
@@ -48,6 +57,9 @@ handlers:
 - url: /Equipment
   script: Equipment.py
   
+- url: /GoogleDocs
+  script: GoogleDocs.py
+
 - url: /google686f6b490a533df7.html
   script: google686f6b490a533df7.py 
 
@@ -74,6 +86,17 @@ handlers:
   
 - url: /MyRequestHandler*
   script: MyRequestHandler.py
+- url: /
+  static_files: html/top.html
+  upload: html/top.html
+
+- url: /RawData
+  script: RawDataRequestHandler.py
+
+- url: /RawData2Cached
+  script: RawDataRequestHandler.py
 
 - url: /OdenkiSession*
   script: OdenkiSession.py
+- url: /RawDataNdb
+  script: RawDataNdb.py
