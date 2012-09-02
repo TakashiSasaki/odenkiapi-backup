@@ -13,10 +13,10 @@ class RawData(db.Model):
     body = db.StringProperty()
     
 def putRawData(request):
-    logging.info(("GetRawData", request.url))
+    #logging.info(("GetRawData", request.url))
     assert isinstance(request, Request)
     parsed_url = urlparse(request.url)
-    logging.info(parsed_url)
+    #logging.info(parsed_url)
     path = parsed_url.path
     parameters = parsed_url.params
     query = parsed_url.query
@@ -24,8 +24,8 @@ def putRawData(request):
     body = request.body
     gql_query = RawData.gql("WHERE path = :1 AND parameters = :2 AND query= :3 AND fragment = :4 AND body = :5", path, parameters, query, fragment, body)
     existing_raw_data = gql_query.get()
-    logging.info(existing_raw_data)
-    logging.info((path, parameters, query, fragment, body))
+    #logging.info(existing_raw_data)
+    #logging.info((path, parameters, query, fragment, body))
     if existing_raw_data is not None:
         return existing_raw_data
     else:
