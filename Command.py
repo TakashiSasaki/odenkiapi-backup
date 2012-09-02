@@ -10,7 +10,7 @@ from datetime import datetime
 from MyRequestHandler import MyRequestHandler
 from google.appengine.ext.webapp import WSGIApplication
 from google.appengine.ext.webapp.util import run_wsgi_app
-from OdenkiUser import getCurrentUser, OdenkiUser
+from OdenkiUser import getCurrentUser, OdenkiUser, OdenkiUserNotFound
 from simplejson import loads
 from Counter import Counter
 from webob import MIMEAccept
@@ -64,16 +64,20 @@ def registerCommand(dict):
     command.put()
     
 class _RequestHandler(MyRequestHandler):
+    resource = {"commands": []}
+    
     def get(self):
         debug(self.request.accept)
         assert isinstance(self.request.accept, MIMEAccept)
-        odenki_user = getCurrentUser()
-        assert isinstance(odenki_user, OdenkiUser)
+        try:
+            odenki_user = getCurrentUser()
+            self.resource["odenkiId"] = odenki_user.odenkiId
+        except OdenkiUserNotFound:
+            self.resource["odenkiId"] = "unknown"
+        #assert isinstance(odenki_user, OdenkiUser)
         query = Command.all()
         query.order("-queuedDateTime")
         result = query.run()
-        self.resource = {}
-        self.resource["commands"] = []
         for x in result:
             v = {}
             v["commandId"] = x.commandId
@@ -86,22 +90,30 @@ class _RequestHandler(MyRequestHandler):
             v["attemptedDateTimes"] = str(x.attemptDateTimes[-1]) if x.attemptDateTimes is not None and len(x.attemptDateTimes) > 0 else None
             v["executedDateTime"] = str(x.executedDateTime)
             self.resource["commands"].append(v)
-        self.resource["odenkiId"] = odenki_user.odenkiId
 
         if self.request.accept.accept_html():
+            self.resource["commands"] = self.resource["commands"][:10];
             self.writeWithTemplate(self.resource, "Command")
         else:
             self.writeJson(self.resource)
             
     def post(self):
-        odenki_user = getCurrentUser()
-        assert isinstance(odenki_user, OdenkiUser)
+        try: 
+            odenki_user = getCurrentUser()
+        except OdenkiUserNotFound:
+            self.response.set_status(401)
+            return
+        #assert isinstance(odenki_user, OdenkiUser)
         parsed_json = loads(self.request.body)
         parsed_json["userId"] = odenki_user.odenkiId
         try:
             renewCommand(parsed_json)
         except (CommandNotFound, KeyError):
             registerCommand(parsed_json)
+        self.get()
+        
+    def delete(self):
+        pass
         
 if __name__ == "__main__":
     getLogger().setLevel(DEBUG)
