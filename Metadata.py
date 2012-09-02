@@ -22,7 +22,7 @@ def putMetadata(sender_, raw_data, data_list):
     metadata = Metadata()
     metadata.metadataId = Counter.GetNextId("metadataId")
     now = datetime.datetime.now()
-    logging.info(now.strftime('%Y/%m/%d %H:%M:%S%z'))
+    #logging.info(now.strftime('%Y/%m/%d %H:%M:%S%z'))
     metadata.receivedDateTime = now 
     metadata.sender = sender_
     metadata.rawData = raw_data
@@ -35,8 +35,6 @@ def getMetadata(key):
     metadata_entity = memcache_client.get(str(key))
     if metadata_entity is None:
         metadata_entity = db.get(key)
-        return metadata_entity
-    memcache_client.set(str(key), metadata_entity)
     return metadata_entity
 
 def getDataIds(metadata):
