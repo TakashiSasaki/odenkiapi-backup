@@ -1,0 +1,17 @@
+from google.appengine.ext.webapp import RequestHandler
+from google.appengine.ext.webapp import  template
+from datetime import datetime
+from logging import debug
+from django.utils.simplejson import dumps
+
+class MyRequestHandler(RequestHandler):
+    def writeWithTemplate(self, values, html_file_name):
+        values["version"] =  self.request.environ["CURRENT_VERSION_ID"].split('.')[0]
+        version_id = self.request.environ["CURRENT_VERSION_ID"].split('.')[1]
+        timestamp = long(version_id) / pow(2,28) 
+        values["version_datetime"] = datetime.fromtimestamp(timestamp).strftime("%Y/%m/%d %X UTC")
+        self.response.out.write(template.render("template/" + html_file_name + ".html", values))
+        
+    def writeJson(self, dictionary):
+        self.response.content_type = "application/json"
+        self.response.out.write(dumps(dictionary))
