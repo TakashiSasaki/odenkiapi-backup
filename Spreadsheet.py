@@ -1,7 +1,6 @@
 from MyRequestHandler import MyRequestHandler
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import WSGIApplication
-from GoogleDocs import getSpreadsheetsClient, getDocsClient, loadAccessToken
 from gdata.docs.data import Resource
 from gdata.spreadsheets.data import Spreadsheet, WorksheetsFeed, \
     SpreadsheetsFeed, WorksheetEntry
@@ -10,19 +9,21 @@ from OdenkiUser import getCurrentUser, OdenkiUser
 from logging import debug, getLogger, DEBUG
 from gdata.client import RequestError, Unauthorized
 from google.appengine.api.urlfetch import DownloadError
+from GoogleUser import getGoogleUser
 getLogger().setLevel(DEBUG)
 
 ODENKI_FOLDER_NAME = "Odenki"
 ODENKI_SPREADSHEET_NAME = "Odenki"
 
 def getOdenkiFolder():
-    odenki_user = getCurrentUser()
+    google_user = getGoogleUser()
     assert isinstance(odenki_user, OdenkiUser)
     
-    debug("odenki user = " + odenki_user.odenkiNickname)
+    #debug("odenki user = " + odenki_user.odenkiNickname)
     if odenki_user.docsCollectionId is not None:
         debug("docsCollectionId : " + odenki_user.docsCollectionId)
-        client = getDocsClient()
+        google_docs = GoogleDocs()
+        client = google_docs.getDocsClient()
         try:
             debug("trying to get existing collection by id = " + odenki_user.docsCollectionId)
             existing_collection = client.GetResourceById(odenki_user.docsCollectionId)
@@ -36,12 +37,12 @@ def getOdenkiFolder():
             odenki_user.docsCollectionId = None
             odenki_user.put()
 
-    client = getDocsClient()
+    client = google_user.getDocsClient()
     new_collection = Resource(type="folder", title=ODENKI_FOLDER_NAME)
     created_collection = client.CreateResource(new_collection)
     assert isinstance(created_collection, Resource)
-    odenki_user.docsCollectionId = created_collection.resource_id.text
-    odenki_user.put()
+    google_user.setCollectionId(created_collection.resource_id.text)
+    google_user.put()
     return created_collection
 
 def getOdenkiSpreadsheet():
@@ -49,7 +50,8 @@ def getOdenkiSpreadsheet():
     assert isinstance(odenki_user, OdenkiUser)
     
     if odenki_user.docsSpreadsheetId is not None:
-        client = getDocsClient()
+        google_docs = GoogleDocs()
+        client = google_docs.getDocsClient()
         try:
             existing_spreadsheet = client.GetResourceById(odenki_user.docsSpreadsheetId)
             assert isinstance(existing_spreadsheet, Resource)
@@ -61,7 +63,8 @@ def getOdenkiSpreadsheet():
             odenki_user.docsSpreadsheetId = None
             odenki_user.put()
 
-    client = getDocsClient()
+    google_docs = GoogleDocs()
+    client = google_docs.getDocsClient()
     new_spreadsheet = Resource(type="spreadsheet", title=ODENKI_SPREADSHEET_NAME)
     created_spreadsheet = client.CreateResource(new_spreadsheet, collection=getOdenkiFolder())
     assert isinstance(created_spreadsheet, Resource)
@@ -126,6 +129,12 @@ def getWorksheetGid(worksheet_id):
 
 class _RequestHandler(MyRequestHandler):
     def get(self):
+        try:
+            getCurrentUser()
+        except:
+            self.response.set_status(401)
+            self.redirect("/OdenkiUser")
+            return
         folder = getOdenkiFolder()
         assert isinstance(folder, Resource)
         spreadsheet = getOdenkiSpreadsheet()
