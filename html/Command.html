@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8"/>
 		<title>コマンド</title>
-		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+		<script type="text/javascript" src="/js/jquery-1.7.2.min.js"></script>
 		<script type="text/javascript" src="/js/jquery.json-2.3.min.js"></script>
 		<script type='text/javascript' src='https://www.google.com/jsapi'></script>
 	</head>
@@ -19,6 +19,44 @@
 				var json = $.toJSON(param);
 				$("#json").get()[0].value = json;
 			}
+		</script>
+		<script type='text/javascript'>
+			google.load('visualization', '1', {
+				packages : ['table']
+			});
+			//google.setOnLoadCallback(drawTable);
+			function drawTable(commands) {
+				var data = new google.visualization.DataTable();
+				data.addColumn('number', 'commandId');
+				data.addColumn('string', 'gatewayId');
+				data.addColumn('string', 'equipmentId');
+				data.addColumn('string', 'userId');
+				data.addColumn('string', 'command');
+				data.addColumn('string', 'result');
+				data.addColumn('string', 'queuedDateTime');
+				data.addColumn('string', 'attemptedDateTimes');
+				data.addColumn('string', 'executedDateTime');
+				var i;
+				for( i = 0; i < commands.length; ++i) {
+					var command = commands[i];
+					//data.addRow([command.commandId, command.gatewayId, command.equipmentId, 
+					//	command.userId, command.command, 
+					//	command.result, command.queuedDateTime, 
+					//	command.attemptedDateTimes, 
+					//	command.executedDateTime]);
+					data.addRow([command.commandId,command.gatewayId,
+						command.equipmentId, command.userId, command.command,
+						command.result,
+						command.queuedDateTime, command.attemptedDateTimes, command.executedDateTime]);
+				}//for
+				$("#table_div").get()[0].innerHTML = "aaa";
+
+				var table_div = new google.visualization.Table(document.getElementById('table_div'));
+				table_div.draw(data, {
+					showRowNumber : false,
+					page : "enable"
+				});
+			}//drawTable
 
 			function Post() {
 				var xhr = false;
@@ -36,39 +74,46 @@
 				xhr.onreadystatechange = function() {
 					if(this.readyState == 4) {
 						$("#response").get()[0].value = this.responseText;
+						var responseJson = $.evalJSON(this.responseText);
+						//$("#table_div").get()[0].innerHTML = responseJson.commands.length;
+						drawTable(responseJson.commands);
 					} else {
 						//$("#response").get()[0].value = this.readyState;
 					}//if
 				}//function
 				//alert($("#query_string").get()[0].value);
 				xhr.open("POST", "/Command");
+				xhr.setRequestHeader("Accept", "application/json");
 				xhr.send($("#json").val());
 			}//Post
 		</script>
 		<p>
 			登録済みのコマンドを実行済みのものも含めて新しいものから順に表示します。
 			実行されていないコマンドを変更したり新規のコマンドを登録することもできます。
+			コマンドを登録するにはログインして下さい。
 		</p>
-		<table border="1px">
-			<tr>
-				<th>commandId</th><th>gatewayId</th><th>equipmentId</th><th>userId</th><th>command</th><th>result</th>
-				<th>queuedDateTime</th><th>attemptedDateTimes</th><th>executedDateTime</th>
-			</tr>
-			{% for command in commands %}
-			<tr>
-				<td>{{ command.commandId|escape }}</td>
-				<td>{{ command.gatewayId|escape }}</td>
-				<td>{{ command.equipmentId|escape }}</td>
-				<td>{{ command.userId|escape }}</td>
-				<td>{{ command.command|escape }}</td>
-				<td>{{ command.result|escape }}</td>
-				<td>{{ command.queuedDateTime|escape }}</td>
-				<td>{% for attempted_date_time in command.attemptedDateTimes %}}
-				{{ attempted_date_time|escape }}{% endfor %}</td>
-				<td>{{ command.executedDateTime }}</td>
-			</tr>
-			{% endfor %}
-		</table>
+		<div id="table_div">
+			<table border="1px">
+				<tr>
+					<th>commandId</th><th>gatewayId</th><th>equipmentId</th><th>userId</th><th>command</th><th>result</th>
+					<th>queuedDateTime</th><th>attemptedDateTimes</th><th>executedDateTime</th>
+				</tr>
+				{% for command in commands %}
+				<tr>
+					<td>{{ command.commandId|escape }}</td>
+					<td>{{ command.gatewayId|escape }}</td>
+					<td>{{ command.equipmentId|escape }}</td>
+					<td>{{ command.userId|escape }}</td>
+					<td>{{ command.command|escape }}</td>
+					<td>{{ command.result|escape }}</td>
+					<td>{{ command.queuedDateTime|escape }}</td>
+					<td>{% for attempted_date_time in command.attemptedDateTimes %}}
+					{{ attempted_date_time|escape }}{% endfor %}</td>
+					<td>{{ command.executedDateTime }}</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
 		<p>
 			新しいコマンドを一つ登録する
 		</p>
@@ -110,8 +155,9 @@
 			<input type="button" value="コマンドを1つ予約する" onclick="Post()"/>
 		</form>
 		<p>
-			Googleスプレッドシートを利用して実行されていないコマンドを変更したり複数のコマンドを登録したりする。
+			Googleスプレッドシートを利用して実行されていないコマンドを変更したり複数のコマンドを登録したりする機能は只今準備中です。
 		</p>
+		<textarea id="response" cols="80" rows="10" disabled></textarea>
 		{% include "footer.html" %}
 	</body>
 </html>
