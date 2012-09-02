@@ -1,58 +1,102 @@
 <!DOCTYPE html>
 <html>
-    <head>
+	<head>
 
-        <title>jQuery Mobile page</title>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="../css/odenki-theme.min.css" />
-        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css" />
-        <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-        <script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+		<title>jQuery Mobile page</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="../css/odenki-theme.min.css" />
+		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css" />
+		<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+		<script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+		<script type="text/javascript">
+			google.load("visualization", "1", {
+				packages : ["corechart", 'table']
+			});
+		</script>
 
-    </head>
-    <body>
-        <div data-role="page" >
-            <div data-role="header" data-position="inline" data-theme="e">
-                <h1>みんなでおでんき</h1>
-            </div>
-            <div data-role="navbar">
-                <ul>
-                    <li>
-                        <a href="main.html"   data-ajax="false"   data-icon="home" >
-                        <div class="ui-bar-a">
-                            みんなのおでんき
-                        </div></a>
-                    </li>
-                    <li >
-                        <a href="community.html"   data-ajax="false"   data-icon="star" >
-                        <div class="ui-bar-b">
-                            なかまのおでんき
-                        </div></a>
-                    </li>
-                    <li>
-                        <a href="myself.html"   data-ajax="false"   data-icon="info" class="ui-btn-active">
-                        <div class="ui-bar-c">
-                            マイおでんき
-                        </div></a>
-                    </li>
-                    <li>
-                        <a href="input.html"   data-ajax="false"   data-icon="gear" >
-                        <div class="ui-bar-d">
-                            入力
-                        </div></a>
-                    </li>
-                </ul>
-            </div>
-            <div data-role="content">
-                <h1>自分の発電量</h1>
-                <h1>自分の発電地図</h1>
-                <h1>自分の発電グラフ</h1>
-                <h1>ライフログ</h1>
-                <h1>あなたへのお知らせ</h1>
-                <h1>エコナンバーズ</h1>
-            </div>
+		<script src="../js/dummy.js"></script>
+		<script type="text/javascript">
+			//$("#allGeneratorsContainer").live("expand", function(event) {
+			//	drawmap(document.getElementById('allGenerators'));
+			//});
+			//setTimeout(function() {
+			//}, 10);
 
-        </div>
-    </body>
+			$('#myPage').live('pagecreate', function(event) {
+				RawData2();
+				//showMyGeneratorNow(1, 2, 3, 4, 5, 7);
+				//drawMyGeneratorChart(dummygen, document.getElementById("myGeneratorChart"));
+				//drawTotalElectricityChart(document.getElementById("totalElectricityGenerated"));
+				//drawRanking(document.getElementById('allRanking'));
+			});
+			//google.setOnLoadCallback(function() {
+			// triggered just after google javascript libraries are loaded
+			//});
+		</script>
+	</head>
+	<body>
+		<div data-role="page" id="myPage">
+			<div data-role="header" data-position="inline" data-theme="e" >
+				<h1><img width="40px" height="40px" src="https://twimg0-a.akamaihd.net/profile_images/1522990803/___________reasonably_small.png"></img> みんなでおでんき<img width="40px" height="40px" src="https://twimg0-a.akamaihd.net/profile_images/1522990803/___________reasonably_small.png"></img></h1>
+			</div>
+			<div data-role="navbar">
+				<ul>
+					<li>
+						<a href="main.html"   data-ajax="false"   data-icon="home" >
+						<div class="ui-bar-a">
+							みんなのおでんき
+						</div></a>
+					</li>
+					<li >
+						<a href="community.html"   data-ajax="false"   data-icon="star" >
+						<div class="ui-bar-b">
+							なかまのおでんき
+						</div></a>
+					</li>
+					<li>
+						<a href="myself.html"   data-ajax="false"   data-icon="info" class="ui-btn-active">
+						<div class="ui-bar-c">
+							マイおでんき
+						</div></a>
+					</li>
+					<!--<li>
+					<a href="input.html"   data-ajax="false"   data-icon="gear" >
+					<div class="ui-bar-d">
+					入力
+					</div></a>
+					</li>-->
+				</ul>
+			</div>
+			<div data-role="content">
+				<h1>現在の発電量</h1>
+				<table align="center" border="0px" style="font-size:20px;">
+					<tr>
+						<td id="myGeneratorYear"></td>
+						<td id="myGeneratorMonth"></td>
+						<td id="myGeneratorDay"></td>
+						<td id="myGeneratorHour"></td>
+						<td id="myGeneratorMinute"></td>
+					</tr>
+					<tr>
+						<td colspan="5" id="myGeneratorWatt" align="center"></td>
+					</tr>
+				</table>
+				<div data-role="collapsible" data-collapsed="false">
+					<h1>自分の発電グラフ</h1>
+					<div id="myGeneratorChart"></div>
+				</div>
+				<button>
+					手動での入力
+				</button>
+				<div data-role="collapsible" data-collapsed="false">
+					<h1>あなたへのお知らせ</h1>
+				</div>
+				<div data-role="collapsible" data-collapsed="false">
+					<h1>エコナンバーズ</h1>
+				</div>
+			</div>
+		</div>
+	</body>
 </html>
