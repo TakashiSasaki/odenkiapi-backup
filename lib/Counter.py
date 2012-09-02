@@ -13,3 +13,6 @@ class Counter(db.Model):
             obj.put()
             return obj.count
         return db.run_in_transaction(txn)
+
+def getNewOdenkiId():
+    return Counter.GetNextId("OdenkiId")
