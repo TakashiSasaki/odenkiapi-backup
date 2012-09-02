@@ -1,8 +1,9 @@
+<p id="hexKwTPbhWhy">
+	「みんなでおでんき」ウェブAPI（version <span class="versionString"></span><span class="timeStampString"></span>版)へようこそ
+	{% if user_email %}{{ user_email }}さん{% endif %}<span></span>
+</p>
+<script>odenki.fillVersion("hexKwTPbhWhy");</script>
 <table>
-	<p>
-		「みんなでおでんき」ウェブAPI（version {{ version }} {{ version_datetime }}版)へようこそ 
-		{% if user_email %}{{ user_email }}さん{% endif %}
-	</p>
 	<tr>
 		<td><a href="/">Top</a></td>
 		<!-- <td><a href="/Joined">Joined</a></td> -->
@@ -11,8 +12,8 @@
 		<td><a href="/RawData">RawData</a></td>
 		<td><a href="/Data">Data</a></td>
 		<td><a href="/Last">Last</a></td>
-		<td><a href="/Spreadsheet">スプレッドシート</a>
-		<td><a href="/OdenkiUser">ユーザー情報</a>
+		<td><a href="/Command">機器へのコマンド</a><td><a href="/Spreadsheet">スプレッドシート</a><td><a href="/OdenkiUser">ユーザー情報</a><td><a href="https://docs.google.com/open?id=0Bw_QuYgBcuXaZmUyNDQzODgtNzMzMi00YTE0LWE3M2MtYTgxMGZmOGUxNzU3">ドキュメント</a> {% if googleLoginUrl %}<a href="{{ googleLoginUrl }}">ログイン</a>{% endif %}
+		{% if googleLogoutUrl %}<a href="{{ googleLogoutUrl }}">ログアウト</a>{% endif %}
 	</tr>
 </table>
 <hr/>
