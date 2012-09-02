@@ -11,7 +11,7 @@ class Sender(db.Model):
     protocol = db.StringProperty()
 
 def GetSender(request):
-    logging.info(("GetSender", request.url))
+    #logging.info(("GetSender", request.url))
     assert isinstance(request, Request)
     ip_address = request.remote_addr
     parsed_url = urlparse(request.url)
@@ -24,12 +24,12 @@ def GetSender(request):
     else:
         protocol = ""
         port = -1
-    logging.info((ip_address, port, protocol))
+    #logging.info((ip_address, port, protocol))
     gql_query = Sender.gql("WHERE ipAddress = :1 AND port = :2 AND protocol = :3", ip_address, port, protocol)
     existing_sender = gql_query.get()
-    logging.info(existing_sender)
+    #logging.info(existing_sender)
     if existing_sender is not None:
-        logging.info((existing_sender.senderId, existing_sender.ipAddress, existing_sender.port, existing_sender.protocol))
+        #logging.info((existing_sender.senderId, existing_sender.ipAddress, existing_sender.port, existing_sender.protocol))
         return existing_sender
     else:
         sender = Sender()
