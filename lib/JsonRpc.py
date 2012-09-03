@@ -28,37 +28,37 @@ def _JsonRpcErrorToHttpStatus(json_rpc_error):
         return 500
     return None
 
-def _getJsonFromUrl(url_param_part_as_dict):
+def _getJsonRpcRequestDictFromUrlParams(url_params_as_dict):
     """JSON-RPC 2.0 over HTTP GET method should have method,id and params in URL parameter part.
     params should be encoded in BASE64.
     This method also accepts bare parameters in URL parameter part and puts them in value of 
     'param' key in JSON-RPC request object.
     See http://www.simple-is-better.org/json-rpc/jsonrpc20-over-http.html
     """
-    assert isinstance(url_param_part_as_dict, dict)
-    json_from_url = {}
-    for k, v in url_param_part_as_dict.items():
-        if json_from_url.get(k):
-            if isinstance(json_from_url[k], list):
-                json_from_url[k].append(v)
+    assert isinstance(url_params_as_dict, dict)
+    json_rpc_request_dict = {}
+    for k, v in url_params_as_dict.items():
+        if json_rpc_request_dict.get(k):
+            if isinstance(json_rpc_request_dict[k], list):
+                json_rpc_request_dict[k].append(v)
             else:
-                json_from_url[k] = [json_from_url[k], v]
+                json_rpc_request_dict[k] = [json_rpc_request_dict[k], v]
         else:
-            json_from_url[k] = v
+            json_rpc_request_dict[k] = v
     
-    base64_params = json_from_url.get("params")
+    base64_params = json_rpc_request_dict.get("params")
     if base64_params:
         params_string = base64_decode(base64_params)
-        json_from_url["params"] = loads(params_string)
-    return json_from_url
+        json_rpc_request_dict["params"] = loads(params_string)
+    return json_rpc_request_dict
         
-def _getJsonFromBody(body):
+def _getJsonRpcRequestDictFromPostedBody(body):
     assert isinstance(body, str)
-    json_from_body = loads(body)
-    if json_from_body is None:
-        json_from_body = {}
-    assert isinstance(json_from_body, dict)
-    return json_from_body
+    json_rpc_request_dict = loads(body)
+    if json_rpc_request_dict is None:
+        json_rpc_request_dict = {}
+    assert isinstance(json_rpc_request_dict, dict)
+    return json_rpc_request_dict
 
 class JsonRpcRequest(object):
     """represents JSON-RPC request.
