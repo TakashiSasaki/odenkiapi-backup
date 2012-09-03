@@ -1,10 +1,14 @@
 from google.appengine.ext.webapp import RequestHandler
-import lib
+import lib.debug
 
 class MethodsHandler(RequestHandler):
     __slot__ = ["methodList", "jsonRpc"]
     
     def _initMethodList(self):
+        """ It registers user methods to self.methodList.
+        User methods are expected to take just one JSON-RPC object.  
+        """
+        
         RequestHandler.__init__(self)
         self.methodList = {}
         self.methodList.update(self.__class__.__dict__)
@@ -57,4 +61,3 @@ class MethodsHandler(RequestHandler):
         self._invokeMethod(method, json_rpc)
         json_rpc.write()
         return
-
