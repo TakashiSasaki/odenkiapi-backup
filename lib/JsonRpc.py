@@ -60,6 +60,17 @@ def _getJsonFromBody(body):
     assert isinstance(json_from_body, dict)
     return json_from_body
 
+class JsonRpcRequest(object):
+    """represents JSON-RPC request.
+    TODO: should be separated from JsonRpc class. 
+    """
+    def __init__(self, json_rpc_request_object):
+        assert isinstance(json_rpc_request_object, dict)
+        self.jsonrpc = json_rpc_request_object.get("jsonrpc")
+        self.method = json_rpc_request_object.get("method")
+        self.params = json_rpc_request_object.get("params")
+        self.id = json_rpc_request_object.get("id")
+
 class JsonRpc(object):
     __slots__ = [ "request", "response", "jsonRequest", "requestHandler", "jsonrpc", "method", "params", "id", "result", "error", "log", "httpStatus"]
     
