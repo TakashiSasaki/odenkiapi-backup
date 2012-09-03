@@ -13,7 +13,7 @@ JSON_RPC_ERROR_INTERNAL_ERROR = -32603
 JSON_RPC_ERROR_SERVER_ERROR_RESERVED_MAX = -32000
 JSON_RPC_ERROR_SERVER_ERROR_RESERVED_MIN = -32099
 
-def _JsonRpcErrorToHttpStatus(json_rpc_error):
+def _getHttpStatusFromJsonRpcerror(json_rpc_error):
     if json_rpc_error == JSON_RPC_ERROR_PARSE_ERROR:
         return 500
     if json_rpc_error == JSON_RPC_ERROR_INVALID_REQUEST:
@@ -116,7 +116,7 @@ class JsonRpc(object):
                       "message": error_message,
                       "data":error_data
                       }
-        http_status = _toHttpStatus(error_code)
+        http_status = _getHttpStatusFromJsonRpcerror(error_code)
         self.setHttpStatus(http_status)
         
     def setResultValule(self, key, value):
@@ -189,7 +189,7 @@ class JsonRpc(object):
             # POST can change the state of servers.
             # PUT should be idempotent.
             try:
-                self.jsonRequest = _getJsonFromBody(self.request.body)
+                self.jsonRequest = _getJsonRpcRequestDictFromPostedBody(self.request.body)
                 return
             except JSONDecodeError, e:
                 self.jsonRequest = None
@@ -200,7 +200,7 @@ class JsonRpc(object):
             # DELETE should be idempotent.
             try:
                 argument_dict = self._getArgumentDict()
-                self.jsonRequest = _getJsonFromUrl(argument_dict)
+                self.jsonRequest = _getJsonRpcRequestDictFromUrlParams(argument_dict)
                 assert isinstance(self.jsonRequest, dict)
                 return
             except JSONDecodeError, e:

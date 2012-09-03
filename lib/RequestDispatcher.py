@@ -1,5 +1,5 @@
 from google.appengine.ext.webapp import RequestHandler
-import lib.debug
+import lib
 
 class RequestDispatcher(RequestHandler):
     __slot__ = ["methodList", "jsonRpc"]

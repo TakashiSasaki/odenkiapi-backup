@@ -1,9 +1,10 @@
 from lib.RequestDispatcher import RequestDispatcher
 from google.appengine.ext.webapp import RequestHandler
-import logging
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
-logger.debug("Echo.py was loaded")
+#import logging
+#logger = logging.getLogger()
+#logger.setLevel(logging.DEBUG)
+#logger.debug("Echo.py was loaded")
+import lib
 
 #class Echo(RequestDispatcher):
 class Echo(RequestHandler):
@@ -15,14 +16,14 @@ class Echo(RequestHandler):
         rpc.result = rpc.getRequest()
     
     def post(self):
-        self.request.out.write("echo")
+        self.response.out.write("echo")
         #self.get()
         
     def get(self):
-        self.request.out.write("echo")
+        self.response.out.write("echo")
         
 
 from lib import runWsgiApp
 if __name__ == "__main__":
-    logger.debug("abc")
+    lib.debug("abc")
     runWsgiApp(Echo, "/api/echo")
