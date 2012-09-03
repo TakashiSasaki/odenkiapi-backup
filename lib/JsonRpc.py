@@ -13,18 +13,18 @@ JSON_RPC_ERROR_INTERNAL_ERROR = -32603
 JSON_RPC_ERROR_SERVER_ERROR_RESERVED_MAX = -32000
 JSON_RPC_ERROR_SERVER_ERROR_RESERVED_MIN = -32099
 
-def _toHttpStatus(error_code):
-    if error_code == JSON_RPC_ERROR_PARSE_ERROR:
+def _JsonRpcErrorToHttpStatus(json_rpc_error):
+    if json_rpc_error == JSON_RPC_ERROR_PARSE_ERROR:
         return 500
-    if error_code == JSON_RPC_ERROR_INVALID_REQUEST:
+    if json_rpc_error == JSON_RPC_ERROR_INVALID_REQUEST:
         return 400
-    if error_code == JSON_RPC_ERROR_METHOD_NOT_FOUND:
+    if json_rpc_error == JSON_RPC_ERROR_METHOD_NOT_FOUND:
         return 404
-    if error_code == JSON_RPC_ERROR_INVALID_PARAMS:
+    if json_rpc_error == JSON_RPC_ERROR_INVALID_PARAMS:
         return 500
-    if error_code == JSON_RPC_ERROR_INTERNAL_ERROR:
+    if json_rpc_error == JSON_RPC_ERROR_INTERNAL_ERROR:
         return 500
-    if error_code >= JSON_RPC_ERROR_SERVER_ERROR_RESERVED_MIN and error_code <= JSON_RPC_ERROR_SERVER_ERROR_RESERVED_MAX:
+    if json_rpc_error >= JSON_RPC_ERROR_SERVER_ERROR_RESERVED_MIN and json_rpc_error <= JSON_RPC_ERROR_SERVER_ERROR_RESERVED_MAX:
         return 500
     return None
 
