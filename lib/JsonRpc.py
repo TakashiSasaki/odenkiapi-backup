@@ -28,10 +28,16 @@ def _toHttpStatus(error_code):
         return 500
     return None
 
-def _getJsonFromUrl(params):
-    assert isinstance(params, dict)
+def _getJsonFromUrl(url_param_part_as_dict):
+    """JSON-RPC 2.0 over HTTP GET method should have method,id and params in URL parameter part.
+    params should be encoded in BASE64.
+    This method also accepts bare parameters in URL parameter part and puts them in value of 
+    'param' key in JSON-RPC request object.
+    See http://www.simple-is-better.org/json-rpc/jsonrpc20-over-http.html
+    """
+    assert isinstance(url_param_part_as_dict, dict)
     json_from_url = {}
-    for k, v in params.items():
+    for k, v in url_param_part_as_dict.items():
         if json_from_url.get(k):
             if isinstance(json_from_url[k], list):
                 json_from_url[k].append(v)
