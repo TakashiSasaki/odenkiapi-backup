@@ -61,3 +61,21 @@ class RequestDispatcher(RequestHandler):
         self._invokeMethod(method, json_rpc)
         json_rpc.write()
         return
+
+    def post(self, *args):
+        RequestHandler.post(self, *args)
+    
+    def put(self, *args):
+        RequestHandler.put(self, *args)
+    
+    def head(self, *args):
+        RequestHandler.head(self, *args)
+    
+    def options(self, *args):
+        RequestHandler.options(self, *args)
+        
+    def delete(self, *args):
+        RequestHandler.delete(self, *args)
+        
+    def trace(self, *args):
+        RequestHandler.trace(self, *args)
