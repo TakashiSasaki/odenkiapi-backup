@@ -36,6 +36,8 @@ handlers:
   script: SenderRequestHandler.py
   
 - url: /RawData
+  script: RawDataRequestHandler.py
+
 - url: /RawDataNonCached
   script: RawDataRequestHandler.py
   
