@@ -1,4 +1,3 @@
-from lib.RequestDispatcher import RequestDispatcher
 #from google.appengine.ext.webapp import RequestHandler
 from lib.JsonRpc import *
 #import logging
@@ -7,16 +6,19 @@ from lib.JsonRpc import *
 #logger.debug("Echo.py was loaded")
 import lib
 
-class Echo(RequestDispatcher):
+class Echo(JsonRpcDispatcher):
     """Echo returns given RPC object as it is."""
     
     def GET(self, json_rpc_request):
+        assert isinstance(json_rpc_request, JsonRpcRequest)
         return self.echo(json_rpc_request)
         
     def TRACE(self, json_rpc_request):
+        assert isinstance(json_rpc_request, JsonRpcRequest)
         return self.echo(json_rpc_request)
 
     def echo(self, json_rpc_request):
+        assert isinstance(json_rpc_request, JsonRpcRequest)
         lib.debug("entered in Echo.echo")
         json_rpc_response = JsonRpcResponse(json_rpc_request.id)
         json_rpc_response.result = {
@@ -29,5 +31,4 @@ class Echo(RequestDispatcher):
     
 from lib import runWsgiApp
 if __name__ == "__main__":
-    lib.debug("abc")
     runWsgiApp(Echo, "/api/echo")
