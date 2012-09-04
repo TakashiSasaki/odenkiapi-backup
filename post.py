@@ -11,7 +11,7 @@ from google.appengine.ext.webapp.util import  run_wsgi_app
 from google.appengine.ext.webapp import  template
 from django.utils import  simplejson as json
 from Sender import GetSender
-from RawData import putRawData
+from lib.RawData import putRawData
 from Data import putDataList
 from Metadata import putMetadata
 from google.appengine.ext import db
