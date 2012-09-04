@@ -18,7 +18,7 @@ def _getHttpStatusFromJsonRpcerror(json_rpc_error):
         return 500
     return None
 
-class RequestDispatcher(RequestHandler):
+class JsonRpcDispatcher(RequestHandler):
     __slot__ = ["methodList", "jsonRpc"]
     
     def __init__(self, request, response):
