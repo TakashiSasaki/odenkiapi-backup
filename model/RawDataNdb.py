@@ -1,6 +1,8 @@
 import lib
+from urlparse import urlparse
 from google.appengine.ext import ndb
-
+from google.appengine.ext.webapp import Request
+from model.Counter import Counter
 #ctx = ndb.get_context()
 #lib.debug("ndb cache policy is %s" % ctx.get_cache_policy())
 #lib.debug("ndb memcache policy is %s" % ctx.get_memcache_policy())
