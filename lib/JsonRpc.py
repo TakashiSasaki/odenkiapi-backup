@@ -315,6 +315,8 @@ class JsonRpcDispatcher(RequestHandler):
         return self.methodList[method_name](self, json_rpc_request)
         
     def get(self):
+        lib.debug("PATH_INFO = %s" % self.request.path_info)
+        lib.debug("type of path_info is %s" % type(self.request.path_info))
         json_rpc_request = JsonRpcRequest(self.request)
         json_rpc_response = self._invokeMethod(json_rpc_request.method, json_rpc_request)
         lib.debug("_invokeMethod returns %s" % type(json_rpc_response))

@@ -1,8 +1,10 @@
 import logging
 from urlparse import urlparse
 from google.appengine.ext import db
+from google.appengine.ext import ndb
 from google.appengine.ext.webapp import Request
 from lib.Counter import Counter
+import lib
 
 class RawData(db.Model):
     rawDataId = db.IntegerProperty()
@@ -28,3 +30,25 @@ def putRawData(request):
     raw_data.fragment = fragment
     raw_data.body = body
     return raw_data.put()
+
+class RawDataNdb(ndb.Model):
+    rawDataId = ndb.IntegerProperty()
+    path = ndb.StringProperty(indexed=False)
+    parameters = ndb.StringProperty(indexed=False)
+    query = ndb.StringProperty(indexed=False)
+    fragment = ndb.StringProperty(indexed=False)
+    body = ndb.StringProperty(indexed=False)
+    
+    @classmethod
+    def getRecentRawData(cls, start, end):
+        lib.debug("getRecentRawData start=%s end=%s" % (start,end))
+        q = ndb.Query(kind="RawData")
+        if start < end:
+            q = q.order(cls.rawDataId)
+            limit = end - start + 1
+        else:
+            q = q.order(-cls.rawDataId)
+            limit = start - end + 1
+        entities = q.fetch(limit)
+        lib.debug("%s entities were fetched" % len(entities))
+        return entities

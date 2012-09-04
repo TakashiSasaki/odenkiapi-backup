@@ -6,13 +6,14 @@ from google.appengine.ext.webapp.util import  run_wsgi_app
 from google.appengine.ext.webapp import  template
 from django.utils import  simplejson as json
 #import json
-from RawData import RawData
+from lib.RawData import RawData, RawDataNdb
 from MyRequestHandler import MyRequestHandler
 import simplejson
 from google.appengine.ext.db import Query, GqlQuery
 from google.appengine.ext.webapp import RequestHandler
 from google.appengine.api import memcache
 from google.appengine.api.datastore import typename, Key
+import lib
 
 class RawDataRequestHandler(MyRequestHandler):
     
@@ -36,6 +37,8 @@ class RawDataRequestHandler(MyRequestHandler):
         
 class RawDataCached(MyRequestHandler):
     def get(self):
+        path_info = self.request.path_info.split("/")
+        lib.debug("PATH_INFO = %s" % path_info)
         client = memcache.Client()
         LIMIT = 100
 
@@ -106,6 +109,7 @@ class RawDataRequestHandler2(MyRequestHandler):
 
 if __name__ == "__main__":
     logging.getLogger().setLevel(logging.DEBUG)
-    application = webapp.WSGIApplication([('/RawData', RawDataCached), ('/RawData2', RawDataRequestHandler2), ('/RawDataNonCached', RawDataRequestHandler)
+    application = webapp.WSGIApplication([('/RawData', RawDataCached), 
+                                          ('/RawData2', RawDataRequestHandler2), ('/RawDataNonCached', RawDataRequestHandler)
                                           ], debug=True)
     run_wsgi_app(application)

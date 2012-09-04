@@ -1,5 +1,0 @@
-indexes:
-- kind: RawData
-  properties:
-  - name: rawDataId
-    direction: desc

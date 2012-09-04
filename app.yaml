@@ -37,6 +37,9 @@ handlers:
   
 - url: /RawData
   script: RawDataRequestHandler.py
+  
+- url: /resource/RawData/[0-9]+/[0-9]+
+  script: RawDataNdb.py
 
 - url: /RawDataNonCached
   script: RawDataRequestHandler.py
