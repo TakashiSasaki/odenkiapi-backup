@@ -32,6 +32,9 @@ class Data(db.Model):
     def getKeyByFieldAndStringFromDatastore(cls, field, string):
         gql_query = Data.gql("WHERE field = :1 AND string = :2", field, string)
         key = gql_query.get(keys_only=True)
+        key2 = gql_query.get(keys_only=True)
+        if key2:
+            lib.debug("two entities having key %s and %s are identical" % (key, key2))
         # TODO: duplicated entity should be merged
         return key
     
