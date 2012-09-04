@@ -6,7 +6,7 @@ from google.appengine.ext.webapp.util import  run_wsgi_app
 from google.appengine.ext.webapp import  template
 from django.utils import  simplejson as json
 #import json
-from lib.RawData import RawData, RawDataNdb
+from model.RawData import RawData
 from MyRequestHandler import MyRequestHandler
 import simplejson
 from google.appengine.ext.db import Query, GqlQuery
