@@ -6,7 +6,7 @@ from Sender import  Sender
 from RawData import RawData
 from Data import Data
 import datetime
-from Counter import Counter
+from lib.Counter import Counter
 from google.appengine.api import memcache
 
 class Metadata(db.Model):

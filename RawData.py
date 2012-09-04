@@ -2,7 +2,7 @@ import logging
 from urlparse import urlparse
 from google.appengine.ext import db
 from google.appengine.ext.webapp import Request
-from Counter import Counter
+from lib.Counter import Counter
 
 class RawData(db.Model):
     rawDataId = db.IntegerProperty()

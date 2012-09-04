@@ -1,7 +1,7 @@
 from google.appengine.ext import db
 from google.appengine.ext.webapp import Request
 import types,logging
-from Counter import Counter
+from lib.Counter import Counter
 #import json
 from django.utils import simplejson
 

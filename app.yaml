@@ -3,13 +3,13 @@ version: python-0008
 #runtime: python
 runtime: python27
 api_version: 1
-
 default_expiration: "1d 1h"
-
 threadsafe: no
 inbound_services:
 - warmup
-
+libraries:
+- name: django
+  version: "1.2"
 handlers:
 - url: /stylesheets
   static_dir: stylesheets
