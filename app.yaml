@@ -10,6 +10,8 @@ inbound_services:
 libraries:
 - name: django
   version: "1.2"
+#- name: webapp2
+#  version: "2.5.1"
 handlers:
 - url: /stylesheets
   static_dir: stylesheets
@@ -39,12 +41,18 @@ handlers:
 - url: /Sender
   script: SenderRequestHandler.py
 
+##############################################
 - url: /record/RawData/[0-9]+/[0-9]+
-  script: RawDataNdb.py
+  script: record/RawData.py
 
 - url: /record/RawData/[0-9]+
-  script: RawDataNdb.py
+  script: record/RawData.py
 
+- url: /record
+  static_files: html/record.html
+  upload: html/record.html
+
+###############################################
 - url: /RawData
   script: RawDataRequestHandler.py
 
