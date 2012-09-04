@@ -1,9 +1,9 @@
-import logging
+#import logging
 from urlparse import urlparse
 from google.appengine.ext import db
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import Request
-from lib.Counter import Counter
+from model.Counter import Counter
 import lib
 
 class RawData(db.Model):

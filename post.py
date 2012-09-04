@@ -3,20 +3,20 @@ Created on 2011/11/28
 
 @author: sasaki
 '''
-import logging
-import cgi
-from google.appengine.ext import webapp
+#import logging
+#import cgi
+from google.appengine.ext.webapp import WSGIApplication, RequestHandler
 from google.appengine.ext.webapp.util import  run_wsgi_app
 #from google.appengine.api import users
-from google.appengine.ext.webapp import  template
-from django.utils import  simplejson as json
-from Sender import GetSender
-from lib.RawData import putRawData
-from Data import putDataList
-from Metadata import putMetadata
+#from google.appengine.ext.webapp import  template
+#from django.utils import  simplejson as json
+from model.Sender import GetSender
+from model.RawData import putRawData
+from model.Data import putDataList
+from model.Metadata import putMetadata
 from google.appengine.ext import db
 
-class PostPage(webapp.RequestHandler):
+class PostPage(RequestHandler):
 
     def get(self):
         self.sender = GetSender(self.request)
@@ -33,12 +33,6 @@ class PostPage(webapp.RequestHandler):
         #logging.info("body="+self.request.body)
         self.get()
 
-application = webapp.WSGIApplication([('/post', PostPage)], debug=True)
-
-
-def main():
-    logging.getLogger().setLevel(logging.DEBUG)
-    run_wsgi_app(application)
-
 if __name__ == "__main__":
-    main()
+    application = WSGIApplication([('/post', PostPage)], debug=True)
+    run_wsgi_app(application)

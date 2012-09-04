@@ -21,7 +21,7 @@ class RawData(ndb.Model):
     #_memcache_timeout = 7200
     
     @classmethod
-    def getRecentRawData(cls, start, end):
+    def getRecentKeys(cls, start, end):
         lib.debug("getRecentRawData start=%s end=%s" % (start,end))
         q = ndb.Query(kind="RawData")
         if start < end:

@@ -1,13 +1,13 @@
 from  google.appengine.ext import db
-from  google.appengine.ext.webapp import Request
-from urlparse import urlparse
-import logging
-from Sender import  Sender
-from lib.RawData import RawData
-from Data import Data
-import datetime
-from lib.Counter import Counter
+#from  google.appengine.ext.webapp import Request
+#from urlparse import urlparse
+#import logging
+from model.Sender import  Sender
+from model.RawData import RawData
+#from model.Data import Data
+from model.Counter import Counter
 from google.appengine.api import memcache
+import datetime
 
 class Metadata(db.Model):
     metadataId = db.IntegerProperty()

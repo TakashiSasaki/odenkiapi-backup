@@ -1,8 +1,8 @@
 from google.appengine.ext import db
 from google.appengine.ext.webapp import Request
-import logging
+#import logging
 from urlparse import urlparse
-from lib.Counter import Counter
+from model.Counter import Counter
 
 class Sender(db.Model):       
     senderId = db.IntegerProperty()
