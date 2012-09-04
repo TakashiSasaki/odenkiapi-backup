@@ -8,19 +8,21 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 #import simplejson
 import lib
 from lib.RawDataNdb import RawData
+from google.appengine.ext import ndb
 
 #DEFAULT_LIMIT = 100
 
 #from google.appengine.ext import ndb
 
 class RawDataStartEnd(RequestHandler):
+    @ndb.toplevel
     def get(self):
         path_info = self.request.path_info.split("/")
         start = int(path_info[3])
         end = int(path_info[4])
         raw_data = RawData.getRecentRawData(start, end)
         for x in raw_data:
-            self.response.out.write(str(x))
+            self.response.out.write(str(x.get()))
 
 if __name__ == "__main__":
     #logging.getLogger().setLevel(logging.DEBUG)
