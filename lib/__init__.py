@@ -24,7 +24,7 @@ def runWsgiApp(request_handler, path = None):
 RPC_ERROR_USER_AGENT_DOES_NOT_ACCEPT_HTML = 1
 
 import logging as _logging
-from logging import debug 
+from logging import debug, error, warning, info, critical
 _logging.getLogger().setLevel(_logging.DEBUG)
 
 #from JsonRpc import JsonRpc

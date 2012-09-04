@@ -1,95 +1,158 @@
+__all__ = ["JsonRpcError", "JsonRpcRequest", "JsonRpcResponse"]
+
 from encodings.base64_codec import base64_decode
-from simplejson import dumps, load, loads, JSONDecodeError
-from lib.CachedContent import CachedContent
-from logging import debug, getLogger, DEBUG
-getLogger().setLevel(DEBUG)
+from simplejson import loads, JSONDecodeError
+#from lib.CachedContent import CachedContent
+#from logging import debug, getLogger, DEBUG
+from google.appengine.ext.webapp import Request
+#getLogger().setLevel(DEBUG)
+import lib
 
+class JsonRpcError(object):
+    PARSE_ERROR = -32700
+    INVALID_REQUEST = -32600
+    METHOD_NOT_FOUND = -32601
+    INVALID_PARAMS = -32602
+    INTERNAL_ERROR = -32603
+    SERVER_ERROR_RESERVED_MAX = -32000
+    SERVER_ERROR_RESERVED_MIN = -32099
 
-JSON_RPC_ERROR_PARSE_ERROR = -32700
-JSON_RPC_ERROR_INVALID_REQUEST = -32600
-JSON_RPC_ERROR_METHOD_NOT_FOUND = -32601
-JSON_RPC_ERROR_INVALID_PARAMS = -32602
-JSON_RPC_ERROR_INTERNAL_ERROR = -32603
-JSON_RPC_ERROR_SERVER_ERROR_RESERVED_MAX = -32000
-JSON_RPC_ERROR_SERVER_ERROR_RESERVED_MIN = -32099
-
-def _getHttpStatusFromJsonRpcerror(json_rpc_error):
-    if json_rpc_error == JSON_RPC_ERROR_PARSE_ERROR:
-        return 500
-    if json_rpc_error == JSON_RPC_ERROR_INVALID_REQUEST:
-        return 400
-    if json_rpc_error == JSON_RPC_ERROR_METHOD_NOT_FOUND:
-        return 404
-    if json_rpc_error == JSON_RPC_ERROR_INVALID_PARAMS:
-        return 500
-    if json_rpc_error == JSON_RPC_ERROR_INTERNAL_ERROR:
-        return 500
-    if json_rpc_error >= JSON_RPC_ERROR_SERVER_ERROR_RESERVED_MIN and json_rpc_error <= JSON_RPC_ERROR_SERVER_ERROR_RESERVED_MAX:
-        return 500
-    return None
-
-def _getJsonRpcRequestDictFromUrlParams(url_params_as_dict):
+class JsonRpcRequest(object):
     """JSON-RPC 2.0 over HTTP GET method should have method,id and params in URL parameter part.
     params should be encoded in BASE64.
     This method also accepts bare parameters in URL parameter part and puts them in value of 
     'param' key in JSON-RPC request object.
     See http://www.simple-is-better.org/json-rpc/jsonrpc20-over-http.html
     """
-    assert isinstance(url_params_as_dict, dict)
-    json_rpc_request_dict = {}
-    for k, v in url_params_as_dict.items():
-        if json_rpc_request_dict.get(k):
-            if isinstance(json_rpc_request_dict[k], list):
-                json_rpc_request_dict[k].append(v)
-            else:
-                json_rpc_request_dict[k] = [json_rpc_request_dict[k], v]
-        else:
-            json_rpc_request_dict[k] = v
-    
-    base64_params = json_rpc_request_dict.get("params")
-    if base64_params:
-        params_string = base64_decode(base64_params)
-        json_rpc_request_dict["params"] = loads(params_string)
-    return json_rpc_request_dict
+    __slots__ = ["jsonrpc", "method", "id", "params", "extras", "error"]
+
+    def __init__(self, request):
+        assert isinstance(request, Request)
+        self.error = None
+        self.method = None
+        self.params = []
+        self.id = None
+        self.jsonrpc = None
+        self.extras = {}
+
+        # methods are listed in http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
+        # default JSON-RPC method is identical to HTTP method and it should be overridden
+        lib.debug("HTTP method: %s" % request.method)
+        self.method = request.method
+        if request.method == "OPTIONS":
+            self._getFromArguments(request)
+            return
+        if request.method == "GET":
+            self._getFromArguments(request)
+            return
+        if request.method == "HEAD":
+            self._getFromArguments(request)
+            return
+        if request.method == "POST":
+            self._getFromBody(request)
+            return
+        if request.method == "PUT":
+            self._getFromBody(request)
+            return
+        if request.method == "DELETE":
+            self._getFromArguments(request)
+            return
+        if request.method == "TRACE":
+            self._getFromBody(request)
+            return
         
-def _getJsonRpcRequestDictFromPostedBody(body):
-    assert isinstance(body, str)
-    json_rpc_request_dict = loads(body)
-    if json_rpc_request_dict is None:
-        json_rpc_request_dict = {}
-    assert isinstance(json_rpc_request_dict, dict)
-    return json_rpc_request_dict
-
-class JsonRpcRequest(object):
-    """represents JSON-RPC request.
-    TODO: should be separated from JsonRpc class. 
-    """
-    def __init__(self, json_rpc_request_object):
-        assert isinstance(json_rpc_request_object, dict)
-        self.jsonrpc = json_rpc_request_object.get("jsonrpc")
-        self.method = json_rpc_request_object.get("method")
-        self.params = json_rpc_request_object.get("params")
-        self.id = json_rpc_request_object.get("id")
-
-class JsonRpc(object):
-    __slots__ = [ "request", "response", "jsonRequest", "requestHandler", "jsonrpc", "method", "params", "id", "result", "error", "log", "httpStatus"]
+    def _getFromArguments(self, request):
+        lib.debug("entered in _getFromArguments")
+        for argument in request.arguments():
+            values = request.get_all(argument)
+            if argument == "jsonrpc":
+                assert len(values) != 0
+                if len(values) > 1:
+                    lib.error("multiple jsonrpc version indicator")
+                    self.error = JsonRpcError.INVALID_REQUEST
+                    return
+                self.jsonrpc = values[0]
+                continue
+            if argument == "method":
+                lib.debug("argument %s has %s" % (argument, values))
+                assert len(values) != 0
+                if len(values) > 1:
+                    lib.error("multiple methods are given")
+                    self.error = JsonRpcError.INVALID_REQUEST
+                    return
+                self.method = values[0]
+                continue
+            if argument == "id":
+                lib.debug("argument %s has %s" % (argument, values))
+                assert len(values) != 0
+                if len(values) > 1:
+                    lib.error("multiple ids are given")
+                    self.error = JsonRpcError.INVALID_REQUEST
+                    return
+                self.id = values[0]
+                continue
+            if argument == "params":
+                for params in values:
+                    try:
+                        decoded_params = base64_decode(params)
+                    except:
+                        lib.error("failed to decode BASE64 for params")
+                        self.error = JsonRpcError.PARSE_ERROR
+                        return
+                    try:
+                        loaded_params = loads(decoded_params)
+                    except:
+                        lib.error("failed to decode JSON for params")
+                        self.error = JsonRpcError.PARSE_ERROR
+                        return
+                    try:
+                        assert isinstance(loaded_params, list)
+                    except:
+                        lib.error("params is expected to be an array of objects, that is, a list")
+                        self.error = JsonRpcError.PARSE_ERROR
+                    self.params.extend(loaded_params)
+                continue
+            lib.debug("extra data %s:%s" % (argument, values))
+            self.extras[argument] = values
+        assert not isinstance(self.id, list)
+        #self.extras.extends(extras_in_arguments)
+                    
+    def _getFromBody(self, request):
+        """JSON-RPC request in HTTP body precedes that in parameter part of URL and FORM"""
+        assert self.error is None
+        assert isinstance(request.body, str)
+        try:
+            json_rpc_request_dict = loads(request.body)
+        except:
+            lib.error("failed to parse JSON object in the body")
+            self.error = JsonRpcError.PARSE_ERROR
+            return
+        for k, v in json_rpc_request_dict:
+            if k == "jsonrpc":
+                self.jsonrpc = v
+            if k == "method":
+                self.method = v
+            if k == "id":
+                self.id = v
+            if k == "params":
+                self.params = v
+            self.extras[k] = v
+        
+class JsonRpcResponse(object):
+    __slots__ = [ "id", "result", "error" ]
     
-    def __init__(self, request_handler):
-        self.requestHandler = request_handler
-        self.request = request_handler.request
-        self.response = request_handler.response
+    def __init__(self, request_id):
+        lib.debug("constructor of JsonRpcResponse object")
+        self.id = request_id
+        #self.requestHandler = request_handler
+        #self.request = request_handler.request
+        #self.response = request_handler.response
         #self.error = {}
-        self._getJsonRequest()
-        if self.jsonRequest:
-            self.jsonrpc = self.jsonRequest.get("jsonrpc")
-            if  self.jsonRequest.has_key("method"):
-                self.method = self.jsonRequest.get("method")
-            self.params = self.jsonRequest.get("params")
-            self.id = self.jsonRequest.get("id")
-            if isinstance(self.id, list) and len(self.id) == 1:
-                self.id = self.id[0]
-        
+        self.result = None
+        self.error = None
+    
     def _getArgumentDict(self):
+        raise DeprecationWarning()
         d = {}
         for a in self.request.arguments():
             assert isinstance(a, unicode)
@@ -99,11 +162,13 @@ class JsonRpc(object):
         return d
 
     def redirect(self, url):
+        raise DeprecationWarning()
         self.requestHandler.redirect(url)
         assert self.response.status == 302
         self.setHttpStatus(self.response.status)
 
     def setHttpStatus(self, http_status):
+        raise DeprecationWarning()
         assert isinstance(http_status, int)
         assert not hasattr(self, "httpStatus")
         self.httpStatus = http_status
@@ -116,10 +181,10 @@ class JsonRpc(object):
                       "message": error_message,
                       "data":error_data
                       }
-        http_status = _getHttpStatusFromJsonRpcerror(error_code)
-        self.setHttpStatus(http_status)
+        #http_status = _getHttpStatusFromJsonRpcerror(error_code)
+        #self.setHttpStatus(http_status)
         
-    def setResultValule(self, key, value):
+    def setResultValue(self, key, value):
         if not hasattr(self, "result"):
             self.result = {}
         assert isinstance(self.result, dict)
@@ -127,13 +192,17 @@ class JsonRpc(object):
         self.result[key] = value
         
     def appendResultValue(self, key, value):
-        assert isinstance(self.result.has_key("key"), list)
+        if self.result.has_key(key):
+            if not isinstance(self.result.get(key), list):
+                self.result[key] = [self.result[key]]
+        assert isinstance(self.result.get(key), list)
         self.result["key"].append(value)
+
         
-    def addLog(self, log_message):
-        if not hasattr(self, "log"):
-            self.log = []
-        self.log.append(log_message)
+    #def addLog(self, log_message):
+    #    if not hasattr(self, "log"):
+    #        self.log = []
+    #    self.log.append(log_message)
 
     def setResult(self, result):
         assert not hasattr(self, "result") or self.result is None
@@ -143,34 +212,34 @@ class JsonRpc(object):
         assert isinstance(self.result, dict)
         self.result.update(result)
         
-    def getParam(self, key):
-        if hasattr(self, "params"):
-            if isinstance(self.params, dict):
-                return self.params.get(key)
-        return self.jsonRequest.get(key)
+    #def getParam(self, key):
+    #    if hasattr(self, "params"):
+    #       if isinstance(self.params, dict):
+    #           return self.params.get(key)
+    #    return self.jsonRequest.get(key)
     
-    def getParams(self):
-        assert isinstance(self.params, dict)
-        return self.params
+    #def getParams(self):
+    #    assert isinstance(self.params, dict)
+    #   return self.params
     
-    def getMethod(self):
-        if not hasattr(self, "method"): return None
-        assert isinstance(self.method, str) or isinstance(self.method, unicode)
-        return self.method
+    #def getMethod(self):
+    #    if not hasattr(self, "method"): return None
+    #   assert isinstance(self.method, str) or isinstance(self.method, unicode)
+    #    return self.method
     
-    def getRequest(self):
-        return self.jsonRequest
+    #def getRequest(self):
+    #   return self.jsonRequest
     
-    def getId(self):
-        assert isinstance(self.id, None) or isinstance(self.id, int) or isinstance(self.id, long) or isinstance(self.id, str)
-        return self.id
+    #def getId(self):
+    #    assert isinstance(self.id, None) or isinstance(self.id, int) or isinstance(self.id, long) or isinstance(self.id, str)
+    #    return self.id
     
-    def getVersion(self):
-        if hasattr(self, "jsonrpc"):
-            if self.jsonrpc == "2.0":
-                return 2
-            else: return 1
-        return None
+    #def getVersion(self):
+    #    if hasattr(self, "jsonrpc"):
+    #        if self.jsonrpc == "2.0":
+    #            return 2
+    #        else: return 1
+    #    return None
         
     def getErrorCode(self):
         try:
@@ -181,80 +250,4 @@ class JsonRpc(object):
             pass
         return None
     
-    def _getJsonRequest(self):
-        """getJsonRequest is intended to gather as many parameters as possible 
-        even if parameters in URL or request body does not meet JSON-RPC 2.0 specification.
-        """
-        if self.request.method == "POST" or self.request.method == "PUT":
-            # POST can change the state of servers.
-            # PUT should be idempotent.
-            try:
-                self.jsonRequest = _getJsonRpcRequestDictFromPostedBody(self.request.body)
-                return
-            except JSONDecodeError, e:
-                self.jsonRequest = None
-                self.setError(JSON_RPC_ERROR_PARSE_ERROR, e.message)
-                return
-        if self.request.method == "GET" or self.request.method == "DELETE":
-            # GET should not change the state of servers.
-            # DELETE should be idempotent.
-            try:
-                argument_dict = self._getArgumentDict()
-                self.jsonRequest = _getJsonRpcRequestDictFromUrlParams(argument_dict)
-                assert isinstance(self.jsonRequest, dict)
-                return
-            except JSONDecodeError, e:
-                self.jsonRequest = None
-                self.setError(JSON_RPC_ERROR_PARSE_ERROR, e.message)
-                return
-
-        self.jsonRequest = None
-        self.setError(JSON_RPC_ERROR_INVALID_REQUEST, "%s is unknown HTTP method" % self.request.method)
         
-    def write(self):
-        if hasattr(self, "error"):
-            assert isinstance(self.error, dict)
-            assert not hasattr(self, "result")
-            self.response.content_type = "application/json"
-            params = {
-                      "error" : self.error,
-                      }
-            if hasattr(self, "id"):
-                params["id"] = self.id
-            if hasattr(self, "log"):
-                params["log"] = self.log
-            if hasattr(self, "jsonrpc") and self.jsonrpc == "2.0":
-                params["jsonrpc"] = self.jsonrpc
-            self.response.out.write(dumps(params))
-            return
-        
-        # notification has no id
-        if not hasattr(self, "id") and hasattr(self, "method"):
-            assert not hasattr(self, "error")
-            assert not hasattr(self, "result")
-            assert not hasattr(self, "httpStatus")
-            self.response.set_status(204) # No content
-            return
-        
-        if hasattr(self, "id") and hasattr(self, "method"):
-            params = {
-                      "id" : self.id
-                      }
-            if hasattr(self, "result"):
-                params["result"] = self.result
-            if hasattr(self, "log"):
-                params["log"] = self.log
-            if self.jsonrpc == "2.0":
-                params["jsonrpc"] = self.jsonrpc
-            cached_content = CachedContent(self.request.path, params)
-            cached_content.dump()
-            if hasattr(self, "httpStatus"):
-                self.response.set_status(self.httpStatus)
-            cached_content.write(self.requestHandler)
-            return
-            
-        if hasattr(self, "log"):
-            self.result["log"] = self.log
-        cached_content = CachedContent(self.request.path, self.result)
-        cached_content.dump()
-        cached_content.write(self.requestHandler)
