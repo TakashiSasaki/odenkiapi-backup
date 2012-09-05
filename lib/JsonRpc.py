@@ -139,6 +139,11 @@ class JsonRpcRequest(object):
             self.extras[k] = v
         
 class JsonRpcResponse(object):
+    """Each JSON-RPC method should return JsonRpcResponse object.
+    JsonRpcDispatcher sees it and determines actual HTTP response
+    without any other assumptions. 
+    """
+    
     __slots__ = [ "id", "result", "error" ]
     
     def __init__(self, request_id):
@@ -249,22 +254,6 @@ class JsonRpcResponse(object):
         except:
             pass
         return None
-    
-        
-def _getHttpStatusFromJsonRpcerror(json_rpc_error):
-    if json_rpc_error == JsonRpcError.PARSE_ERROR:
-        return 500
-    if json_rpc_error == JsonRpcError.INVALID_REQUEST:
-        return 400
-    if json_rpc_error == JsonRpcError.METHOD_NOT_FOUND:
-        return 404
-    if json_rpc_error == JsonRpcError.INVALID_PARAMS:
-        return 500
-    if json_rpc_error == JsonRpcError.INTERNAL_ERROR:
-        return 500
-    if json_rpc_error >= JsonRpcError.SERVER_ERROR_RESERVED_MIN and json_rpc_error <= JsonRpcError.SERVER_ERROR_RESERVED_MAX:
-        return 500
-    return None
 
 class JsonRpcDispatcher(RequestHandler):
     __slot__ = ["methodList", "jsonRpc"]
@@ -369,7 +358,7 @@ class JsonRpcDispatcher(RequestHandler):
                 response_dict["jsonrpc"] = json_rpc_response.jsonrpc
             if hasattr(json_rpc_response, "extras"):
                 response_dict["extras"] = json_rpc_response.extras
-            self.response.status = _getHttpStatusFromJsonRpcerror(json_rpc_response.error.code) 
+            self.response.status = JsonRpcDispatcher._getHttpStatusFromJsonRpcError(json_rpc_response.error.code) 
             self.response.out.write(dumps(response_dict))
             return
         
@@ -395,3 +384,19 @@ class JsonRpcDispatcher(RequestHandler):
             response_dict["extras"] = json_rpc_response.extras
         self.response.out.write(dumps(response_dict))
         return
+
+    @classmethod
+    def _getHttpStatusFromJsonRpcError(cls, json_rpc_error):
+        if json_rpc_error == JsonRpcError.PARSE_ERROR:
+            return 500
+        if json_rpc_error == JsonRpcError.INVALID_REQUEST:
+            return 400
+        if json_rpc_error == JsonRpcError.METHOD_NOT_FOUND:
+            return 404
+        if json_rpc_error == JsonRpcError.INVALID_PARAMS:
+            return 500
+        if json_rpc_error == JsonRpcError.INTERNAL_ERROR:
+            return 500
+        if json_rpc_error >= JsonRpcError.SERVER_ERROR_RESERVED_MIN and json_rpc_error <= JsonRpcError.SERVER_ERROR_RESERVED_MAX:
+            return 500
+        return None
