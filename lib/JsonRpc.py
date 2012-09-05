@@ -343,6 +343,7 @@ class JsonRpcDispatcher(RequestHandler):
         self._write(json_rpc_response)
 
     def _write(self, json_rpc_response):
+        # write JSON-RPC response as it is
         assert isinstance(json_rpc_response, JsonRpcResponse)
         if json_rpc_response.error:
             assert  json_rpc_response.result is None
@@ -369,7 +370,21 @@ class JsonRpcDispatcher(RequestHandler):
             assert not hasattr(self, "result")
             self.response.set_status(204) # No content
             return
+
         
+        # HTTP response in given format
+        if self.request.get("format") == "tsv":
+            self._writeTsv(json_rpc_response)
+            return
+        if self.request.get("format") == "csv":
+            self._writeCsv(json_rpc_response)
+            return
+        if self.request.get("callback"):
+            self._writeJsonP(json_rpc_response)
+            return
+        self._writeJson(json_rpc_response)
+    
+    def _writeJson(self, json_rpc_response):    
         lib.debug("json_rpc_response has result")
         response_dict = {
                       "id" : json_rpc_response.id
@@ -384,6 +399,15 @@ class JsonRpcDispatcher(RequestHandler):
             response_dict["extras"] = json_rpc_response.extras
         self.response.out.write(dumps(response_dict))
         return
+    
+    def _writeCsv(self, json_rpc_response):
+        pass
+    
+    def _writeTsv(self, json_rpc_response):
+        pass
+    
+    def _writeJsonP(self, jspn_rpc_response):
+        pass
 
     @classmethod
     def _getHttpStatusFromJsonRpcError(cls, json_rpc_error):
