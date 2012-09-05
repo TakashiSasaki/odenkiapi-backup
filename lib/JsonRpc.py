@@ -24,7 +24,7 @@ class JsonRpcRequest(object):
     'param' key in JSON-RPC request object.
     See http://www.simple-is-better.org/json-rpc/jsonrpc20-over-http.html
     """
-    __slots__ = ["jsonrpc", "method", "id", "params", "extras", "error"]
+    __slots__ = ["jsonrpc", "method", "id", "params", "extra", "error"]
 
     def __init__(self, request):
         assert isinstance(request, Request)
@@ -33,7 +33,7 @@ class JsonRpcRequest(object):
         self.params = []
         self.id = None
         self.jsonrpc = None
-        self.extras = {}
+        self.extra = {}
 
         # methods are listed in http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
         # default JSON-RPC method is identical to HTTP method and it should be overridden
@@ -113,7 +113,7 @@ class JsonRpcRequest(object):
                     self.params.extend(loaded_params)
                 continue
             lib.debug("extra data %s:%s" % (argument, values))
-            self.extras[argument] = values
+            self.extra[argument] = values
         assert not isinstance(self.id, list)
         #self.extras.extends(extras_in_arguments)
                     
@@ -136,7 +136,7 @@ class JsonRpcRequest(object):
                 self.id = v
             if k == "params":
                 self.params = v
-            self.extras[k] = v
+            self.extra[k] = v
         
 class JsonRpcResponse(object):
     """Each JSON-RPC method should return JsonRpcResponse object.
@@ -357,8 +357,8 @@ class JsonRpcDispatcher(RequestHandler):
                 response_dict["log"] = json_rpc_response.log
             if hasattr(json_rpc_response, "jsonrpc"):
                 response_dict["jsonrpc"] = json_rpc_response.jsonrpc
-            if hasattr(json_rpc_response, "extras"):
-                response_dict["extras"] = json_rpc_response.extras
+            if hasattr(json_rpc_response, "extra"):
+                response_dict["extra"] = json_rpc_response.extra
             self.response.status = JsonRpcDispatcher._getHttpStatusFromJsonRpcError(json_rpc_response.error.code) 
             self.response.out.write(dumps(response_dict))
             return
@@ -395,12 +395,16 @@ class JsonRpcDispatcher(RequestHandler):
             response_dict["log"] = json_rpc_response.log
         if hasattr(json_rpc_response, "jsonrpc"):
             response_dict["jsonrpc"] = json_rpc_response.jsonrpc
-        if hasattr(json_rpc_response, "extras"):
-            response_dict["extras"] = json_rpc_response.extras
+        if hasattr(json_rpc_response, "extra"):
+            response_dict["extra"] = json_rpc_response.extra
         self.response.out.write(dumps(response_dict))
         return
     
     def _writeCsv(self, json_rpc_response):
+        from StringIO import StringIO
+        import csv
+        output = StringIO()
+        # TODO: 
         pass
     
     def _writeTsv(self, json_rpc_response):
