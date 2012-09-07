@@ -2,7 +2,7 @@
 __all__ = ["JsonRpcError", "JsonRpcRequest", "JsonRpcResponse", "JsonRpcDispatcher"]
 
 from encodings.base64_codec import base64_decode
-from simplejson import loads
+from json import loads
 from lib import dumps
 #from lib.CachedContent import CachedContent
 #from logging import debug, getLogger, DEBUG

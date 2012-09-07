@@ -23,7 +23,7 @@ def runWsgiApp(request_handler, path=None):
 
 RPC_ERROR_USER_AGENT_DOES_NOT_ACCEPT_HTML = 1
 
-from simplejson import dumps as _dumps
+from json import dumps as _dumps
 def dumps(d):
     return _dumps(d, indent=4)
 
