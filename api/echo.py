@@ -9,9 +9,6 @@ from logging import debug
 class Echo(JsonRpcDispatcher):
     """Echo returns given RPC object as it is."""
     
-    def getDoc(self):
-        return self.__doc__
-    
     def GET(self, json_rpc_request):
         debug("entered in Echo.GET")
         assert isinstance(json_rpc_request, JsonRpcRequest)
