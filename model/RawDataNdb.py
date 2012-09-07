@@ -1,8 +1,9 @@
 import lib
 from urlparse import urlparse
 from google.appengine.ext import ndb
-from google.appengine.ext.webapp import Request
+#from google.appengine.ext.webapp import Request
 from model.Counter import Counter
+from json import dumps
 #ctx = ndb.get_context()
 #lib.debug("ndb cache policy is %s" % ctx.get_cache_policy())
 #lib.debug("ndb memcache policy is %s" % ctx.get_memcache_policy())
@@ -23,8 +24,8 @@ class RawData(ndb.Model):
     #_memcache_timeout = 7200
     
     @classmethod
-    def getRecentKeys(cls, start, end):
-        lib.debug("getRecentRawData start=%s end=%s" % (start,end))
+    def getKeys(cls, start, end):
+        lib.debug("getRecentRawData start=%s end=%s" % (start, end))
         q = ndb.Query(kind="RawData")
         if start < end:
             q = q.order(cls.rawDataId)
@@ -35,4 +36,42 @@ class RawData(ndb.Model):
         entities = q.fetch(limit, keys_only=True)
         lib.debug("%s entities were fetched" % len(entities))
         return entities
+    
+    @classmethod
+    def queryRecent(cls):
+        """returns iterator which yields ndb.Key object"""
+        q = ndb.Query(kind="RawData")
+        q.order(-cls.rawDataId)
+        return q
 
+    @classmethod
+    def queryPeriod(cls, start_rawdata_id, end_rawdata_id):
+        assert isinstance(start_rawdata_id, int)
+        assert isinstance(end_rawdata_id, int)
+        q = ndb.Query(kind="RawData")
+        if start_rawdata_id >= end_rawdata_id:
+            q = q.order(-cls.rawDataId)
+            q = q.filter(cls.rawDataId <= start_rawdata_id)
+            q = q.filter(cls.rawDataId >= end_rawdata_id)
+        else:
+            q = q.order(-cls.rawDataId)
+            q = q.filter(cls.rawDataId <= end_rawdata_id)
+            q = q.filter(cls.rawDataId >= start_rawdata_id)
+        return q
+
+    def toDict(self):
+        return self.to_dict()
+    
+    def toJson(self):
+        return dumps(self.to_dict()) 
+
+
+    @classmethod
+    def getFieldNames(cls):
+        field_names = []
+        for attribute_name in dir(cls):
+            assert isinstance(attribute_name, str)
+            attribute = getattr(cls, attribute_name)
+            if isinstance(attribute, ndb.Property):
+                field_names.append(attribute_name)
+        return field_names

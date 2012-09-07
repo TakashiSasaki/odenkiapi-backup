@@ -8,6 +8,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 #import lib
 from model.RawDataNdb import RawData
 from google.appengine.ext import ndb
+#from lib.JsonRpc import JsonRpcDispatcher, JsonRpcRequest
 
 #DEFAULT_LIMIT = 100
 
@@ -19,8 +20,9 @@ class RawDataStartEnd(RequestHandler):
         path_info = self.request.path_info.split("/")
         start = int(path_info[3])
         end = int(path_info[4])
-        raw_data_keys = RawData.getRecentKeys(start, end)
-        for raw_data_key in raw_data_keys:
+        q = RawData.queryPeriod(start, end)
+        
+        for raw_data_key in q.fetch(keys_only=True):
             self.response.out.write(str(raw_data_key.get()))
 
 if __name__ == "__main__":

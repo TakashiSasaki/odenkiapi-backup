@@ -1,12 +1,16 @@
+#from google.appengine import runtime
 __all__ = ["JsonRpcError", "JsonRpcRequest", "JsonRpcResponse", "JsonRpcDispatcher"]
 
 from encodings.base64_codec import base64_decode
-from simplejson import loads, dumps, JSONDecodeError
+from simplejson import loads
+from lib import dumps
 #from lib.CachedContent import CachedContent
 #from logging import debug, getLogger, DEBUG
 from google.appengine.ext.webapp import Request, RequestHandler
 #getLogger().setLevel(DEBUG)
-import lib
+from StringIO import StringIO
+import csv
+from logging import debug, error
 
 class JsonRpcError(object):
     PARSE_ERROR = -32700
@@ -37,7 +41,7 @@ class JsonRpcRequest(object):
 
         # methods are listed in http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
         # default JSON-RPC method is identical to HTTP method and it should be overridden
-        lib.debug("HTTP method: %s" % request.method)
+        debug("HTTP method: %s" % request.method)
         self.method = request.method
         if request.method == "OPTIONS":
             self._getFromArguments(request)
@@ -62,31 +66,31 @@ class JsonRpcRequest(object):
             return
         
     def _getFromArguments(self, request):
-        lib.debug("entered in _getFromArguments")
+        debug("entered in _getFromArguments")
         for argument in request.arguments():
             values = request.get_all(argument)
             if argument == "jsonrpc":
                 assert len(values) != 0
                 if len(values) > 1:
-                    lib.error("multiple jsonrpc version indicator")
+                    error("multiple jsonrpc version indicator")
                     self.error = JsonRpcError.INVALID_REQUEST
                     return
                 self.jsonrpc = values[0]
                 continue
             if argument == "method":
-                lib.debug("argument %s has %s" % (argument, values))
+                debug("argument %s has %s" % (argument, values))
                 assert len(values) != 0
                 if len(values) > 1:
-                    lib.error("multiple methods are given")
+                    error("multiple methods are given")
                     self.error = JsonRpcError.INVALID_REQUEST
                     return
                 self.method = values[0]
                 continue
             if argument == "id":
-                lib.debug("argument %s has %s" % (argument, values))
+                debug("argument %s has %s" % (argument, values))
                 assert len(values) != 0
                 if len(values) > 1:
-                    lib.error("multiple ids are given")
+                    error("multiple ids are given")
                     self.error = JsonRpcError.INVALID_REQUEST
                     return
                 self.id = values[0]
@@ -96,23 +100,23 @@ class JsonRpcRequest(object):
                     try:
                         decoded_params = base64_decode(params)
                     except:
-                        lib.error("failed to decode BASE64 for params")
+                        error("failed to decode BASE64 for params")
                         self.error = JsonRpcError.PARSE_ERROR
                         return
                     try:
                         loaded_params = loads(decoded_params)
                     except:
-                        lib.error("failed to decode JSON for params")
+                        error("failed to decode JSON for params")
                         self.error = JsonRpcError.PARSE_ERROR
                         return
                     try:
                         assert isinstance(loaded_params, list)
                     except:
-                        lib.error("params is expected to be an array of objects, that is, a list")
+                        error("params is expected to be an array of objects, that is, a list")
                         self.error = JsonRpcError.PARSE_ERROR
                     self.params.extend(loaded_params)
                 continue
-            lib.debug("extra data %s:%s" % (argument, values))
+            debug("extra data %s:%s" % (argument, values))
             self.extra[argument] = values
         assert not isinstance(self.id, list)
         #self.extras.extends(extras_in_arguments)
@@ -124,7 +128,7 @@ class JsonRpcRequest(object):
         try:
             json_rpc_request_dict = loads(request.body)
         except:
-            lib.error("failed to parse JSON object in the body")
+            error("failed to parse JSON object in the body")
             self.error = JsonRpcError.PARSE_ERROR
             return
         for k, v in json_rpc_request_dict:
@@ -137,51 +141,71 @@ class JsonRpcRequest(object):
             if k == "params":
                 self.params = v
             self.extra[k] = v
+            
+    def getValue(self, key):
+        params = getattr(self, "params", None)
+        if isinstance(params, dict):
+            value = params.get(key)
+            if value: return value
+        extra = getattr(self, "extra", None)
+        if isinstance(extra, dict):
+            return extra.get(key)
+
+    def getExtra(self):
+        if hasattr(self, "extra"): return self.extra
+        return None
+
+    def getJsonRpcVersion(self):
+        if hasattr(self, "jsonrpc"): return self.jsonrpc
+        return 1.0
+    
+    def getParams(self):
+        if hasattr(self, "params"): return self.params
+        return None
         
-class JsonRpcResponse(object):
+    def getId(self):
+        return getattr(self, "id", None)
+
+        
+class JsonRpcResponse(dict):
     """Each JSON-RPC method should return JsonRpcResponse object.
     JsonRpcDispatcher sees it and determines actual HTTP response
     without any other assumptions. 
     """
     
-    __slots__ = [ "id", "result", "error" ]
+    __slots__ = []
     
     def __init__(self, request_id):
-        lib.debug("constructor of JsonRpcResponse object")
-        self.id = request_id
+        dict.__init__(self)
+        debug("constructor of JsonRpcResponse object")
+        self["id"] = request_id
         #self.requestHandler = request_handler
         #self.request = request_handler.request
         #self.response = request_handler.response
         #self.error = {}
-        self.result = None
-        self.error = None
+        #self.result = None
+        #elf.error = None
     
-    def _getArgumentDict(self):
-        raise DeprecationWarning()
-        d = {}
-        for a in self.request.arguments():
-            assert isinstance(a, unicode)
-            d[a] = self.request.get_all(a)
-            if isinstance(d[a], list) and len(d[a]) == 1:
-                d[a] = d[a][0]
-        return d
+    #def redirect(self, url):
+    #    raise DeprecationWarning()
+    #    self.requestHandler.redirect(url)
+    #    assert self.response.status == 302
+    #    self.setHttpStatus(self.response.status)
+    
+    def getId(self):
+        assert isinstance(self , dict)
+        return self.get("id")
 
-    def redirect(self, url):
-        raise DeprecationWarning()
-        self.requestHandler.redirect(url)
-        assert self.response.status == 302
-        self.setHttpStatus(self.response.status)
+    def delError(self):
+        if self.has_key("error"): del self["error"]
 
-    def setHttpStatus(self, http_status):
-        raise DeprecationWarning()
-        assert isinstance(http_status, int)
-        assert not hasattr(self, "httpStatus")
-        self.httpStatus = http_status
-        
     def setError(self, error_code, error_message=None, error_data=None):
         assert isinstance(error_code, int)
-        assert not hasattr(self, "error")
-        self.error = {
+        assert isinstance(self, dict)
+        if self.has_key("error"):
+            raise RuntimeError("JSON-RPC error is already set.")
+        #assert not hasattr(self, "error")
+        self["error"] = {
                       "code": error_code,
                       "message": error_message,
                       "data":error_data
@@ -189,12 +213,22 @@ class JsonRpcResponse(object):
         #http_status = _getHttpStatusFromJsonRpcerror(error_code)
         #self.setHttpStatus(http_status)
         
+    def getError(self):
+        return self.get("error")
+        
     def setResultValue(self, key, value):
-        if not hasattr(self, "result"):
-            self.result = {}
-        assert isinstance(self.result, dict)
-        assert not self.result.has_key(key)
-        self.result[key] = value
+        if self.getError(): 
+            raise RuntimeError("JSON-RPC error is already set and any result can't exist simultaneously.")
+        if self.get("result") is None: self["result"] = {}
+        if not isinstance(self.get("result"), dict):
+            raise RuntimeError("Existing JSON-RPC result object is not a dict.")
+        if self["result"].get(key):
+            raise RuntimeError("Existing JSON-RPC result already has key %s" % key)
+        self["result"][key] = value
+        return self["result"]
+    
+    def getResult(self):
+        return self.get("result")
         
     def appendResultValue(self, key, value):
         if self.result.has_key(key):
@@ -203,6 +237,21 @@ class JsonRpcResponse(object):
         assert isinstance(self.result.get(key), list)
         self.result["key"].append(value)
 
+    def getExtra(self):
+        return self.get("extra")
+
+    def setExtraDict(self, extra_dict):
+        assert isinstance(extra_dict, dict)
+        if self.get("extra") is not None: raise RuntimeError("JSON-RPC response already has extra object")
+        self["extra"] = extra_dict
+    
+    def setExtraValue(self, k, v):
+        extra = self.getExtra()
+        if extra is None: self.setExtraDict({})
+        extra = self.getExtra()
+        assert isinstance(extra, dict)
+        if extra.has_key(k): raise RuntimeError("extra dict already has %s key" % k)
+        self["extra"][k] = v
         
     #def addLog(self, log_message):
     #    if not hasattr(self, "log"):
@@ -210,12 +259,26 @@ class JsonRpcResponse(object):
     #    self.log.append(log_message)
 
     def setResult(self, result):
-        assert not hasattr(self, "result") or self.result is None
-        self.result = result
+        debug("JsonRpcResponse.setResult(%s)" % result)
+        if self.has_key("result"): raise RuntimeError("result is already set")
+        self["result"] = result
+        
+    def delResult(self):
+        if self.has_key("result"): del self["result"]
         
     def updateResult(self, result):
         assert isinstance(self.result, dict)
         self.result.update(result)
+        
+    def addResult(self, item_to_append_to_result):
+        result = self.getResult()
+        if result is not None and not isinstance(result, list): return
+        if result is None: 
+            result = []
+            self.setResult(result)
+        assert isinstance(result, list)
+        result.append(item_to_append_to_result)
+        
         
     #def getParam(self, key):
     #    if hasattr(self, "params"):
@@ -247,15 +310,24 @@ class JsonRpcResponse(object):
     #    return None
         
     def getErrorCode(self):
-        try:
-            error_code = self.error["code"]
-            if isinstance(error_code, int):
-                return error_code
-        except:
-            pass
-        return None
+        error_code = self["error"]["code"]
+        if isinstance(error_code, int):
+            return error_code
+
+    def getFieldNames(self):
+        """fieldnames in extra member is non-standard as JSON-RPC but convenient for CSV or TSV output"""
+        extra = self.getExtra()
+        if not isinstance(extra, dict): return None
+        fieldnames = extra.get("fieldnames")
+        if not isinstance(fieldnames, list): return None
+        return fieldnames
+    
+    def setFieldNames(self, field_names):
+        """fieldnames in extra member is non-standard as JSON-RPC but convenient for CSV or TSV output"""
+        self.setExtraValue("fieldnames", field_names)
 
 class JsonRpcDispatcher(RequestHandler):
+    """JsonRpcDispatcher invokes corresponding methods according to given method parameter"""
     __slot__ = ["methodList", "jsonRpc"]
     
     def __init__(self, request, response):
@@ -296,19 +368,21 @@ class JsonRpcDispatcher(RequestHandler):
         
         for k, v in self.methodList.iteritems():
             if isinstance(k, str):
-                lib.debug("key = " + k + " value = " + str(v))
+                debug("key = " + k + " value = " + str(v))
                 self.methodList[k.decode()] = v
     
     def _invokeMethod(self, method_name, json_rpc_request):
-        lib.debug("_invokeMethod invokes %s" % method_name)
+        debug("_invokeMethod invokes %s" % method_name)
         return self.methodList[method_name](self, json_rpc_request)
-        
-    def get(self):
-        lib.debug("PATH_INFO = %s" % self.request.path_info)
-        lib.debug("type of path_info is %s" % type(self.request.path_info))
+    
+    
+    def get(self, *args):
+        debug("JsonRpcDispatcher.get was invoked")
+        debug("PATH_INFO = %s" % self.request.path_info)
+        debug("type of path_info is %s" % type(self.request.path_info))
         json_rpc_request = JsonRpcRequest(self.request)
         json_rpc_response = self._invokeMethod(json_rpc_request.method, json_rpc_request)
-        lib.debug("_invokeMethod returns %s" % type(json_rpc_response))
+        debug("_invokeMethod returns %s" % type(json_rpc_response))
         assert isinstance(json_rpc_response, JsonRpcResponse)
         self._write(json_rpc_response)
 
@@ -323,11 +397,13 @@ class JsonRpcDispatcher(RequestHandler):
         self._write(json_rpc_response)
     
     def head(self, *args):
+        debug("JsonRpcDispatcher.head was invoked with %s" % args)
         json_rpc_request = JsonRpcRequest(self.request)
         json_rpc_response = self._invokeMethod(json_rpc_request.method, json_rpc_request)
         self._write(json_rpc_response)
     
     def options(self, *args):
+        debug("JsonRpcDispatcher.options was invoked with %s" % args)
         json_rpc_request = JsonRpcRequest(self.request)
         json_rpc_response = self._invokeMethod(json_rpc_request.method, json_rpc_request)
         self._write(json_rpc_response)
@@ -338,6 +414,7 @@ class JsonRpcDispatcher(RequestHandler):
         self._write(json_rpc_response)
         
     def trace(self, *args):
+        debug("JsonRpcDispatcher.trace was invoked with %s" % args)
         json_rpc_request = JsonRpcRequest(self.request)
         json_rpc_response = self._invokeMethod(json_rpc_request.method, json_rpc_request)
         self._write(json_rpc_response)
@@ -345,32 +422,26 @@ class JsonRpcDispatcher(RequestHandler):
     def _write(self, json_rpc_response):
         # write JSON-RPC response as it is
         assert isinstance(json_rpc_response, JsonRpcResponse)
-        if json_rpc_response.error:
-            assert  json_rpc_response.result is None
-            self.response.content_type = "application/json"
-            response_dict = {
-                      "error" : json_rpc_response.error,
-                      }
-            if hasattr(json_rpc_response, "id"):
-                response_dict["id"] = json_rpc_response.id
-            if hasattr(json_rpc_response, "log"):
-                response_dict["log"] = json_rpc_response.log
-            if hasattr(json_rpc_response, "jsonrpc"):
-                response_dict["jsonrpc"] = json_rpc_response.jsonrpc
-            if hasattr(json_rpc_response, "extra"):
-                response_dict["extra"] = json_rpc_response.extra
-            self.response.status = JsonRpcDispatcher._getHttpStatusFromJsonRpcError(json_rpc_response.error.code) 
-            self.response.out.write(dumps(response_dict))
-            return
-        
+        assert isinstance(json_rpc_response, dict)
         # notification has no id
-        if not hasattr(json_rpc_response, "id"):
-            assert json_rpc_response.error is None
-            assert json_rpc_response.result is None
-            assert not hasattr(self, "result")
-            self.response.set_status(204) # No content
-            return
+        if json_rpc_response.getId() is None:
+            debug("JSON-RPC notification")
+            if not json_rpc_response.has_key("error") and not json_rpc_response.has_key("result"):
+                # http://www.simple-is-better.org/json-rpc/jsonrpc20-over-http.html
+                self.response.set_status(204) # No content
+                self.response.content_type = "text/plain"
+                return
+            json_rpc_response.delError()
+            json_rpc_response.setError(JsonRpcError.INVALID_REQUEST, "Response for notification should have neither result nor error.")
+            json_rpc_response.delResult()
 
+        if json_rpc_response.has_key("error"):
+            debug("JSON RPC response with error.")
+            assert  json_rpc_response.getResult() is None
+            self.response.content_type = "application/json"
+            self.response.status = JsonRpcDispatcher._getHttpStatusFromJsonRpcError(json_rpc_response.getErrorCode()) 
+            self.response.out.write(dumps(json_rpc_response))
+            return
         
         # HTTP response in given format
         if self.request.get("format") == "tsv":
@@ -384,34 +455,39 @@ class JsonRpcDispatcher(RequestHandler):
             return
         self._writeJson(json_rpc_response)
     
-    def _writeJson(self, json_rpc_response):    
-        lib.debug("json_rpc_response has result")
-        response_dict = {
-                      "id" : json_rpc_response.id
-                      }
-        if hasattr(json_rpc_response, "result"):
-            response_dict["result"] = json_rpc_response.result
-        if hasattr(json_rpc_response, "log"):
-            response_dict["log"] = json_rpc_response.log
-        if hasattr(json_rpc_response, "jsonrpc"):
-            response_dict["jsonrpc"] = json_rpc_response.jsonrpc
-        if hasattr(json_rpc_response, "extra"):
-            response_dict["extra"] = json_rpc_response.extra
-        self.response.out.write(dumps(response_dict))
+    def _writeJson(self, json_rpc_response):
+        assert isinstance(json_rpc_response, JsonRpcResponse)
+        assert isinstance(json_rpc_response, dict)
+        debug("_writeJson was invoked")
+        self.response.content_type = "application/json"
+        self.response.out.write(dumps(json_rpc_response))
         return
     
-    def _writeCsv(self, json_rpc_response):
-        from StringIO import StringIO
-        import csv
+    def _writeCsv(self, json_rpc_response, dialect=csv.excel):
+        assert isinstance(json_rpc_response, JsonRpcResponse)
         output = StringIO()
-        # TODO: 
-        pass
+        csv_writer = csv.writer(output)
+        fieldnames = json_rpc_response.getFieldNames()
+        if not isinstance(fieldnames, list):
+            if self.request.get("fieldnames"):
+                csv_writer.write(fieldnames)
+        result = json_rpc_response.getResult()
+        if not isinstance(result, list): raise RuntimeError("result is not a list")
+        for x in result:
+            if not isinstance(x, list): raise RuntimeError("result contains non-list item")
+            csv_writer.write(x)
+        self.response.out.write(output.getvalue())
+        self.response.content_type = "text/plain"
     
     def _writeTsv(self, json_rpc_response):
-        pass
+        self._writeCsv(json_rpc_response, csv.excel_tab)
     
-    def _writeJsonP(self, jspn_rpc_response):
-        pass
+    def _writeJsonP(self, json_rpc_response):
+        result = json_rpc_response.getResult()
+        if not isinstance(result, dict) or not isinstance(result, list):
+            raise RuntimeError("result is neither dict or list")
+        self.response.out.write(dumps(result))
+        self.response.content_type = "application/javascript"
 
     @classmethod
     def _getHttpStatusFromJsonRpcError(cls, json_rpc_error):
