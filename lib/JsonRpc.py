@@ -3,7 +3,7 @@ __all__ = ["JsonRpcError", "JsonRpcRequest", "JsonRpcResponse", "JsonRpcDispatch
 
 from encodings.base64_codec import base64_decode
 from json import loads
-from lib import dumps
+from lib.JsonEncoder import dumps
 #from lib.CachedContent import CachedContent
 #from logging import debug, getLogger, DEBUG
 from google.appengine.ext.webapp import Request, RequestHandler
