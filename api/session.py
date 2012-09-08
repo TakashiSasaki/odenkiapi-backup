@@ -6,9 +6,9 @@ from lib.OdenkiSession import OdenkiSession
 
 class UserInfo(JsonRpcDispatcher):
     
-    def GET(self, json_rpc_request):
+    def GET(self, json_rpc_request, json_rpc_response):
         assert isinstance(json_rpc_request, JsonRpcRequest)
-        json_rpc_response = JsonRpcResponse(json_rpc_request.getId())
+        assert isinstance(json_rpc_response, JsonRpcResponse)
         json_rpc_response.setResultValue("gaesession", str(get_current_session()))
         json_rpc_response.setResultValue("OdenkiSession", OdenkiSession())
         return json_rpc_response

@@ -372,8 +372,10 @@ class JsonRpcDispatcher(RequestHandler):
                 self.methodList[k.decode()] = v
     
     def _invokeMethod(self, method_name, json_rpc_request):
+        assert isinstance(json_rpc_request, JsonRpcRequest)
+        json_rpc_response = JsonRpcResponse(json_rpc_request.getId())
         debug("_invokeMethod invokes %s" % method_name)
-        return self.methodList[method_name](self, json_rpc_request)
+        return self.methodList[method_name](self, json_rpc_request, json_rpc_response)
     
     
     def get(self, *args):
