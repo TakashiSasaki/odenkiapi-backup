@@ -31,7 +31,7 @@ class _Version(JsonRpcDispatcher):
 
 if __name__ == "__main__":
     mapping = []
-    mapping.append(("/api/Version", _Version))
+    mapping.append(("/api/version", _Version))
     from lib import WSGIApplication
     application = WSGIApplication(mapping)
     from lib import run_wsgi_app
