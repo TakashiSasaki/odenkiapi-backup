@@ -4,7 +4,8 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import Request
 #import types,logging
 from model.Counter import Counter
-from django.utils import simplejson
+#from django.utils import simplejson
+from json import loads
 from model.NdbModel import NdbModel
 
 class Data(NdbModel):
@@ -13,27 +14,55 @@ class Data(NdbModel):
     string = ndb.StringProperty()
     
     fieldnames = ["dataId", "field", "string"]
+
+    @classmethod
+    def querySingle(cls, data_id):
+        query = ndb.Query(kind="Data")
+        query = query.filter(Data.dataId==data_id)
+        return query
     
     @classmethod
-    def getByDataIdDescending(cls):
+    def queryRecent(cls):
         query = ndb.Query(kind="Data")
         query = query.order(-Data.dataId)
         return query
     
     @classmethod
-    def getByDataId(cls, data_id):
+    def queryByDataId(cls, data_id):
         assert isinstance(data_id, int)
         query = ndb.Query(kind="Data")
         query = query.filter(cls.dataId == data_id)
         return query
     
     @classmethod
-    def getByFieldAndString(cls, field, string):
+    def queryByFieldAndString(cls, field, string):
         assert isinstance(field, unicode)
         assert isinstance(string, unicode)
         query = ndb.Query(kind="Data")
         query = query.filter(cls.field == field)
         query = query.filter(cls.string == string)
+        return query
+    
+    @classmethod
+    def queryRange(cls, start, end):
+        assert isinstance(start, int)
+        assert isinstance(end, int)
+        query = ndb.Query(kind="Data")
+        query = query.order(-cls.dataId)
+        if start<=end:
+            query = query.filter(cls.dataId>=start)
+            query = query.filter(cls.dataId<=end)
+            return query
+        else:
+            query = query.filter(cls.dataId<=start)
+            query = query.filter(cls.dataId>=end)
+            return query
+    
+    def queryDuplication(self):
+        query = ndb.Query(kind="Data")
+        query = query.filter(Data.field == self.field)
+        query = query.filter(Data.string == self.string)
+        query = query.order(Data.dataId)
         return query
 
     @classmethod
@@ -89,7 +118,7 @@ class Data(NdbModel):
                 if data is None: continue
                 data_list.append(data)
         try:
-            parsed_json = simplejson.loads(request.body)
+            parsed_json = loads(request.body)
         except ValueError:
             parsed_json = None
     
@@ -100,3 +129,19 @@ class Data(NdbModel):
                 if data is None: continue
                 data_list.append(data)
         return data_list
+
+def getCanonicalizedKey(key):
+    assert isinstance(key, ndb.Key)
+    data = key.get()
+    if data is None: return None
+    assert isinstance(data, Data)
+    query = data.queryDuplication()
+    return query.get(keys_only=True)
+
+def canonicalizeKeyList(keys):
+    assert isinstance(keys, list)
+    result = []
+    for key in keys:
+        result.append(getCanonicalizedKey(key))
+    return result
+
