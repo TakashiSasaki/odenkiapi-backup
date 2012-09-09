@@ -1,4 +1,3 @@
-#from google.appengine.api.users import get_current_user, User
 from __future__ import unicode_literals
 from gaesessions import get_current_session, Session
 from gdata.gauth import AeLoad, AeSave, AeDelete
@@ -22,11 +21,6 @@ class GoogleAuthSession(dict):
         assert self._isJsonizable()
         self._loadFromGaeSession()
         assert self._isJsonizable()
-#        self["currentUser"] = get_current_user()
-#        if self["currentUser"]:
-#            self["id"] = self.getCurrentUser().user_id()
-#            self["email"] = self.getCurrentUser().email()
-#            self["nickname"] = self.getCurrentUser().nickname()
 
     def _loadFromGaeSession(self):
         existing_google_auth_session = self.gaesession.get("googleAuthSession")
@@ -47,18 +41,6 @@ class GoogleAuthSession(dict):
         assert isinstance(self.gaesession, Session)
         self.gaesession.de
 
-    def getCurrentUser(self):
-        return self.get("currentUser")
-    
-    def getId(self):
-        return self.get("id")
-    
-    def getEmail(self):
-        return self.get("email")
-    
-    def getNickname(self):
-        return self.get("nickname")
-        
     def _getToken(self):
         token = AeLoad(self._TOKEN_KEY)
         if token:
@@ -78,15 +60,7 @@ class GoogleAuthSession(dict):
         self.clear()
         self._saveToGaeSession()
         assert AeLoad(self._TOKEN_KEY) is None
-        
     
-    def getNonAuthorizedRequestToken(self):
-        token = self._getToken()
-        if token:
-            assert isinstance(token, OAuthHmacToken)
-            if token.auth_state == REQUEST_TOKEN:
-                return token
-
     def setNonAuthorizedRequestToken(self, non_authorized_request_token):
         assert isinstance(non_authorized_request_token, OAuthHmacToken)
         assert non_authorized_request_token.auth_state == REQUEST_TOKEN
@@ -95,6 +69,13 @@ class GoogleAuthSession(dict):
         self["nonAuthorizedRequestToken"] = non_authorized_request_token
         assert self._isJsonizable()
             
+    def getNonAuthorizedRequestToken(self):
+        token = self._getToken()
+        if token:
+            assert isinstance(token, OAuthHmacToken)
+            if token.auth_state == REQUEST_TOKEN:
+                return token
+
     def setAuthorizedRequestToken(self, authorized_request_token):
         assert isinstance(authorized_request_token, OAuthHmacToken)
         assert authorized_request_token.auth_state == AUTHORIZED_REQUEST_TOKEN
