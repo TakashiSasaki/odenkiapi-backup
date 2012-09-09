@@ -25,10 +25,10 @@ handlers:
 - url: /css
   static_dir: css
 
-- url: /api/([A-Za-z]+).*
+- url: /api/([A-Za-z_]+).*
   script: api/\1.py
 
-- url: /record/([A-Za-z]+).*
+- url: /record/([A-Za-z_]+).*
   script: record/\1.py
   
 - url: /post
