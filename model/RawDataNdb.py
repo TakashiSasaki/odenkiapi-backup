@@ -1,9 +1,10 @@
-import lib
-from urlparse import urlparse
+#import lib
+#from urlparse import urlparse
 from google.appengine.ext import ndb
 #from google.appengine.ext.webapp import Request
 from model.Counter import Counter
 from json import dumps
+from logging import debug
 #ctx = ndb.get_context()
 #lib.debug("ndb cache policy is %s" % ctx.get_cache_policy())
 #lib.debug("ndb memcache policy is %s" % ctx.get_memcache_policy())
@@ -25,7 +26,7 @@ class RawData(ndb.Model):
     
     @classmethod
     def getKeys(cls, start, end):
-        lib.debug("getRecentRawData start=%s end=%s" % (start, end))
+        debug("getRecentRawData start=%s end=%s" % (start, end))
         q = ndb.Query(kind="RawData")
         if start < end:
             q = q.order(cls.rawDataId)
@@ -34,7 +35,7 @@ class RawData(ndb.Model):
             q = q.order(-cls.rawDataId)
             limit = start - end + 1
         entities = q.fetch(limit, keys_only=True)
-        lib.debug("%s entities were fetched" % len(entities))
+        debug("%s entities were fetched" % len(entities))
         return entities
     
     @classmethod
