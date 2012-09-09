@@ -36,7 +36,7 @@ class _Recent(JsonRpcDispatcher):
         for key in keys:
             raw_data = key.get()
             assert isinstance(raw_data, RawData)
-            jresponse.addResult(raw_data.getFields())
+            jresponse.addResult(raw_data)
 
 if __name__ == "__main__":
     from google.appengine.ext.webapp import WSGIApplication
