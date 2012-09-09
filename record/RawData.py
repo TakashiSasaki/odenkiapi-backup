@@ -1,5 +1,9 @@
 from lib.JsonRpc import JsonRpcDispatcher, JsonRpcResponse
 from model.RawDataNdb import RawData
+from google.appengine.ext.key_range import ndb
+from google.appengine.api import memcache
+from logging import debug
+from test.test_pprint import uni
 #from google.appengine.ext import ndb
 
 class _Range(JsonRpcDispatcher):
@@ -36,7 +40,16 @@ class _Recent(JsonRpcDispatcher):
             limit = 1000
         jresponse.setId()
         query = RawData.queryRecent()
-        keys = query.fetch(keys_only=True, limit=limit)
+        
+        client = memcache.Client()
+        keys = client.get("recent_items", namespace=unicode(_Recent))
+        if keys:
+            jresponse.setExtraValue("memcache", "hit")
+        if not keys:
+            jresponse.setExtraValue("memcache", "missed and reloaded")
+            keys = query.fetch(keys_only=True, limit=limit)
+            client.set("recent_items", keys, namespace=unicode(_Recent), time=20)
+
         for key in keys:
             raw_data = key.get()
             assert isinstance(raw_data, RawData)
