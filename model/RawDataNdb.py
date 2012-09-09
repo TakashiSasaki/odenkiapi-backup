@@ -24,8 +24,14 @@ class RawData(ndb.Model):
     #_use_memcache = True
     #_memcache_timeout = 7200
     
+    def getFieldNames(self):
+        return ["rawDataId", "path", "parameters", "query", "fragment", "body"]
+    
+    def getFields(self):
+        return [self.rawDataId, self.path, self.parameters, self.query, self.fragment, self.body]
+    
     @classmethod
-    def getKeys(cls, start, end):
+    def queryRange(cls, start, end):
         debug("getRecentRawData start=%s end=%s" % (start, end))
         q = ndb.Query(kind="RawData")
         if start < end:
@@ -41,9 +47,9 @@ class RawData(ndb.Model):
     @classmethod
     def queryRecent(cls):
         """returns iterator which yields ndb.Key object"""
-        q = ndb.Query(kind="RawData")
-        q.order(-cls.rawDataId)
-        return q
+        query = ndb.Query(kind="RawData")
+        query = query.order(-cls.rawDataId)
+        return query
 
     @classmethod
     def queryPeriod(cls, start_rawdata_id, end_rawdata_id):
