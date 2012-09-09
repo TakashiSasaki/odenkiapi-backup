@@ -6,7 +6,7 @@ from json import loads
 from lib.JsonEncoder import dumps
 #from lib.CachedContent import CachedContent
 #from logging import debug, getLogger, DEBUG
-from google.appengine.ext.webapp import Request, RequestHandler
+from google.appengine.ext.webapp import Request, RequestHandler, Response
 #getLogger().setLevel(DEBUG)
 from StringIO import StringIO
 import csv
@@ -173,7 +173,7 @@ class JsonRpcResponse(dict):
     without any other assumptions. 
     """
     
-    __slots__ = []
+    __slots__ = ["_redirectTarget"]
     
     def __init__(self, request_id):
         dict.__init__(self)
@@ -195,9 +195,14 @@ class JsonRpcResponse(dict):
     def getId(self):
         assert isinstance(self , dict)
         return self.get("id")
+    
+    def setId(self):
+        if self.getId(): return
+        from time import time
+        self["id"] = time()
 
-    def delError(self):
-        if self.has_key("error"): del self["error"]
+    #def delError(self):
+    #    if self.has_key("error"): del self["error"]
 
     def setError(self, error_code, error_message=None, error_data=None):
         assert isinstance(error_code, int)
@@ -210,11 +215,24 @@ class JsonRpcResponse(dict):
                       "message": error_message,
                       "data":error_data
                       }
+        if self.getResult(): 
+            self.setErrorData(self.getResult())
+            self.delResult()
         #http_status = _getHttpStatusFromJsonRpcerror(error_code)
         #self.setHttpStatus(http_status)
         
     def getError(self):
         return self.get("error")
+
+    def setErrorData(self, error_data):
+        assert isinstance(error_data, list) or isinstance(error_data, dict)
+        assert self.has_key("error")
+        assert not self["error"]["data"]
+        self["error"]["data"] = error_data
+    
+    def getErrorData(self):
+        if not self.has_key("error"): return None
+        return self["error"]["data"]
         
     def setResultValue(self, key, value):
         if self.getError(): 
@@ -325,6 +343,14 @@ class JsonRpcResponse(dict):
     def setFieldNames(self, field_names):
         """fieldnames in extra member is non-standard as JSON-RPC but convenient for CSV or TSV output"""
         self.setExtraValue("fieldnames", field_names)
+        
+    def setRedirectTarget(self, target_url):
+        assert isinstance(target_url, str)
+        assert not hasattr(self, "_redirectTarget") 
+        self._redirectTarget = target_url
+        
+    def getRedirectTarget(self):
+        if hasattr(self, "_redirectTarget"): return self._redirectTarget
 
 class JsonRpcDispatcher(RequestHandler):
     """JsonRpcDispatcher invokes corresponding methods according to given method parameter"""
@@ -375,18 +401,17 @@ class JsonRpcDispatcher(RequestHandler):
         assert isinstance(json_rpc_request, JsonRpcRequest)
         json_rpc_response = JsonRpcResponse(json_rpc_request.getId())
         debug("_invokeMethod invokes %s" % method_name)
-        return self.methodList[method_name](self, json_rpc_request, json_rpc_response)
-    
+        x = self.methodList[method_name](self, json_rpc_request, json_rpc_response)
+        assert x is None
+        return json_rpc_response
     
     def get(self, *args):
         debug("JsonRpcDispatcher.get was invoked")
         debug("PATH_INFO = %s" % self.request.path_info)
         debug("type of path_info is %s" % type(self.request.path_info))
-        json_rpc_request = JsonRpcRequest(self.request)
-        json_rpc_response = self._invokeMethod(json_rpc_request.method, json_rpc_request)
-        debug("_invokeMethod returns %s" % type(json_rpc_response))
-        assert isinstance(json_rpc_response, JsonRpcResponse)
-        self._write(json_rpc_response)
+        jrequest = JsonRpcRequest(self.request)
+        jresponse = self._invokeMethod(jrequest.method, jrequest)
+        self._write(jresponse)
 
     def post(self, *args):
         json_rpc_request = JsonRpcRequest(self.request)
@@ -422,9 +447,16 @@ class JsonRpcDispatcher(RequestHandler):
         self._write(json_rpc_response)
 
     def _write(self, json_rpc_response):
-        # write JSON-RPC response as it is
+        """write JSON-RPC response as it is"""
         assert isinstance(json_rpc_response, JsonRpcResponse)
         assert isinstance(json_rpc_response, dict)
+        
+        if json_rpc_response.getRedirectTarget():
+            assert isinstance(self.response, Response)
+            self.redirect(json_rpc_response.getRedirectTarget())
+            debug("redirecting to %s" % json_rpc_response.getRedirectTarget())
+            return
+        
         # notification has no id
         if json_rpc_response.getId() is None:
             debug("JSON-RPC notification")
@@ -433,9 +465,7 @@ class JsonRpcDispatcher(RequestHandler):
                 self.response.set_status(204) # No content
                 self.response.content_type = "text/plain"
                 return
-            json_rpc_response.delError()
             json_rpc_response.setError(JsonRpcError.INVALID_REQUEST, "Response for notification should have neither result nor error.")
-            json_rpc_response.delResult()
 
         if json_rpc_response.has_key("error"):
             debug("JSON RPC response with error.")
@@ -506,3 +536,10 @@ class JsonRpcDispatcher(RequestHandler):
         if json_rpc_error >= JsonRpcError.SERVER_ERROR_RESERVED_MIN and json_rpc_error <= JsonRpcError.SERVER_ERROR_RESERVED_MAX:
             return 500
         return None
+    
+    def doesAcceptHtml(self, jrequest, jresponse):
+        if self.request.accept.accept_html(): return True
+        self.response.setHttpStatus(406)
+        assert isinstance(jresponse, JsonRpcResponse)
+        error_message = "user agent does not accept text/html response"
+        jresponse.setError(JsonRpcError.INVALID_REQUEST, error_message)
