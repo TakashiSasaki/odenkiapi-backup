@@ -39,7 +39,6 @@ class JsonRpcRequest(object):
 
         # methods are listed in http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
         # default JSON-RPC method is identical to HTTP method and it should be overridden
-        debug("HTTP method: %s" % request.method)
         self.method = request.method
         if request.method == "OPTIONS":
             self._getFromArguments(request)
@@ -64,7 +63,6 @@ class JsonRpcRequest(object):
             return
         
     def _getFromArguments(self, request):
-        debug("entered in _getFromArguments")
         for argument in request.arguments():
             values = request.get_all(argument)
             if argument == "jsonrpc":
@@ -386,7 +384,6 @@ class JsonRpcDispatcher(RequestHandler):
         
         for k, v in self.methodList.iteritems():
             if isinstance(k, str):
-                debug("key = " + k + " value = " + str(v))
                 self.methodList[k.decode()] = v
     
     def _invokeMethod(self, method_name, json_rpc_request):
@@ -397,8 +394,6 @@ class JsonRpcDispatcher(RequestHandler):
         return json_rpc_response
     
     def get(self, *args):
-        debug("PATH_INFO = %s" % self.request.path_info)
-        debug("type of path_info is %s" % type(self.request.path_info))
         jrequest = JsonRpcRequest(self.request)
         jresponse = self._invokeMethod(jrequest.method, jrequest)
         self._write(jresponse)
@@ -414,13 +409,11 @@ class JsonRpcDispatcher(RequestHandler):
         self._write(json_rpc_response)
     
     def head(self, *args):
-        debug("JsonRpcDispatcher.head was invoked with %s" % args)
         json_rpc_request = JsonRpcRequest(self.request)
         json_rpc_response = self._invokeMethod(json_rpc_request.method, json_rpc_request)
         self._write(json_rpc_response)
     
     def options(self, *args):
-        debug("JsonRpcDispatcher.options was invoked with %s" % args)
         json_rpc_request = JsonRpcRequest(self.request)
         json_rpc_response = self._invokeMethod(json_rpc_request.method, json_rpc_request)
         self._write(json_rpc_response)
@@ -431,7 +424,6 @@ class JsonRpcDispatcher(RequestHandler):
         self._write(json_rpc_response)
         
     def trace(self, *args):
-        debug("JsonRpcDispatcher.trace was invoked with %s" % args)
         json_rpc_request = JsonRpcRequest(self.request)
         json_rpc_response = self._invokeMethod(json_rpc_request.method, json_rpc_request)
         self._write(json_rpc_response)
