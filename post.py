@@ -28,3 +28,4 @@ if __name__ == "__main__":
     application = WSGIApplication([('/post', PostPage)], debug=True)
     from google.appengine.ext.webapp.util import run_wsgi_app
     run_wsgi_app(application)
+

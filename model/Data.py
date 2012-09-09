@@ -1,12 +1,10 @@
-from __future__ import unicode_literals
+from __future__ import unicode_literals, print_function
 from google.appengine.ext import db
 from google.appengine.ext.webapp import Request
-#import types,logging
 from model.Counter import Counter
-#import json
 from django.utils import simplejson
 from google.appengine.api.memcache import Client
-import lib
+from logging import debug
 
 class Data(db.Model):
     dataId = db.IntegerProperty()
@@ -34,7 +32,7 @@ class Data(db.Model):
         key = gql_query.get(keys_only=True)
         key2 = gql_query.get(keys_only=True)
         if key2:
-            lib.debug("two entities having key %s and %s are identical" % (key, key2))
+            debug("two entities having key %s and %s are identical" % (key, key2))
         # TODO: duplicated entity should be merged
         return key
     
@@ -65,7 +63,7 @@ class Data(db.Model):
     
     @classmethod
     def putEntity(cls, field, string):
-        lib.debug("type of field is %s" % type(field))
+        debug("type of field is %s" % type(field))
         assert isinstance(field, unicode)
         assert isinstance(string, unicode)
         key = cls.getKeyByFieldAndString(field, string)
