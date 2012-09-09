@@ -495,25 +495,25 @@ class JsonRpcDispatcher(RequestHandler):
         self.response.out.write(dumps(json_rpc_response))
         return
     
-    def _writeCsv(self, json_rpc_response, dialect=csv.excel):
+    def _writeCsv(self, json_rpc_response, dialect=csv.excel, content_type="text/csv"):
         assert isinstance(json_rpc_response, JsonRpcResponse)
         output = StringIO()
-        csv_writer = csv.writer(output)
+        csv_writer = csv.writer(output, dialect)
         fieldnames = json_rpc_response.getFieldNames()
         if not isinstance(fieldnames, list):
             if self.request.get("fieldnames"):
-                csv_writer.write(fieldnames)
+                csv_writer.writerow(fieldnames)
         result = json_rpc_response.getResult()
         if not isinstance(result, list): raise RuntimeError("result is not a list")
         for x in result:
             if not isinstance(x, list): raise RuntimeError("result contains non-list item")
-            csv_writer.write(x)
+            csv_writer.writerow(x)
         self.response.out.write(output.getvalue())
-        self.response.content_type = "text/plain"
+        self.response.content_type = content_type
     
     def _writeTsv(self, json_rpc_response):
-        self._writeCsv(json_rpc_response, csv.excel_tab)
-    
+        self._writeCsv(json_rpc_response, dialect=csv.excel_tab, content_type="application/vnd.ms-excel")
+        
     def _writeJsonP(self, json_rpc_response):
         result = json_rpc_response.getResult()
         if not isinstance(result, dict) or not isinstance(result, list):

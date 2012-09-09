@@ -12,7 +12,7 @@ class Data(ndb.Model):
     string = ndb.StringProperty()
     
     @classmethod
-    def getByDataIdDecending(cls):
+    def getByDataIdDescending(cls):
         query = ndb.Query(kind="Data")
         query = query.order(-Data.dataId)
         return query
