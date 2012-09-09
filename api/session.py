@@ -11,7 +11,6 @@ class UserInfo(JsonRpcDispatcher):
         assert isinstance(json_rpc_response, JsonRpcResponse)
         json_rpc_response.setResultValue("gaesession", str(get_current_session()))
         json_rpc_response.setResultValue("OdenkiSession", OdenkiSession())
-        return json_rpc_response
 
 #        odenki_session = lib.OdenkiSession()
 #        self.jsonRpc.setResultValule("sid", odenki_session.getSid())
@@ -24,13 +23,13 @@ class UserInfo(JsonRpcDispatcher):
 #        self.jsonRpc.write()
 #        return
 
-    def terminate(self, json_rpc_request):
+    def terminate(self, json_rpc_request, jresponse):
         assert isinstance(json_rpc_request, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
         json_rpc_response = JsonRpcResponse(json_rpc_request.getId())
         json_rpc_response.setResultValue("before", str(OdenkiSession().gaesession()))
         OdenkiSession().gaesession().terminate()
         json_rpc_response.setResultValue("after", str(OdenkiSession().gaesession()))
-        return json_rpc_response
 
     @classmethod
     def _getLoginUrl(self):
@@ -43,9 +42,9 @@ class UserInfo(JsonRpcDispatcher):
         return logout_url
 
 if __name__ == "__main__":
-    from google.appengine.ext.webapp import WSGIApplication
     url_map = []
     url_map.append(("/api/session", UserInfo))
+    from lib import WSGIApplication
     application = WSGIApplication(url_map, debug=True)
-    from google.appengine.ext.webapp.util import run_wsgi_app
+    from lib import run_wsgi_app
     run_wsgi_app(application)

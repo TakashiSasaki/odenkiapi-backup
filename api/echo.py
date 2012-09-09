@@ -29,7 +29,7 @@ class Echo(JsonRpcDispatcher):
                                     })
     
 if __name__ == "__main__":
-    from google.appengine.ext.webapp import WSGIApplication
+    from lib import WSGIApplication
     application = WSGIApplication([("/api/echo", Echo)], debug=True)
-    from google.appengine.ext.webapp.util import run_wsgi_app
+    from lib import run_wsgi_app
     run_wsgi_app(application)
