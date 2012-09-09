@@ -5,6 +5,7 @@ from google.appengine.ext import ndb
 from model.Counter import Counter
 from json import dumps
 from logging import debug
+from model.NdbModel import NdbModel
 #ctx = ndb.get_context()
 #lib.debug("ndb cache policy is %s" % ctx.get_cache_policy())
 #lib.debug("ndb memcache policy is %s" % ctx.get_memcache_policy())
@@ -13,7 +14,7 @@ from logging import debug
 #ctx.set_cache_policy(True)
 #ctx.set_memcache_timeout_policy(7200)
 
-class RawData(ndb.Model):
+class RawData(NdbModel):
     rawDataId = ndb.IntegerProperty()
     path = ndb.StringProperty(indexed=False)
     parameters = ndb.StringProperty(indexed=False)
@@ -23,12 +24,8 @@ class RawData(ndb.Model):
     #_use_cache = True
     #_use_memcache = True
     #_memcache_timeout = 7200
-    
-    def getFieldNames(self):
-        return ["rawDataId", "path", "parameters", "query", "fragment", "body"]
-    
-    def getFields(self):
-        return [self.rawDataId, self.path, self.parameters, self.query, self.fragment, self.body]
+
+    fieldnames = ["rawDataId", "path", "parameters", "query", "fragment", "body"]
     
     @classmethod
     def queryRange(cls, start, end):
@@ -71,14 +68,3 @@ class RawData(ndb.Model):
     
     def toJson(self):
         return dumps(self.to_dict()) 
-
-
-    @classmethod
-    def getFieldNames(cls):
-        field_names = []
-        for attribute_name in dir(cls):
-            assert isinstance(attribute_name, str)
-            attribute = getattr(cls, attribute_name)
-            if isinstance(attribute, ndb.Property):
-                field_names.append(attribute_name)
-        return field_names
