@@ -6,22 +6,26 @@ from model.DataNdb import Data
 from google.appengine.ext import ndb
 from logging import debug
 
-class _RecentData(JsonRpcDispatcher):
+class _Recent(JsonRpcDispatcher):
 
     def GET(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
-        debug("%s" % Data)
-        query = Data.getByDataIdDescending()
-        keys = query.fetch(keys_only=True)
+        try:
+            limit = int(jrequest.getValue("limit"))
+        except:
+            limit = 100
+        jresponse.setExtraValue("limit", limit)
+        query = Data.queryRecent()
+        keys = query.fetch(keys_only=True, limit=limit)
         for k in keys:
             assert isinstance(k, ndb.Key)
             e = k.get()
             assert isinstance(e, Data)
             jresponse.addResult(e)
         
-class _Data(JsonRpcDispatcher):
+class _Range(JsonRpcDispatcher):
 
     def GET(self, jrequest, jresponse):
         assert isinstance(jresponse, JsonRpcResponse)
@@ -30,9 +34,9 @@ class _Data(JsonRpcDispatcher):
         start = int(path_info[3])
         end = int(path_info[4])
         
-        query = Data.getByDataIdDescending()
-        query = query.filter(Data.dataId >= start)
-        query = query.filter(Data.dataId <= end)
+        query = Data.queryRange(start, end)
+        #query = query.filter(Data.dataId >= start)
+        #query = query.filter(Data.dataId <= end)
         
         keys = query.fetch(keys_only=True)
         for key in keys:
@@ -89,12 +93,12 @@ class _DuplicationCheck(JsonRpcDispatcher):
         
         
 if __name__ == "__main__":
-    from google.appengine.ext.webapp import WSGIApplication
+    from lib import WSGIApplication
     mapping = []
-    mapping.append(("/record/Data", _RecentData))
+    mapping.append(("/record/Data", _Recent))
     mapping.append(("/record/Data/[0-9]+", _Single))
-    mapping.append(("/record/Data/[0-9]+/[0-9]+", _Data))
+    mapping.append(("/record/Data/[0-9]+/[0-9]+", _Range))
     mapping.append(("/record/Data/duplicated", _DuplicationCheck))
     application = WSGIApplication(mapping, debug=True)
-    from google.appengine.ext.webapp.util import run_wsgi_app
+    from lib import run_wsgi_app
     run_wsgi_app(application)

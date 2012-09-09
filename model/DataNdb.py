@@ -48,12 +48,12 @@ class Data(NdbModel):
         assert isinstance(start, int)
         assert isinstance(end, int)
         query = ndb.Query(kind="Data")
-        query = query.order(-cls.dataId)
         if start<=end:
             query = query.filter(cls.dataId>=start)
             query = query.filter(cls.dataId<=end)
             return query
         else:
+            query = query.order(-cls.dataId)
             query = query.filter(cls.dataId<=start)
             query = query.filter(cls.dataId>=end)
             return query
