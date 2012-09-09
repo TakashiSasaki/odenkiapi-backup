@@ -6,13 +6,12 @@ Created on 2012/09/04
 from lib.JsonRpc import JsonRpcDispatcher, JsonRpcRequest, JsonRpcResponse
 from google.appengine.ext.ndb import Key
 from model.RawDataNdb import RawData
-import lib
 
 class RecentRawData(JsonRpcDispatcher):
     
-    def GET(self, json_rpc_request):
-        #lib.debug("called")
+    def GET(self, json_rpc_request, jresponse):
         assert isinstance(json_rpc_request, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
         #start = json_rpc_request.getValue("start")
         #end = json_rpc_request.getValue("end")
         limit = json_rpc_request.getValue("limit")
@@ -35,10 +34,9 @@ class RecentRawData(JsonRpcDispatcher):
         return json_rpc_response
 
 if __name__ == "__main__":
-    #lib.debug("__main__ called")
-    from google.appengine.ext.webapp import WSGIApplication
     mapping = []
     mapping.append(("/api/RawData", RecentRawData))
+    from lib import WSGIApplication
     application = WSGIApplication(mapping, debug=True)
-    from google.appengine.ext.webapp.util import run_wsgi_app
+    from lib import run_wsgi_app
     run_wsgi_app(application)

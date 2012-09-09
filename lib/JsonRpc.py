@@ -269,13 +269,7 @@ class JsonRpcResponse(dict):
         if extra.has_key(k): raise RuntimeError("extra dict already has %s key" % k)
         self["extra"][k] = v
         
-    #def addLog(self, log_message):
-    #    if not hasattr(self, "log"):
-    #        self.log = []
-    #    self.log.append(log_message)
-
     def setResult(self, result):
-        debug("JsonRpcResponse.setResult(%s)" % result)
         if self.has_key("result"): raise RuntimeError("result is already set")
         self["result"] = result
         
@@ -398,13 +392,11 @@ class JsonRpcDispatcher(RequestHandler):
     def _invokeMethod(self, method_name, json_rpc_request):
         assert isinstance(json_rpc_request, JsonRpcRequest)
         json_rpc_response = JsonRpcResponse(json_rpc_request.getId())
-        debug("_invokeMethod invokes %s" % method_name)
         x = self.methodList[method_name](self, json_rpc_request, json_rpc_response)
         assert x is None
         return json_rpc_response
     
     def get(self, *args):
-        debug("JsonRpcDispatcher.get was invoked")
         debug("PATH_INFO = %s" % self.request.path_info)
         debug("type of path_info is %s" % type(self.request.path_info))
         jrequest = JsonRpcRequest(self.request)
@@ -488,7 +480,6 @@ class JsonRpcDispatcher(RequestHandler):
     def _writeJson(self, json_rpc_response):
         assert isinstance(json_rpc_response, JsonRpcResponse)
         assert isinstance(json_rpc_response, dict)
-        debug("_writeJson was invoked")
         self.response.content_type = "application/json"
         self.response.out.write(dumps(json_rpc_response))
         return

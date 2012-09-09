@@ -33,13 +33,14 @@ class RawData(NdbModel):
         q = ndb.Query(kind="RawData")
         if start < end:
             q = q.order(cls.rawDataId)
-            limit = end - start + 1
+            q = q.filter(cls.rawDataId>=start)
+            q = q.filter(cls.rawDataId<=end)
+            return q
         else:
             q = q.order(-cls.rawDataId)
-            limit = start - end + 1
-        entities = q.fetch(limit, keys_only=True)
-        debug("%s entities were fetched" % len(entities))
-        return entities
+            q = q.filter(cls.rawDataId<=start)
+            q = q.filter(cls.rawDataId>=end)
+            return q
     
     @classmethod
     def queryRecent(cls):

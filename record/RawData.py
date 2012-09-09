@@ -20,29 +20,33 @@ class _Range(JsonRpcDispatcher):
         start = int(path_info[3])
         end = int(path_info[4])
         query = RawData.queryRange(start, end)
-        keys = query.fetch(keys_only=True)
+        keys = query.fetch(keys_only=True, limit=100)
         for key in keys:
             raw_data = key.get()
             assert isinstance(raw_data, RawData)
-            jresponse.addResult(raw_data.getFields())
+            jresponse.addResult(raw_data)
         
 class _Recent(JsonRpcDispatcher):
     
     def GET(self, jrequest, jresponse):
         assert isinstance(jresponse, JsonRpcResponse)
+        try:
+            limit = int(jrequest["params"]["limit"])
+        except:
+            limit = 1000
         jresponse.setId()
         query = RawData.queryRecent()
-        keys = query.fetch(keys_only=True)
+        keys = query.fetch(keys_only=True, limit=limit)
         for key in keys:
             raw_data = key.get()
             assert isinstance(raw_data, RawData)
             jresponse.addResult(raw_data)
 
 if __name__ == "__main__":
-    from google.appengine.ext.webapp import WSGIApplication
     mapping = []
     mapping.append(('/record/RawData/[0-9]+/[0-9]+', _Range))
     mapping.append(('/record/RawData', _Recent))
-    application = WSGIApplication(mapping, debug=True)
-    from google.appengine.ext.webapp.util import run_wsgi_app
+    from lib import WSGIApplication
+    application = WSGIApplication(mapping)
+    from lib import run_wsgi_app
     run_wsgi_app(application)
