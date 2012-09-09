@@ -18,10 +18,7 @@ class _RecentData(JsonRpcDispatcher):
             assert isinstance(k, ndb.Key)
             e = k.get()
             assert isinstance(e, Data)
-            jresponse.addResult([e.dataId, e.field, e.string])
-            #self.response.out.write("%s, %s, %s \n" % (e.dataId, e.field, e.string))
-        #self.response.content_type = "text/plain"
-        
+            jresponse.addResult(e)
         
 class _Data(JsonRpcDispatcher):
 
@@ -40,7 +37,7 @@ class _Data(JsonRpcDispatcher):
         for key in keys:
             entity = key.get()
             assert isinstance(entity, Data)
-            jresponse.addResult([entity.dataId, entity.field, entity.string])
+            jresponse.addResult(entity)
         
 
     def PUT(self, jrequest, jresponse):

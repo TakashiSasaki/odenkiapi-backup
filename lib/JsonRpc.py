@@ -1,13 +1,11 @@
 #from google.appengine import runtime
+from model.NdbModel import NdbModel
 __all__ = ["JsonRpcError", "JsonRpcRequest", "JsonRpcResponse", "JsonRpcDispatcher"]
 
 from encodings.base64_codec import base64_decode
 from json import loads
 from lib.JsonEncoder import dumps
-#from lib.CachedContent import CachedContent
-#from logging import debug, getLogger, DEBUG
 from google.appengine.ext.webapp import Request, RequestHandler, Response
-#getLogger().setLevel(DEBUG)
 from StringIO import StringIO
 import csv
 from logging import debug, error
@@ -505,9 +503,14 @@ class JsonRpcDispatcher(RequestHandler):
                 csv_writer.writerow(fieldnames)
         result = json_rpc_response.getResult()
         if not isinstance(result, list): raise RuntimeError("result is not a list")
-        for x in result:
-            if not isinstance(x, list): raise RuntimeError("result contains non-list item")
-            csv_writer.writerow(x)
+        for record in result:
+            if isinstance(record, list):
+                csv_writer.writerow(record)
+                continue
+            if isinstance(record, NdbModel):
+                csv_writer.writerow(record.to_list())
+                continue
+            error("result contains neither list nor NdbModel")
         self.response.out.write(output.getvalue())
         self.response.content_type = content_type
     

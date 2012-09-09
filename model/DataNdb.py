@@ -5,11 +5,14 @@ from google.appengine.ext.webapp import Request
 #import types,logging
 from model.Counter import Counter
 from django.utils import simplejson
+from model.NdbModel import NdbModel
 
-class Data(ndb.Model):
+class Data(NdbModel):
     dataId = ndb.IntegerProperty()
     field = ndb.StringProperty()
     string = ndb.StringProperty()
+    
+    fieldnames = ["dataId", "field", "string"]
     
     @classmethod
     def getByDataIdDescending(cls):
