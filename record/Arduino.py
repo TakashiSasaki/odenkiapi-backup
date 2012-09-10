@@ -39,6 +39,7 @@ class _OneDay(JsonRpcDispatcher):
             year = int(path_info[4])
             month = int(path_info[5])
             day = int(path_info[6])
+            hour = int(path_info[7])
         except:
             jresponse.setError(JsonRpcError.INVALID_REQUEST, "Try /record/Arduino/<arduinoid>/<year>/<month>/<day> .")
             return
@@ -47,9 +48,9 @@ class _OneDay(JsonRpcDispatcher):
         assert isinstance(month, int)
         assert isinstance(day, int)
         
-        start = datetime(year=year, month=month, day=day)
-        end = start + timedelta(days=1) + timedelta(minutes=5)
-        start = start - timedelta(minutes=5)
+        start = datetime(year=year, month=month, day=day, hour=hour)
+        end = start + timedelta(hours=1) + timedelta(minutes=1)
+        start = start - timedelta(minutes=1)
         data_list = _getDataListByArduinoId(arduino_id)
         jresponse.setExtraValue("data_list", data_list)
         metadata_set = set()
@@ -68,7 +69,7 @@ class _OneDay(JsonRpcDispatcher):
 
 if __name__ == "__main__":
     mapping = []
-    mapping.append(("/record/Arduino/[^/]+/[0-9]+/[0-9]+/[0-9]+", _OneDay))
+    mapping.append(("/record/Arduino/[^/]+/[0-9]+/[0-9]+/[0-9]+/[0-9]+", _OneDay))
     from lib import WSGIApplication
     application = WSGIApplication(mapping)
     from lib import run_wsgi_app
