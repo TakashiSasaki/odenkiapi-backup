@@ -26,7 +26,7 @@ class JsonRpcRequest(object):
     'param' key in JSON-RPC request object.
     See http://www.simple-is-better.org/json-rpc/jsonrpc20-over-http.html
     """
-    __slots__ = ["jsonrpc", "method", "id", "params", "extra", "error"]
+    __slots__ = ["jsonrpc", "method", "id", "params", "extra", "error", "pathInfo"]
 
     def __init__(self, request):
         assert isinstance(request, Request)
@@ -36,6 +36,8 @@ class JsonRpcRequest(object):
         self.id = None
         self.jsonrpc = None
         self.extra = {}
+        self.pathInfo = request.path_info.split("/")
+
 
         # methods are listed in http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
         # default JSON-RPC method is identical to HTTP method and it should be overridden
@@ -162,7 +164,9 @@ class JsonRpcRequest(object):
     def getId(self):
         return getattr(self, "id", None)
 
-        
+    def getPathInfo(self):
+        return getattr(self, "pathInfo", None)
+
 class JsonRpcResponse(dict):
     """Each JSON-RPC method should return JsonRpcResponse object.
     JsonRpcDispatcher sees it and determines actual HTTP response
