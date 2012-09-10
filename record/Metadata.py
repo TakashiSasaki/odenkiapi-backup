@@ -2,8 +2,7 @@ from lib.JsonRpc import JsonRpcDispatcher, JsonRpcResponse, JsonRpcRequest, \
     JsonRpcError
 from model.MetadataNdb import Metadata as MetadataNdb
 from model.Metadata import Metadata as MetadataDb
-from model.DataNdb import getCanonicalDataList, isEquivalentDataKeyList, \
-    isEquivalentDataKeyList
+from model.DataNdb import getCanonicalDataList, isEquivalentDataKeyList
 from model.DataNdb import Data as DataNdb
 from model.Data import Data as DataDb
 from datetime import datetime, timedelta
