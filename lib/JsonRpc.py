@@ -1,7 +1,9 @@
 #from google.appengine import runtime
 from model.NdbModel import NdbModel
+from google.appengine.api.memcache import Client
 __all__ = ["JsonRpcError", "JsonRpcRequest", "JsonRpcResponse", "JsonRpcDispatcher"]
 
+from exceptions import Exception
 from encodings.base64_codec import base64_decode
 from json import loads
 from lib.JsonEncoder import dumps
@@ -202,10 +204,14 @@ class JsonRpcResponse(dict):
         if self.getId(): return
         from time import time
         self["id"] = time()
-
-    #def delError(self):
-    #    if self.has_key("error"): del self["error"]
-
+    
+    def setErrorInvalidParameter(self, e):
+        if isinstance(e, Exception):
+            error_message = unicode(e)
+        elif isinstance(e, unicode) or isinstance(e, str):
+            error_message = e
+        self.setError(JsonRpcError.INVALID_PARAMS, error_message)
+    
     def setError(self, error_code, error_message=None, error_data=None):
         assert isinstance(error_code, int)
         assert isinstance(self, dict)
@@ -223,9 +229,6 @@ class JsonRpcResponse(dict):
         #http_status = _getHttpStatusFromJsonRpcerror(error_code)
         #self.setHttpStatus(http_status)
         
-    def getError(self):
-        return self.get("error")
-
     def setErrorData(self, error_data):
         assert isinstance(error_data, list) or isinstance(error_data, dict)
         assert self.has_key("error")
@@ -236,6 +239,9 @@ class JsonRpcResponse(dict):
         if not self.has_key("error"): return None
         return self["error"]["data"]
         
+    def getError(self):
+        return self.get("error")
+
     def setResultValue(self, key, value):
         if self.getError(): 
             raise RuntimeError("JSON-RPC error is already set and any result can't exist simultaneously.")
