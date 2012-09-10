@@ -2,7 +2,8 @@ from lib.JsonRpc import JsonRpcDispatcher, JsonRpcResponse, JsonRpcRequest, \
     JsonRpcError
 from model.MetadataNdb import Metadata as MetadataNdb
 from model.Metadata import Metadata as MetadataDb
-from model.DataNdb import getCanonicalDataList
+from model.DataNdb import getCanonicalDataList, isEquivalentDataKeyList, \
+    isEquivalentDataKeyList
 from model.DataNdb import Data as DataNdb
 from model.Data import Data as DataDb
 from datetime import datetime, timedelta
@@ -34,6 +35,14 @@ def _listifyDataList(data_list):
         listified_data = data_entity.to_list()
         result.append(listified_data)
     return result
+
+def _isIdenticalKeyList(l1, l2):
+    if len(l1) != len(l2): return False
+    try:
+        for x in range(len(l1)):
+            if l1[x] != l2[x]: return False
+    except: return False
+    return True
 
 class _MakeTestData(JsonRpcDispatcher):
     def GET(self, jrequest, jresponse):
@@ -86,7 +95,6 @@ class _MakeTestData(JsonRpcDispatcher):
             assert isinstance(key, ndb.Key)
             metadata = key.get()
             jresponse.addResult([metadata.metadataId, _listifyDataList(metadata.dataList)])
-        
 
 class _CanonicalizeData(JsonRpcDispatcher):
     
@@ -96,31 +104,27 @@ class _CanonicalizeData(JsonRpcDispatcher):
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
         try:
-            start = int(jrequest.getValue("start")[0])
-            end = int(jrequest.getValue("end")[0])
+            start = int(jrequest.getPathInfo(4))
+            end = int(jrequest.getPathInfo(5))
             execute = jrequest.getValue("execute")[0]
         except Exception, e:
-            jresponse.setError(JsonRpcError.INVALID_PARAMS, unicode(e.__class__) + unicode(e))
+            jresponse.setError(JsonRpcError.INVALID_REQUEST, unicode(e))
             return
         query = MetadataNdb.queryRange(start, end)
         keys = query.fetch(keys_only=True)
-        #assert len(keys) == abs(start - end) + 1
         count = 0
         for key in keys:
             metadata = key.get()
             assert isinstance(metadata, MetadataNdb)
             if not isinstance(metadata.dataList, list): continue
             canonicalized_list = getCanonicalDataList(metadata.dataList)
+            if _isIdenticalKeyList(canonicalized_list, metadata.dataList): continue
             assert len(canonicalized_list) == len(metadata.dataList)
-            for i in range(len(canonicalized_list)):
-                debug("%s ==> %s" % (metadata.dataList, canonicalized_list))
-                assert canonicalized_list[i].get().field == metadata.dataList[i].get().field
-                assert canonicalized_list[i].get().string == metadata.dataList[i].get().string
-                assert canonicalized_list[i].get().dataId <= metadata.dataList[i].get().dataId
+            if not isEquivalentDataKeyList(canonicalized_list, metadata.dataList): continue 
             if execute == EXECUTE_TOKEN:
                 metadata.dataList = canonicalized_list
                 metadata.put()
-                count += 1
+            count += 1
             jresponse.addResult([metadata.metadataId, _listifyDataList(metadata.dataList), _listifyDataList(canonicalized_list)])
         jresponse.setExtraValue("count", count)
             
@@ -180,7 +184,7 @@ if __name__ == "__main__":
     mapping.append(("/record/Metadata/[0-9]+", _ByMetadataId))
     mapping.append(("/record/Metadata/[0-9]+/[0-9]+", _Range))
     mapping.append(("/record/Metadata/[0-9]+/[0-9]+/[0-9]+", _OneDay))
-    mapping.append(("/record/Metadata/CanonicalizeData", _CanonicalizeData))
+    mapping.append(("/record/Metadata/CanonicalizeData/[0-9]+/[0-9]+", _CanonicalizeData))
     mapping.append(("/record/Metadata/MakeTestData", _MakeTestData))
     from lib import WSGIApplication
     application = WSGIApplication(mapping, debug=True)

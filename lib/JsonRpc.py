@@ -180,7 +180,6 @@ class JsonRpcResponse(dict):
     
     def __init__(self, request_id):
         dict.__init__(self)
-        debug("constructor of JsonRpcResponse object")
         self["id"] = request_id
         #self.requestHandler = request_handler
         #self.request = request_handler.request
