@@ -1,14 +1,10 @@
 from logging import debug
 import cgi
-from google.appengine.ext import webapp
-from google.appengine.ext.webapp.util import  run_wsgi_app
 #from google.appengine.api import users
 from google.appengine.ext.webapp import  template
-from django.utils import  simplejson as json
-#import json
+from lib.JsonEncoder import dumps
 from model.RawData import RawData
 from MyRequestHandler import MyRequestHandler
-import simplejson
 from google.appengine.ext.db import Query, GqlQuery
 from google.appengine.ext.webapp import RequestHandler
 from google.appengine.api import memcache
@@ -106,7 +102,7 @@ class RawDataRequestHandler2(MyRequestHandler):
                 except: continue
                 results.append([gen_power, timestring[0:4], timestring[4:6], timestring[6:8], timestring[8:10], timestring[10:12], timestring[12:14]])
                 #results.append([gen_power])
-        self.response.out.write(self.request.get("callback") + "(" + simplejson.dumps({"timeVsWatt":results}) + ");")
+        self.response.out.write(self.request.get("callback") + "(" + dumps({"timeVsWatt":results}) + ");")
 
 
 if __name__ == "__main__":
