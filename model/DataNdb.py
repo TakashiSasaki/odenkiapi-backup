@@ -135,12 +135,12 @@ class Data(NdbModel):
         return data_list
 
 def getCanonicalData(key):
-    #MEMCACHE_KEY = "akafkljacuiudrt2po8vxdzskj" + str(key)
-    #debug(MEMCACHE_KEY)
+    MEMCACHE_KEY = "akafkljacuiudrt2po8vxdzskj" + str(key)
+    debug(MEMCACHE_KEY)
     assert isinstance(key, ndb.Key)
-    #client = Client()
-    #canonical_data_key = client.get(MEMCACHE_KEY)
-    #if canonical_data_key: return canonical_data_key
+    client = Client()
+    canonical_data_key = client.get(MEMCACHE_KEY)
+    if canonical_data_key: return canonical_data_key
     data = key.get()
     if data is None: return None
     assert isinstance(data, Data)
@@ -148,23 +148,29 @@ def getCanonicalData(key):
     canonical_data_key = query.get(keys_only=True)
     assert isinstance(canonical_data_key, ndb.Key)
     assert data.dataId >= canonical_data_key.get().dataId
+    assert data.field == canonical_data_key.get().field
+    assert data.string == canonical_data_key.get().string
     #client.set(MEMCACHE_KEY, canonical_data_key)
     return canonical_data_key
 
 def getCanonicalDataList(key_list):
     result = []
     for key in key_list:
+        assert isinstance(key, ndb.Key)
         canonical_data_key = getCanonicalData(key)
         #assert isinstance(canonical_data, Data)
         result.append(canonical_data_key)
-        assert key.get().field == canonical_data_key.get().field
-        assert key.get().string == canonical_data_key.get().string
-        assert key.get().dataId >= canonical_data_key.get().dataId
-    assert len(result) == len(key_list)
-    for x in range(len(result)):
-        r = result[x].get()
-        d = result[x].get()
-        assert r.field == d.field 
-        assert r.string == r.string
-        assert r.dataId <= d.dataId
     return result
+
+def isEquivalentDataKeyList(l1, l2):
+    if len(l1) != len(l2): return False
+    for i in range(len(l1)):
+        k1 = l1[i]
+        if not k1: return False 
+        else: e1 = k1.get()
+        k2 = l2[i]
+        if not k2: return False 
+        else: e2 = k2.get()
+        if e1.field != e2.field: return False
+        if e1.string != e2.string: return False
+    return True
