@@ -3,6 +3,7 @@ from gaesessions import Session
 from gdata.gauth import OAuthHmacToken
 from datetime import datetime 
 from google.appengine.ext import ndb
+from google.appengine.ext import db
 
 from json import dumps as _dumps
 from model.NdbModel import NdbModel
@@ -19,6 +20,9 @@ class JSONEncoder(_JSONEncoder):
             return o.isoformat()
         if isinstance(o, ndb.Key):
             assert isinstance(o, ndb.Key)
+            return unicode(o)
+        if isinstance(o, db.Key):
+            assert isinstance(o, db.Key)
             return unicode(o)
         if isinstance(o, NdbModel):
             return o.to_dict()
