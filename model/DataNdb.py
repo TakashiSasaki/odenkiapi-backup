@@ -7,6 +7,7 @@ from model.Counter import Counter
 #from django.utils import simplejson
 from json import loads
 from model.NdbModel import NdbModel
+from google.appengine.api.memcache import Client
 
 class Data(NdbModel):
     dataId = ndb.IntegerProperty()
@@ -18,7 +19,7 @@ class Data(NdbModel):
     @classmethod
     def querySingle(cls, data_id):
         query = ndb.Query(kind="Data")
-        query = query.filter(Data.dataId==data_id)
+        query = query.filter(Data.dataId == data_id)
         return query
     
     @classmethod
@@ -48,14 +49,14 @@ class Data(NdbModel):
         assert isinstance(start, int)
         assert isinstance(end, int)
         query = ndb.Query(kind="Data")
-        if start<=end:
-            query = query.filter(cls.dataId>=start)
-            query = query.filter(cls.dataId<=end)
+        if start <= end:
+            query = query.filter(cls.dataId >= start)
+            query = query.filter(cls.dataId <= end)
             return query
         else:
             query = query.order(-cls.dataId)
-            query = query.filter(cls.dataId<=start)
-            query = query.filter(cls.dataId>=end)
+            query = query.filter(cls.dataId <= start)
+            query = query.filter(cls.dataId >= end)
             return query
     
     def queryDuplication(self):
@@ -130,18 +131,18 @@ class Data(NdbModel):
                 data_list.append(data)
         return data_list
 
-def getCanonicalizedKey(key):
+def getCanonicalData(key):
+    MEMCACHE_KEY = "pokj32ercghpo8vxdzskj" + unicode(key)
     assert isinstance(key, ndb.Key)
+    client = Client()
+    canonical_data_key = client.get(MEMCACHE_KEY)
+    if canonical_data_key: return canonical_data_key
     data = key.get()
     if data is None: return None
     assert isinstance(data, Data)
     query = data.queryDuplication()
-    return query.get(keys_only=True)
-
-def canonicalizeKeyList(keys):
-    assert isinstance(keys, list)
-    result = []
-    for key in keys:
-        result.append(getCanonicalizedKey(key))
-    return result
-
+    canonical_data_key = query.get(keys_only=True)
+    assert isinstance(canonical_data_key, ndb.Key)
+    assert data.dataId >= canonical_data_key.get().dataId
+    client.set(MEMCACHE_KEY, canonical_data_key)
+    return canonical_data_key
