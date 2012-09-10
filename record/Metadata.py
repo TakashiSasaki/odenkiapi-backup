@@ -1,7 +1,7 @@
 from lib.JsonRpc import JsonRpcDispatcher, JsonRpcResponse, JsonRpcRequest, \
     JsonRpcError
-from model.MetadataNdb import Metadata as MetadataNdb, canonicalizeData
-from model.MetadataNdb import canonicalizeData
+from model.MetadataNdb import Metadata as MetadataNdb
+from model.MetadataNdb import Canonicalizer
 from model.Metadata import Metadata as MetadataDb
 #from model.DataNdb import getCanonicalDataList, isEquivalentDataKeyList
 from model.DataNdb import Data as DataNdb
@@ -9,6 +9,7 @@ from model.Data import Data as DataDb
 from datetime import datetime, timedelta
 from google.appengine.ext import ndb
 from logging import debug
+from google.appengine.ext.deferred import defer
 
 class _Recent(JsonRpcDispatcher):
     def GET(self, jrequest, jresponse):
@@ -116,10 +117,11 @@ class _CanonicalizeData(JsonRpcDispatcher):
             return
         #query = MetadataNdb.queryRange(start, end)
         #keys = query.fetch(keys_only=True)
-        count = canonicalizeData(start, end, execute == "yes")
-        jresponse.setExtraValue("count", count)
-
-
+        canonicalizer = Canonicalizer(start, end, execute == "yes")
+        canonicalizer.run()
+        jresponse.setExtraValue("start", start)
+        jresponse.setExtraValue("end", end)
+        jresponse.setExtraValue("deferred", True)
 
 class _OneDay(JsonRpcDispatcher):
     

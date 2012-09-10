@@ -116,7 +116,6 @@ class JsonRpcRequest(object):
                         self.error = JsonRpcError.PARSE_ERROR
                     self.params.extend(loaded_params)
                 continue
-            debug("extra data %s:%s" % (argument, values))
             self.extra[argument] = values
         assert not isinstance(self.id, list)
         #self.extras.extends(extras_in_arguments)
