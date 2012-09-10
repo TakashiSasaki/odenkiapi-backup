@@ -15,6 +15,9 @@ class Data(NdbModel):
     string = ndb.StringProperty()
     
     fieldnames = ["dataId", "field", "string"]
+    
+    def to_list(self):
+        return [self.dataId, self.field, self.string]
 
     @classmethod
     def querySingle(cls, data_id):
@@ -146,3 +149,12 @@ def getCanonicalData(key):
     assert data.dataId >= canonical_data_key.get().dataId
     client.set(MEMCACHE_KEY, canonical_data_key)
     return canonical_data_key
+
+def getCanonicalDataList(key_list):
+    result = []
+    for key in key_list:
+        canonical_data = getCanonicalData(key)
+        #assert isinstance(canonical_data, Data)
+        result.append(canonical_data)
+    assert len(result) == len(key_list)
+    return result
