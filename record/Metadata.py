@@ -3,17 +3,21 @@ from lib.JsonRpc import JsonRpcDispatcher, JsonRpcResponse, JsonRpcRequest, \
 from model.MetadataNdb import Metadata
 from model.DataNdb import Data, getCanonicalData, getCanonicalDataList
 from datetime import datetime, timedelta
+from google.appengine.ext import ndb
+from logging import debug
 
 class _Recent(JsonRpcDispatcher):
     def GET(self, jrequest, jresponse):
+        LIMIT = 100
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
         query = Metadata.queryRecent()
-        keys = query.fetch(keys_only=True)
+        keys = query.fetch(keys_only=True, limit=LIMIT)
         for key in keys:
             metadata = key.get()
             assert isinstance(metadata, Metadata)
             jresponse.addResult(metadata.to_list())
+        jresponse.setExtraValue("limit", LIMIT)
     
 class _Range(JsonRpcDispatcher):
     def GET(self, jrequest, jresponse):
@@ -28,16 +32,71 @@ def _listifyDataList(data_list):
         result.append(listified_data)
     return result
 
+class _MakeTestData(JsonRpcDispatcher):
+    def GET(self, jrequest, jresponse):
+        
+        def create_data(data_id, field, string):
+            data = Data()
+            data.dataId = data_id
+            data.field = field
+            data.string = string
+            return data.put()
+        
+        def delete_data(start, end):
+            query = Data.queryRange(start, end)
+            keys = query.fetch(keys_only=True)
+            for key in keys: key.delete()
+        
+        def create_metadata(metadata_id, data_list):
+            metadata = Metadata()
+            metadata.metadataId = metadata_id
+            metadata.dataList = data_list
+            return metadata.put()
+        
+        def delete_metadata(start, end):
+            query = Metadata.queryRange(start, end)
+            keys = query.fetch(keys_only=True)
+            for key in keys: key.delete()
+        
+        @ndb.toplevel
+        def prepare():
+            delete_data(1, 4)
+            data1_key = create_data(1, "aa", "bb")
+            data2_key = create_data(2, "aa", "bb")
+            data3_key = create_data(3, "cc", "dd")
+            data4_key = create_data(4, "cc", "dd")
+            delete_metadata(1, 6)
+            create_metadata(1, [data2_key, data4_key])
+            create_metadata(2, [data2_key, data4_key])
+            create_metadata(3, [data1_key, data3_key])
+            create_metadata(4, [data2_key, data2_key])
+            create_metadata(5, [data2_key, data3_key])
+            create_metadata(6, [data4_key, data4_key])
+        
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
+        prepare()
+        query = Metadata.queryRange(1, 6)
+        keys = query.fetch(keys_only=True)
+        for key in keys:
+            debug(key)
+            assert isinstance(key, ndb.Key)
+            metadata = key.get()
+            jresponse.addResult([metadata.metadataId, _listifyDataList(metadata.dataList)])
+        
+
 class _CanonicalizeData(JsonRpcDispatcher):
     
     def GET(self, jrequest, jresponse):
+        EXECUTE_TOKEN = "jikkousuru"
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
         try:
             start = int(jrequest.getValue("start")[0])
             end = int(jrequest.getValue("end")[0])
-            execute = bool(jrequest.getValue("execute")[0])
+            execute = jrequest.getValue("execute")[0]
         except Exception, e:
             jresponse.setError(JsonRpcError.INVALID_PARAMS, unicode(e.__class__) + unicode(e))
             return
@@ -48,18 +107,19 @@ class _CanonicalizeData(JsonRpcDispatcher):
         for key in keys:
             metadata = key.get()
             assert isinstance(metadata, Metadata)
-            data_list = metadata.dataList
-            if not isinstance(data_list, list): continue
-            canonicalized_list = getCanonicalDataList(data_list)
-            assert len(canonicalized_list) == len(data_list)
+            if not isinstance(metadata.dataList, list): continue
+            canonicalized_list = getCanonicalDataList(metadata.dataList)
+            assert len(canonicalized_list) == len(metadata.dataList)
             for i in range(len(canonicalized_list)):
-                if canonicalized_list[i].get().field == data_list[i].get().field: continue
-                if canonicalized_list[i].get().string == data_list[i].get().string: continue
-            if execute == True:
+                debug("%s ==> %s" % (metadata.dataList, canonicalized_list))
+                assert canonicalized_list[i].get().field == metadata.dataList[i].get().field
+                assert canonicalized_list[i].get().string == metadata.dataList[i].get().string
+                assert canonicalized_list[i].get().dataId <= metadata.dataList[i].get().dataId
+            if execute == EXECUTE_TOKEN:
                 metadata.dataList = canonicalized_list
                 metadata.put()
-            count += 1
-            jresponse.addResult([metadata.metadataId, _listifyDataList(data_list), _listifyDataList(canonicalized_list)])
+                count += 1
+            jresponse.addResult([metadata.metadataId, _listifyDataList(metadata.dataList), _listifyDataList(canonicalized_list)])
         jresponse.setExtraValue("count", count)
             
 class _OneDay(JsonRpcDispatcher):
@@ -90,6 +150,7 @@ if __name__ == "__main__":
     mapping.append(("/record/Metadata/[0-9]+/[0-9]+", _Range))
     mapping.append(("/record/Metadata/[0-9]+/[0-9]+/[0-9]+", _OneDay))
     mapping.append(("/record/Metadata/CanonicalizeData", _CanonicalizeData))
+    mapping.append(("/record/Metadata/MakeTestData", _MakeTestData))
     from lib import WSGIApplication
     application = WSGIApplication(mapping, debug=True)
     from lib import run_wsgi_app
