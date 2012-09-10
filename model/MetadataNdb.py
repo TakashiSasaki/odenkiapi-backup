@@ -61,6 +61,29 @@ class Metadata(NdbModel):
             query = query.filter(cls.receivedDateTime >= end)
             query = query.order(-cls.receivedDateTime)
             return query
+
+    @classmethod
+    def queryDateRangeAndData(cls, start, end, data):
+        assert isinstance(start, datetime)
+        assert isinstance(end, datetime)
+        query = ndb.Query(kind="Metadata")
+        if start <= end:
+            query = query.filter(cls.receivedDateTime >= start)
+            query = query.filter(cls.receivedDateTime <= end)
+            query = query.filter(cls.dataList == data)
+            return query
+        else:
+            query = query.filter(cls.receivedDateTime <= start)
+            query = query.filter(cls.receivedDateTime >= end)
+            query = query.order(-cls.receivedDateTime)
+            query = query.filter(cls.dataList == data)
+            return query
+        
+    @classmethod
+    def queryAfter(cls, start):
+        assert isinstance(start, datetime)
+        query = ndb.Query(kind="Metadata")
+        return query
         
     @classmethod
     def queryByData(cls, data):

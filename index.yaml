@@ -15,3 +15,8 @@ indexes:
   - name: field
   - name: string
   - name: dataId
+
+- kind: Metadata
+  properties:
+  - name: dataList
+  - name: receivedDateTime
