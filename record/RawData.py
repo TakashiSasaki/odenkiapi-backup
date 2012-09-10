@@ -1,11 +1,10 @@
+from __future__ import unicode_literals, print_function
 from lib.JsonRpc import JsonRpcDispatcher, JsonRpcResponse, JsonRpcRequest
 from model.RawDataNdb import RawData
 from model.MetadataNdb import Metadata
-from google.appengine.ext.key_range import ndb
 from google.appengine.api import memcache
 from logging import debug
 from datetime import datetime, timedelta
-#from google.appengine.ext import ndb
 
 class _Range(JsonRpcDispatcher):
 #    @ndb.toplevel
@@ -19,42 +18,46 @@ class _Range(JsonRpcDispatcher):
 #            self.response.out.write(str(raw_data_key.get()))
             
     def GET(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
-        path_info = self.request.path_info.split("/")
-        start = int(path_info[3])
-        end = int(path_info[4])
-        query = RawData.queryRange(start, end)
-        keys = query.fetch(keys_only=True, limit=100)
-        for key in keys:
+        try:
+            start = int(jrequest.getPathInfo(3))
+            end = int(jrequest.getPathInfo(4))
+        except Exception, e:
+            jresponse.setErrorInvalidParameter(e)
+            return
+        
+        for key in RawData.fetchRange(start, end):
             raw_data = key.get()
             assert isinstance(raw_data, RawData)
             jresponse.addResult(raw_data)
         
 class _Recent(JsonRpcDispatcher):
+    MEMCACHE_KEY = "2nanjjkzvxnzfdyiwjbdkj8yiqlkj78ghdkhzd"
     
     def GET(self, jrequest, jresponse):
         assert isinstance(jresponse, JsonRpcResponse)
-        try:
-            limit = int(jrequest["params"]["limit"])
-        except:
-            limit = 1000
         jresponse.setId()
-        query = RawData.queryRecent()
         
         client = memcache.Client()
-        keys = client.get("recent_items", namespace=unicode(_Recent))
+        keys = client.get(self.MEMCACHE_KEY)
         if keys:
             jresponse.setExtraValue("memcache", "hit")
-        if not keys:
+        else:
             jresponse.setExtraValue("memcache", "missed and reloaded")
-            keys = query.fetch(keys_only=True, limit=limit)
-            client.set("recent_items", keys, namespace=unicode(_Recent), time=20)
+            keys = RawData.fetchRecent()
+            client.set(self.MEMCACHE_KEY, keys, time=20)
 
         for key in keys:
             raw_data = key.get()
             assert isinstance(raw_data, RawData)
             jresponse.addResult(raw_data)
+        
+        jresponse.setExtraValue("__name__", __name__)
+        jresponse.setExtraValue("__package__", __package__)
+        jresponse.setExtraValue("__file__", __file__)
+        
 
 class _OneDay(JsonRpcDispatcher):
     
@@ -62,12 +65,12 @@ class _OneDay(JsonRpcDispatcher):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
-        path_info = jrequest.getPathInfo()
         try:
-            year = int(path_info[3])
-            month = int(path_info[4])
-            day = int(path_info[5])
-        except:
+            year = int(jrequest.getPathInfo(3))
+            month = int(jrequest.getPathInfo(4))
+            day = int(jrequest.getPathInfo(5))
+        except Exception, e:
+            jresponse.setErrorInvalidParameter(e)
             return
         start = datetime(year=year, month=month, day=day)
         end = start + timedelta(days=1)
