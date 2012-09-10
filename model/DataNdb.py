@@ -43,6 +43,7 @@ class Data(NdbModel):
         assert isinstance(field, unicode)
         assert isinstance(string, unicode)
         query = ndb.Query(kind="Data")
+        query = query.order(cls.dataId)
         query = query.filter(cls.field == field)
         query = query.filter(cls.string == string)
         return query
@@ -135,9 +136,8 @@ class Data(NdbModel):
         return data_list
 
 def getCanonicalData(key):
-    MEMCACHE_KEY = "akafkljacuiudrt2po8vxdzskj" + str(key)
-    debug(MEMCACHE_KEY)
     assert isinstance(key, ndb.Key)
+    MEMCACHE_KEY = "akafkljacuiudrt2po8vxdzskj" + str(key)
     client = Client()
     canonical_data_key = client.get(MEMCACHE_KEY)
     if canonical_data_key: return canonical_data_key
@@ -156,9 +156,8 @@ def getCanonicalData(key):
 def getCanonicalDataList(key_list):
     result = []
     for key in key_list:
-        assert isinstance(key, ndb.Key)
+        #assert isinstance(key, ndb.Key)
         canonical_data_key = getCanonicalData(key)
-        #assert isinstance(canonical_data, Data)
         result.append(canonical_data_key)
     return result
 
