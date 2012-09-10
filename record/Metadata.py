@@ -19,7 +19,7 @@ class _Recent(JsonRpcDispatcher):
         for key in keys:
             metadata = key.get()
             assert isinstance(metadata, MetadataNdb)
-            jresponse.addResult(metadata.to_list())
+            jresponse.addResult(metadata)
         jresponse.setExtraValue("limit", LIMIT)
     
 class _Range(JsonRpcDispatcher):
@@ -144,7 +144,7 @@ class _OneDay(JsonRpcDispatcher):
         query = MetadataNdb.queryDateRange(start, end)
         keys = query.fetch(limit=24 * 60 + 100, keys_only=True)
         for key in keys:
-            jresponse.addResult(key.get().to_list())
+            jresponse.addResult(key.get())
             
 class _ByMetadataId(JsonRpcDispatcher):
     def GET(self, jrequest, jresponse):
