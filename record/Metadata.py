@@ -111,7 +111,6 @@ class _MakeTestData(JsonRpcDispatcher):
 class _CanonicalizeData(JsonRpcDispatcher):
     
     def GET(self, jrequest, jresponse):
-        EXECUTE_TOKEN = "jikkousuru"
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
@@ -119,6 +118,7 @@ class _CanonicalizeData(JsonRpcDispatcher):
             start = int(jrequest.getPathInfo(4))
             end = int(jrequest.getPathInfo(5))
             execute = jrequest.getValue("execute")[0]
+            verbose = jrequest.getValue("verbose")[0]
         except Exception, e:
             jresponse.setError(JsonRpcError.INVALID_REQUEST, unicode(e))
             return
@@ -133,11 +133,12 @@ class _CanonicalizeData(JsonRpcDispatcher):
             if _isIdenticalKeyList(canonicalized_list, metadata.dataList): continue
             assert len(canonicalized_list) == len(metadata.dataList)
             if not isEquivalentDataKeyList(canonicalized_list, metadata.dataList): continue 
-            if execute == EXECUTE_TOKEN:
+            if execute == "yes":
                 metadata.dataList = canonicalized_list
                 metadata.put()
             count += 1
-            jresponse.addResult([metadata.metadataId, _listifyDataList(metadata.dataList), _listifyDataList(canonicalized_list)])
+            if verbose == "yes":
+                jresponse.addResult([metadata.metadataId, _listifyDataList(metadata.dataList), _listifyDataList(canonicalized_list)])
         jresponse.setExtraValue("count", count)
             
 class _OneDay(JsonRpcDispatcher):
