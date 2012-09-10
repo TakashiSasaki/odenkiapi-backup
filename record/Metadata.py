@@ -25,7 +25,20 @@ class _Recent(JsonRpcDispatcher):
     
 class _Range(JsonRpcDispatcher):
     def GET(self, jrequest, jresponse):
-        pass
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
+        try:
+            start = int(jrequest.getPathInfo(3))
+            end = int(jrequest.getPathInfo(4))
+        except Exception, e: 
+            jresponse.setError(JsonRpcError.INVALID_REQUEST, str(e))
+            return
+        keys = MetadataNdb.fetchRange(start, end)
+        for key in keys:
+            jresponse.addResult(key.get())
+        jresponse.setExtraValue("start", start)
+        jresponse.setExtraValue("end", end)
     
 
 def _listifyDataList(data_list):

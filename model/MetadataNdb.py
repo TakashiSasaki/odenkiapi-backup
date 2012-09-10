@@ -48,6 +48,10 @@ class Metadata(NdbModel):
             query = query.filter(cls.metadataId <= start)
             query = query.filter(cls.metadataId >= end)
             return query
+    
+    @classmethod
+    def fetchRange(cls, start, end, limit=100):
+        return cls.queryRange(start, end).fetch(keys_only=True, limit=limit)
         
     @classmethod
     def queryDateRange(cls, start, end):
