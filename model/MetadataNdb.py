@@ -120,3 +120,43 @@ def getMetadataByDataList(data_list):
         keys = query.fetch(keys_only=True)
         metadata_set.update(keys)
     return metadata_set
+
+def _isIdenticalKeyList(l1, l2):
+    if len(l1) != len(l2): return False
+    try:
+        for x in range(len(l1)):
+            if l1[x] != l2[x]: return False
+    except: return False
+    return True
+
+def _canonicalizeDataOne(key):
+    """Canonicalize data in Metadata entity.
+    It returns Metadata key when canonicalization succeeded.
+    You have to put it by yourself because the entity is left not put. 
+    It returns None if no canonicalization is needed or cannot canonicalize because of unexpected situation.
+    """
+    from model.DataNdb import getCanonicalDataList, isEquivalentDataKeyList
+    assert isinstance(key, ndb.Key)
+    metadata = key.get()
+    assert isinstance(metadata, Metadata)
+    if not isinstance(metadata.dataList, list): return
+    canonicalized_list = getCanonicalDataList(metadata.dataList)
+    if _isIdenticalKeyList(canonicalized_list, metadata.dataList): return
+    assert len(canonicalized_list) == len(metadata.dataList)
+    if not isEquivalentDataKeyList(canonicalized_list, metadata.dataList): return
+    metadata.dataList = canonicalized_list
+    return metadata 
+
+@ndb.toplevel
+def canonicalizeData(keys, put=False):
+    assert isinstance(keys, list)
+    count = 0
+    for key in keys:
+        canonicalized_metadata = _canonicalizeDataOne(key)
+        if not canonicalized_metadata: continue
+        assert isinstance(canonicalized_metadata, Metadata)
+        assert key == canonicalized_metadata.key
+        if put:
+            canonicalized_metadata.put_async()
+        count += 1
+    return count

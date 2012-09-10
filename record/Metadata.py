@@ -1,8 +1,9 @@
 from lib.JsonRpc import JsonRpcDispatcher, JsonRpcResponse, JsonRpcRequest, \
     JsonRpcError
-from model.MetadataNdb import Metadata as MetadataNdb
+from model.MetadataNdb import Metadata as MetadataNdb, canonicalizeData
+from model.MetadataNdb import canonicalizeData
 from model.Metadata import Metadata as MetadataDb
-from model.DataNdb import getCanonicalDataList, isEquivalentDataKeyList
+#from model.DataNdb import getCanonicalDataList, isEquivalentDataKeyList
 from model.DataNdb import Data as DataNdb
 from model.Data import Data as DataDb
 from datetime import datetime, timedelta
@@ -47,14 +48,6 @@ def _listifyDataList(data_list):
         listified_data = data_entity.to_list()
         result.append(listified_data)
     return result
-
-def _isIdenticalKeyList(l1, l2):
-    if len(l1) != len(l2): return False
-    try:
-        for x in range(len(l1)):
-            if l1[x] != l2[x]: return False
-    except: return False
-    return True
 
 class _MakeTestData(JsonRpcDispatcher):
     def GET(self, jrequest, jresponse):
@@ -118,29 +111,14 @@ class _CanonicalizeData(JsonRpcDispatcher):
             start = int(jrequest.getPathInfo(4))
             end = int(jrequest.getPathInfo(5))
             execute = jrequest.getValue("execute")[0]
-            verbose = jrequest.getValue("verbose")[0]
         except Exception, e:
             jresponse.setError(JsonRpcError.INVALID_REQUEST, unicode(e))
             return
         query = MetadataNdb.queryRange(start, end)
         keys = query.fetch(keys_only=True)
-        count = 0
-        for key in keys:
-            metadata = key.get()
-            assert isinstance(metadata, MetadataNdb)
-            if not isinstance(metadata.dataList, list): continue
-            canonicalized_list = getCanonicalDataList(metadata.dataList)
-            if _isIdenticalKeyList(canonicalized_list, metadata.dataList): continue
-            assert len(canonicalized_list) == len(metadata.dataList)
-            if not isEquivalentDataKeyList(canonicalized_list, metadata.dataList): continue 
-            if execute == "yes":
-                metadata.dataList = canonicalized_list
-                metadata.put()
-            count += 1
-            if verbose == "yes":
-                jresponse.addResult([metadata.metadataId, _listifyDataList(metadata.dataList), _listifyDataList(canonicalized_list)])
+        count = canonicalizeData(keys, execute == "yes")
         jresponse.setExtraValue("count", count)
-            
+
 class _OneDay(JsonRpcDispatcher):
     
     def GET(self, jrequest, jresponse):
