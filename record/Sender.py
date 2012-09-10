@@ -1,4 +1,4 @@
-from lib.JsonRpc import JsonRpcDispatcher, JsonRpcResponse
+from lib.JsonRpc import JsonRpcDispatcher, JsonRpcResponse, JsonRpcError
 from model.SenderNdb import Sender
 
 class _Range(JsonRpcDispatcher):
@@ -15,23 +15,26 @@ class _Range(JsonRpcDispatcher):
     def GET(self, jrequest, jresponse):
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
-        path_info = self.request.path_info.split("/")
-        start = int(path_info[3])
-        end = int(path_info[4])
-        query = Sender.queryRange(start, end)
-        keys = query.fetch(keys_only=True)
+        try:
+            start = int(jrequest.getPathInfo(3))
+            end = int(jrequest.getPathInfo(4))
+        except Exception, e: 
+            jresponse.setError(JsonRpcError.INVALID_REQUEST, str(e))
+            return
+        keys = Sender.fetchRange(start, end)
         for key in keys:
             sender = key.get()
             assert isinstance(sender, Sender)
-            jresponse.addResult(sender.getFields())
+            jresponse.addResult(sender)
+        jresponse.setExtraValue("start", start)
+        jresponse.setExtraValue("end", end)
         
 class _Recent(JsonRpcDispatcher):
     
     def GET(self, jrequest, jresponse):
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
-        query = Sender.queryRecent()
-        keys = query.fetch(keys_only=True)
+        keys = Sender.fetchRecent()
         for key in keys:
             sender = key.get()
             assert isinstance(sender, Sender)

@@ -31,6 +31,10 @@ class Sender(NdbModel):
         return query
     
     @classmethod
+    def fetchRecent(cls, limit=100):
+        return cls.queryRecent().fetch(keys_only=True, limit=limit)
+    
+    @classmethod
     def queryRange(cls, start, end):
         assert isinstance(start, int)
         assert isinstance(end, int)
@@ -45,7 +49,11 @@ class Sender(NdbModel):
             return query
 
     @classmethod
-    def newSender(request):
+    def fetchRange(cls, start, end):
+        return cls.queryRange(start, end).fetch(keys_only=True)
+
+    @classmethod
+    def createSender(request):
         #logging.info(("GetSender", request.url))
         assert isinstance(request, Request)
         ip_address = request.remote_addr

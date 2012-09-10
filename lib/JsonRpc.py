@@ -164,7 +164,10 @@ class JsonRpcRequest(object):
     def getId(self):
         return getattr(self, "id", None)
 
-    def getPathInfo(self):
+    def getPathInfo(self, index=None):
+        if index:
+            assert isinstance(index, int)
+            return getattr(self, "pathInfo")[index]
         return getattr(self, "pathInfo", None)
 
 class JsonRpcResponse(dict):
