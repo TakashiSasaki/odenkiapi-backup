@@ -14,3 +14,6 @@ google686f6b490a533df7.py
 *.bak
 *.BACKUP.*
 *.REMOTE.*
+bulkloader-log-*
+bulkloader-progress-*
+bulkloader-results-*

@@ -2,7 +2,7 @@ from  google.appengine.ext import ndb
 from model.SenderNdb import  Sender
 from model.RawDataNdb import RawData
 from model.Counter import Counter
-import datetime
+from datetime import datetime
 from logging import debug, info
 from model.NdbModel import NdbModel
 
@@ -15,9 +15,7 @@ class Metadata(NdbModel):
     executedCommandIds = ndb.IntegerProperty(repeated=True)
     executedResults = ndb.StringProperty(repeated=True)
 
-    @classmethod
-    def getFieldNames(cls):
-        return ["metadataId", "receivedDateTime", "sender", "rawData", "dataList", "executedCommandids", "executedResults" ]
+    fieldnames = ["metadataId", "receivedDateTime", "sender", "rawData", "dataList", "executedCommandIds", "executedResults" ]
     
     def getFields(self):
         fields = []
@@ -48,7 +46,29 @@ class Metadata(NdbModel):
             query = query.filter(cls.metadataId <= start)
             query = query.filter(cls.metadataId >= end)
             return query
-
+        
+    @classmethod
+    def queryDateRange(cls, start, end):
+        assert isinstance(start, datetime)
+        assert isinstance(end, datetime)
+        query = ndb.Query(kind="Metadata")
+        if start <= end:
+            query = query.filter(cls.receivedDateTime >= start)
+            query = query.filter(cls.receivedDateTime <= end)
+            return query
+        else:
+            query = query.filter(cls.receivedDateTime <= start)
+            query = query.filter(cls.receivedDateTime >= end)
+            query = query.order(-cls.receivedDateTime)
+            return query
+        
+    @classmethod
+    def queryByData(cls, data):
+        assert isinstance(data, ndb.Key)
+        query = ndb.Query(kind="Metadata")
+        query = query.filter(cls.dataList == data)
+        return query
+    
     @classmethod
     def putMetadata(cls, sender, raw_data, data_keys):
         assert isinstance(sender, Sender)
@@ -63,3 +83,11 @@ class Metadata(NdbModel):
         metadata.rawData = raw_data
         metadata.dataList = data_keys
         return metadata.put()
+
+def getMetadataByDataList(data_list):
+    metadata_set = set()
+    for data in data_list:
+        query = Metadata.queryByData(data)
+        keys = query.fetch(keys_only=True)
+        metadata_set.update(keys)
+    return metadata_set
