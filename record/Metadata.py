@@ -114,10 +114,12 @@ class _CanonicalizeData(JsonRpcDispatcher):
         except Exception, e:
             jresponse.setError(JsonRpcError.INVALID_REQUEST, unicode(e))
             return
-        query = MetadataNdb.queryRange(start, end)
-        keys = query.fetch(keys_only=True)
-        count = canonicalizeData(keys, execute == "yes")
+        #query = MetadataNdb.queryRange(start, end)
+        #keys = query.fetch(keys_only=True)
+        count = canonicalizeData(start, end, execute == "yes")
         jresponse.setExtraValue("count", count)
+
+
 
 class _OneDay(JsonRpcDispatcher):
     

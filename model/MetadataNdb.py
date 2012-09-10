@@ -148,7 +148,8 @@ def _canonicalizeDataOne(key):
     return metadata 
 
 @ndb.toplevel
-def canonicalizeData(keys, put=False):
+def canonicalizeData(start, end, put=False):
+    keys = Metadata.fetchRange(start, end)
     assert isinstance(keys, list)
     count = 0
     for key in keys:
