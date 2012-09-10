@@ -36,6 +36,8 @@ class Metadata(NdbModel):
     
     @classmethod
     def queryRange(cls, start, end):
+        assert isinstance(start, int)
+        assert isinstance(end, int)
         query = ndb.Query(kind="Metadata")
         query = query.order(-cls.metadataId)
         if start <= end:
