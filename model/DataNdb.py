@@ -150,7 +150,7 @@ def getCanonicalData(key):
     assert data.dataId >= canonical_data_key.get().dataId
     assert data.field == canonical_data_key.get().field
     assert data.string == canonical_data_key.get().string
-    #client.set(MEMCACHE_KEY, canonical_data_key)
+    client.set(MEMCACHE_KEY, canonical_data_key)
     return canonical_data_key
 
 def getCanonicalDataList(key_list):
