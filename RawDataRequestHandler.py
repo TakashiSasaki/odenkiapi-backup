@@ -1,4 +1,4 @@
-import logging
+from logging import debug
 import cgi
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import  run_wsgi_app
@@ -38,7 +38,7 @@ class RawDataRequestHandler(MyRequestHandler):
 class RawDataCached(MyRequestHandler):
     def get(self):
         path_info = self.request.path_info.split("/")
-        lib.debug("PATH_INFO = %s" % path_info)
+        debug("PATH_INFO = %s" % path_info)
         client = memcache.Client()
         LIMIT = 100
 
@@ -100,16 +100,21 @@ class RawDataRequestHandler2(MyRequestHandler):
         for record in records:
             query_dict = cgi.parse_qs(record.query)
             if query_dict.has_key("arduinoid"):
-                gen_power = query_dict["gen.power(W)"][0]
-                timestring = query_dict["time"][0]
+                try:
+                    gen_power = query_dict["gen.power(W)"][0]
+                    timestring = query_dict["time"][0]
+                except: continue
                 results.append([gen_power, timestring[0:4], timestring[4:6], timestring[6:8], timestring[8:10], timestring[10:12], timestring[12:14]])
                 #results.append([gen_power])
         self.response.out.write(self.request.get("callback") + "(" + simplejson.dumps({"timeVsWatt":results}) + ");")
 
 
 if __name__ == "__main__":
-    logging.getLogger().setLevel(logging.DEBUG)
-    application = webapp.WSGIApplication([('/RawData', RawDataCached), 
-                                          ('/RawData2', RawDataRequestHandler2), ('/RawDataNonCached', RawDataRequestHandler)
-                                          ], debug=True)
+    mapping = []
+    mapping.append(('/RawData', RawDataCached))
+    mapping.append(('/RawData2', RawDataRequestHandler2))
+    mapping.append(('/RawDataNonCached', RawDataRequestHandler))
+    from lib import WSGIApplication
+    application = WSGIApplication(mapping)
+    from lib import run_wsgi_app
     run_wsgi_app(application)

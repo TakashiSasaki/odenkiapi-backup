@@ -485,11 +485,10 @@ class JsonRpcDispatcher(RequestHandler):
         output = StringIO()
         csv_writer = csv.writer(output, dialect)
         fieldnames = json_rpc_response.getFieldNames()
-        if not isinstance(fieldnames, list):
-            if self.request.get("fieldnames"):
-                csv_writer.writerow(fieldnames)
+        if isinstance(fieldnames, list):
+            csv_writer.writerow(fieldnames)
         result = json_rpc_response.getResult()
-        if not isinstance(result, list): raise RuntimeError("result is not a list")
+        if not isinstance(result, list): result = []
         for record in result:
             if isinstance(record, list):
                 csv_writer.writerow(record)
