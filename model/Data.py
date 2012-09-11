@@ -63,7 +63,6 @@ class Data(db.Model):
     
     @classmethod
     def putEntity(cls, field, string):
-        debug("type of field is %s" % type(field))
         assert isinstance(field, unicode)
         assert isinstance(string, unicode)
         key = cls.getKeyByFieldAndString(field, string)

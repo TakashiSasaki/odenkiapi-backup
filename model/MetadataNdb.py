@@ -160,6 +160,7 @@ class Canonicalizer(object):
         try:
             self.canonicalizeData()
         except DeadlineExceededError:
+            info("remaining metadataId between %s and %s" % (self.nextMetadataId, self.end))
             defer(self.run)
         
     @ndb.toplevel
