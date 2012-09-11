@@ -111,14 +111,13 @@ class _CanonicalizeData(JsonRpcDispatcher):
         try:
             start = int(jrequest.getPathInfo(4))
             end = int(jrequest.getPathInfo(5))
-            execute = jrequest.getValue("execute")[0]
         except Exception, e:
             jresponse.setError(JsonRpcError.INVALID_REQUEST, unicode(e))
             return
         #query = MetadataNdb.queryRange(start, end)
         #keys = query.fetch(keys_only=True)
-        canonicalizer = Canonicalizer(start, end, execute == "yes")
-        canonicalizer.run()
+        canonicalizer = Canonicalizer(start, end)
+        defer(canonicalizer.run)
         jresponse.setExtraValue("start", start)
         jresponse.setExtraValue("end", end)
         jresponse.setExtraValue("deferred", True)

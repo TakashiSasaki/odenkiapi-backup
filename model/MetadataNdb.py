@@ -149,31 +149,28 @@ def _canonicalizeDataOne(key):
 
 
 from google.appengine.ext.deferred import defer
+from google.appengine.runtime import DeadlineExceededError
 class Canonicalizer(object):
-
-    def __init__(self, start, end, put=False):
-        self.start = start
+    
+    def __init__(self, start, end):
+        self.nextMetadataId = start
         self.end = end
-        self.put = put
-
+        
     def run(self):
-        x = self.start
-        while True:
-            defer(self.canonicalizeData)
-            x += 20
-            if self.end < x: break
+        try:
+            self.canonicalizeData()
+        except DeadlineExceededError:
+            defer(self.run)
         
     @ndb.toplevel
     def canonicalizeData(self):
-        keys = Metadata.fetchRange(self.start, self.end)
-        assert isinstance(keys, list)
-        count = 0
-        for key in keys:
-            canonicalized_metadata = _canonicalizeDataOne(key)
-            if not canonicalized_metadata: continue
+        query = Metadata.queryRange(self.nextMetadataId, self.end)
+        for metadata_key in query.iter(keys_only=True):
+            canonicalized_metadata = _canonicalizeDataOne(metadata_key)
+            if not canonicalized_metadata:
+                self.nextMetadataId = metadata_key.get().metadataId
+                continue
             assert isinstance(canonicalized_metadata, Metadata)
-            assert key == canonicalized_metadata.key
-            if self.put:
-                canonicalized_metadata.put_async()
-            count += 1
-        return count
+            assert metadata_key == canonicalized_metadata.key
+            canonicalized_metadata.put_async()
+            self.nextMetadataId = metadata_key.get().metadataId
