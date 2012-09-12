@@ -11,7 +11,7 @@ def dumps(d):
     return _dumps(d, indent=4, cls=JSONEncoder)
 
 class JSONEncoder(_JSONEncoder):
-    def default(self,o):
+    def default(self, o):
         if isinstance(o, Session):
             return str(o.sid)
         if isinstance(o, OAuthHmacToken):
@@ -20,7 +20,9 @@ class JSONEncoder(_JSONEncoder):
             return o.isoformat()
         if isinstance(o, ndb.Key):
             assert isinstance(o, ndb.Key)
-            return unicode(o)
+            entity = o.get()
+            if entity is None: return None
+            return unicode(o.get().to_dict())
         if isinstance(o, db.Key):
             assert isinstance(o, db.Key)
             return unicode(o)
