@@ -18,6 +18,31 @@ class Data(NdbModel):
     
     def to_list(self):
         return [self.dataId, self.field, self.string]
+    
+    @classmethod
+    def queryByField(cls, field):
+        query = ndb.Query(kind="Data")
+        query = query.order(cls.dataId)
+        query = query.filter(cls.field == field)
+        return query
+
+    @classmethod
+    def fetchByField(cls, field):
+        return cls.queryByField(field).fetch(limit=100, keys_only=True)
+    
+    @classmethod
+    def queryByFieldAndString(cls, field, string):
+        assert isinstance(field, unicode)
+        assert isinstance(string, unicode)
+        query = ndb.Query(kind="Data")
+        query = query.order(cls.dataId)
+        query = query.filter(cls.field == field)
+        query = query.filter(cls.string == string)
+        return query
+    
+    @classmethod
+    def fetchByFieldAndString(cls, field, string):
+        return cls.queryByFieldAndString(field, string).fetch(limit=100, keys_only=True)
 
     @classmethod
     def querySingle(cls, data_id):

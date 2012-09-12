@@ -32,6 +32,13 @@ handlers:
 
 - url: /css
   static_dir: css
+  
+- url: /image
+  static_dir: image
+
+- url: /favicon.ico
+  static_files: image/odenki.png
+  upload: image/odenki.png
 
 - url: /api/([A-Za-z_]+).*
   script: api/\1.py

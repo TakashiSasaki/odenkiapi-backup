@@ -106,6 +106,37 @@ class _ByKeyId(JsonRpcDispatcher):
         jresponse.addResult(data_key.get())
         jresponse.setExtraValue("key_id", key_id)
         
+class _ByField(JsonRpcDispatcher):
+    def GET(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
+        try:
+            field = unicode(jrequest.getPathInfo(3))
+        except Exception, e:
+            jresponse.setErrorInvalidParameter(e)
+            return
+        data_keys = Data.fetchByField(field)
+        for data_key in data_keys:
+            data = data_key.get()
+            jresponse.addResult(data)
+
+class _ByFieldAndString(JsonRpcDispatcher):
+    def GET(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
+        try:
+            field = unicode(jrequest.getPathInfo(3))
+            string = unicode(jrequest.getPathInfo(4))
+        except Exception, e:
+            jresponse.setErrorInvalidParameter(e)
+            return
+        data_keys = Data.fetchByFieldAndString(field,string)
+        for data_key in data_keys:
+            data = data_key.get()
+            jresponse.addResult(data)
+        
 if __name__ == "__main__":
     mapping = []
     mapping.append(("/record/Data", _Recent))
@@ -113,6 +144,8 @@ if __name__ == "__main__":
     mapping.append(("/record/Data/id/[0-9]+", _ByKeyId))
     mapping.append(("/record/Data/[0-9]+/[0-9]+", _Range))
     mapping.append(("/record/Data/duplicated", _DuplicationCheck))
+    mapping.append(("/record/Data/[^/]+", _ByField))
+    mapping.append(("/record/Data/[^/]+/[^/]+", _ByFieldAndString))
     from lib import WSGIApplication
     application = WSGIApplication(mapping, debug=True)
     from lib import run_wsgi_app

@@ -13,6 +13,11 @@ indexes:
 - kind: Data
   properties:
   - name: field
+  - name: dataId
+
+- kind: Data
+  properties:
+  - name: field
   - name: string
   - name: dataId
 
