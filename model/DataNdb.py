@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 from logging import debug
+from warnings import warn
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import Request
 #import types,logging
@@ -42,13 +43,30 @@ class Data(NdbModel):
 
     @classmethod
     def fetchByFieldAndString(cls, field, string):
-        return cls.queryByFieldAndString(field, string).fetch(limit=100, keys_only=True)
-
+        assert isinstance(field, unicode)
+        assert isinstance(string, unicode)
+        MEMCACHE_KEY = "kml87wngfp98uw45nvljkbbjlkq4" + field + string
+        client = Client()
+        data_keys = client.get(MEMCACHE_KEY)
+        if data_keys is None: return []
+        data_keys = cls.queryByFieldAndString(field, string).fetch(keys_only=True)
+        if len(data_keys) >= 2: warn("duplicated data entities with field=%s and string=%s" % (field, string))
+        client.set(MEMCACHE_KEY, data_keys)
+        return data_keys
+    
     @classmethod
     def querySingle(cls, data_id):
+        warn("querySingle is deprecatd. Use getByDataId instead.", DeprecationWarning, 2)
         query = ndb.Query(kind="Data")
         query = query.filter(Data.dataId == data_id)
         return query
+    
+    @classmethod
+    def getByDataId(cls, data_id):
+        assert isinstance(data_id, int)
+        query = ndb.Query(kind="Data")
+        query = query.filter(cls.dataId == data_id)
+        return query.get(keys_only=True)
     
     @classmethod
     def queryRecent(cls):
@@ -62,12 +80,7 @@ class Data(NdbModel):
         query = ndb.Query(kind="Data")
         query = query.filter(cls.dataId == data_id)
         return query
-    
-    @classmethod
-    def getByDataId(cls, data_id):
-        assert isinstance(data_id, int)
-        return cls.queryByDataId(data_id).get(keys_only=True)
-    
+
     
     @classmethod
     def queryRange(cls, start, end):
