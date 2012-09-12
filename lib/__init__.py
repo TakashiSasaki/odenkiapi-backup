@@ -46,3 +46,5 @@ def isEqualIfExists(o1, o2, a):
     if not hasattr(o2, a): return False
     if o1.a != o2.a: return False
     return True
+
+isiterable = lambda obj: isinstance(obj, basestring) or hasattr(obj, '__iter__')
