@@ -170,6 +170,37 @@ class _ByKeyId(JsonRpcDispatcher):
         key = ndb.Key(MetadataNdb, key_id)
         jresponse.setExtraValue("key_id", key_id)
         jresponse.addResult(key.get())
+        
+class _ByDataId(JsonRpcDispatcher):
+    def GET(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
+        try:
+            data_id = int(jrequest.getPathInfo(4))
+            data_key = DataNdb.getByDataId(data_id)
+        except Exception, e:
+            jresponse.setErrorInvalidParameter(e)
+            return
+        debug("dataId = %s ==> key %s" % (data_id, data_key))
+        assert isinstance(data_key, ndb.Key)
+        metadata_keys = MetadataNdb.fetchByData(data_key)
+        for metadata_key in metadata_keys:
+            jresponse.addResult(metadata_key.get())
+        
+class _ByDataKey(JsonRpcDispatcher):
+    def GET(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
+        try:
+            data_key = ndb.Key("Data", int(jrequest.getPathInfo(4)))
+        except Exception, e:
+            jresponse.setErrorInvalidParameter(e)
+            return
+        metadata_keys = MetadataNdb.fetchByData(data_key)
+        for metadata_key in metadata_keys:
+            jresponse.addResult(metadata_key.get())
 
 if __name__ == "__main__":
     mapping = []
@@ -180,6 +211,8 @@ if __name__ == "__main__":
     mapping.append(("/record/Metadata/[0-9]+/[0-9]+/[0-9]+", _OneDay))
     mapping.append(("/record/Metadata/CanonicalizeData/[0-9]+/[0-9]+", _CanonicalizeData))
     mapping.append(("/record/Metadata/MakeTestData", _MakeTestData))
+    mapping.append(("/record/Metadata/DataId/[0-9]+", _ByDataId))
+    mapping.append(("/record/Metadata/DataKey/[0-9]+", _ByDataKey))
     from lib import WSGIApplication
     application = WSGIApplication(mapping, debug=True)
     from lib import run_wsgi_app

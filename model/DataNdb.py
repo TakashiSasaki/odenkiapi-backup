@@ -39,7 +39,7 @@ class Data(NdbModel):
         query = query.filter(cls.field == field)
         query = query.filter(cls.string == string)
         return query
-    
+
     @classmethod
     def fetchByFieldAndString(cls, field, string):
         return cls.queryByFieldAndString(field, string).fetch(limit=100, keys_only=True)
@@ -64,14 +64,10 @@ class Data(NdbModel):
         return query
     
     @classmethod
-    def queryByFieldAndString(cls, field, string):
-        assert isinstance(field, unicode)
-        assert isinstance(string, unicode)
-        query = ndb.Query(kind="Data")
-        query = query.order(cls.dataId)
-        query = query.filter(cls.field == field)
-        query = query.filter(cls.string == string)
-        return query
+    def getByDataId(cls, data_id):
+        assert isinstance(data_id, int)
+        return cls.queryByDataId(data_id).get(keys_only=True)
+    
     
     @classmethod
     def queryRange(cls, start, end):

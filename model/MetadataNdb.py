@@ -92,11 +92,15 @@ class Metadata(NdbModel):
         return query
         
     @classmethod
-    def queryByData(cls, data):
-        assert isinstance(data, ndb.Key)
+    def queryByData(cls, data_key):
+        assert isinstance(data_key, ndb.Key)
         query = ndb.Query(kind="Metadata")
-        query = query.filter(cls.dataList == data)
+        query = query.filter(cls.dataList == data_key)
         return query
+    
+    @classmethod
+    def fetchByData(cls, data_key):
+        return cls.queryByData(data_key).fetch(keys_only=True, limit=100)
     
     @classmethod
     def putMetadata(cls, sender, raw_data, data_keys):
