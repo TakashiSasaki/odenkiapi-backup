@@ -79,7 +79,8 @@ class Data(NdbModel):
         query = query.filter(cls.dataId == data_id)
         #query = query.order(cls.dataId)
         data_keys = query.fetch(keys_only=True)
-        if data_keys is None: return None
+        if data_keys is None: return
+        if len(data_keys) == 0: return
         if len(data_keys) > 1:
             warn("%s Data entities with dataId %s were found" % (len(data_keys), data_id), RuntimeWarning)
         data_key = data_keys[0]
