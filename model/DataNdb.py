@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-from logging import debug
+from logging import debug, info
 from warnings import warn
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import Request
@@ -45,10 +45,10 @@ class Data(NdbModel):
     def fetchByFieldAndString(cls, field, string):
         assert isinstance(field, unicode)
         assert isinstance(string, unicode)
-        MEMCACHE_KEY = "kml87wngfp98uw45nvljkbbjlkq4" + field + string
+        MEMCACHE_KEY = "kml87wfasfp98uw45nvljkbbjlkq4" + field + "nvnjqlagzahk" + string
         client = Client()
         data_keys = client.get(MEMCACHE_KEY)
-        if data_keys is None: return []
+        if data_keys: return data_keys
         data_keys = cls.queryByFieldAndString(field, string).fetch(keys_only=True)
         if len(data_keys) >= 2: warn("duplicated data entities with field=%s and string=%s" % (field, string))
         client.set(MEMCACHE_KEY, data_keys)
