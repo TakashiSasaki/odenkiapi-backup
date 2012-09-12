@@ -62,25 +62,36 @@ class Data(NdbModel):
         return query
     
     @classmethod
-    def getByDataId(cls, data_id):
-        assert isinstance(data_id, int)
-        query = ndb.Query(kind="Data")
-        query = query.filter(cls.dataId == data_id)
-        return query.get(keys_only=True)
-    
-    @classmethod
-    def queryRecent(cls):
-        query = ndb.Query(kind="Data")
-        query = query.order(-Data.dataId)
-        return query
-    
-    @classmethod
     def queryByDataId(cls, data_id):
         assert isinstance(data_id, int)
         query = ndb.Query(kind="Data")
         query = query.filter(cls.dataId == data_id)
         return query
 
+    @classmethod
+    def getByDataId(cls, data_id):
+        assert isinstance(data_id, int)
+        client = Client()
+        MEMCACHE_KEY = "jkijwxpmuqzkldruoinj" + unicode(data_id)
+        data_key = client.get(MEMCACHE_KEY)
+        if data_key: return data_key
+        query = ndb.Query(kind="Data")
+        query = query.filter(cls.dataId == data_id)
+        #query = query.order(cls.dataId)
+        data_keys = query.fetch(keys_only=True)
+        if data_keys is None: return None
+        if len(data_keys) > 1:
+            warn("%s Data entities with dataId %s were found" % (len(data_keys), data_id), RuntimeWarning)
+        data_key = data_keys[0]
+        if data_key: client.set(MEMCACHE_KEY, data_key)
+        assert isinstance(data_key, ndb.Key)
+        return data_key
+    
+    @classmethod
+    def queryRecent(cls):
+        query = ndb.Query(kind="Data")
+        query = query.order(-Data.dataId)
+        return query
     
     @classmethod
     def queryRange(cls, start, end):

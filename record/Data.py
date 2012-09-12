@@ -64,12 +64,14 @@ class _ByDataId(JsonRpcDispatcher):
         try:
             data_id = int(jrequest.getPathInfo()[3])
         except: return
-        query = Data.querySingle(data_id)
-        data_key = query.get(keys_only=True)
+        data_key = Data.getByDataId(data_id)
+        if data_key is None:
+            jresponse.setError(JsonRpcError.SERVER_ERROR_RESERVED_MIN, "dataId %s not found" % data_id)
+            return
         data = data_key.get()
         assert isinstance(data, Data)
         jresponse.addResult(data)
-        jresponse.setExtraValue("key_id", data_key.id())
+        jresponse.setExtraValue("key_id", data.key.id())
 
 class _DuplicationCheck(JsonRpcDispatcher):
     
