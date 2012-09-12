@@ -2,8 +2,10 @@ from __future__ import unicode_literals, print_function
 from lib.JsonRpc import *
 from urlparse import urlparse
 from model.DataNdb import Data, getCanonicalData
+from model.UnusedDataEliminator import UnusedDataEliminator
 from google.appengine.ext import ndb
 from logging import debug
+from google.appengine.ext.deferred import defer
 
 class _Recent(JsonRpcDispatcher):
 
@@ -132,11 +134,30 @@ class _ByFieldAndString(JsonRpcDispatcher):
         except Exception, e:
             jresponse.setErrorInvalidParameter(e)
             return
-        data_keys = Data.fetchByFieldAndString(field,string)
+        data_keys = Data.fetchByFieldAndString(field, string)
         if data_keys is None: return
         for data_key in data_keys:
             data = data_key.get()
             jresponse.addResult(data)
+            
+class _DeleteUnused(JsonRpcDispatcher):
+    def GET(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
+        try:
+            start = int(jrequest.getPathInfo(4))
+            end = int(jrequest.getPathInfo(5))
+        except Exception, e:
+            jresponse.setErrorInvalidParameter(e)
+            return
+        #query = MetadataNdb.queryRange(start, end)
+        #keys = query.fetch(keys_only=True)
+        eliminator = UnusedDataEliminator(start, end)
+        defer(eliminator.run)
+        jresponse.setExtraValue("start", start)
+        jresponse.setExtraValue("end", end)
+        
         
 if __name__ == "__main__":
     mapping = []
@@ -145,6 +166,7 @@ if __name__ == "__main__":
     mapping.append(("/record/Data/id/[0-9]+", _ByKeyId))
     mapping.append(("/record/Data/[0-9]+/[0-9]+", _Range))
     mapping.append(("/record/Data/duplicated", _DuplicationCheck))
+    mapping.append(("/record/Data/UnusedDataEliminator/[0-9]+/[0-9]+", _DeleteUnused))
     mapping.append(("/record/Data/[^/]+", _ByField))
     mapping.append(("/record/Data/[^/]+/[^/]+", _ByFieldAndString))
     from lib import WSGIApplication
