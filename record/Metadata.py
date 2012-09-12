@@ -3,6 +3,7 @@ from lib.JsonRpc import JsonRpcDispatcher, JsonRpcResponse, JsonRpcRequest, \
 from model.MetadataNdb import Metadata as MetadataNdb
 from model.MetadataNdb import Canonicalizer
 from model.Metadata import Metadata as MetadataDb
+from model.MetadataNdb import MetadataColumns
 #from model.DataNdb import getCanonicalDataList, isEquivalentDataKeyList
 from model.DataNdb import Data as DataNdb
 from model.Data import Data as DataDb

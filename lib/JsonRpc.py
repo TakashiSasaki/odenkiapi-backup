@@ -1,6 +1,7 @@
 #from google.appengine import runtime
 from model.NdbModel import NdbModel
 from google.appengine.api.memcache import Client
+from model.Columns import Columns
 __all__ = ["JsonRpcError", "JsonRpcRequest", "JsonRpcResponse", "JsonRpcDispatcher"]
 
 from exceptions import Exception
@@ -11,6 +12,7 @@ from google.appengine.ext.webapp import Request, RequestHandler, Response
 from StringIO import StringIO
 import csv
 from logging import debug, error
+from warnings import warn
 
 class JsonRpcError(object):
     PARSE_ERROR = -32700
@@ -177,7 +179,7 @@ class JsonRpcResponse(dict):
     without any other assumptions. 
     """
     
-    __slots__ = ["_redirectTarget"]
+    __slots__ = ["_redirectTarget", "_columns"]
     
     def __init__(self, request_id):
         dict.__init__(self)
@@ -277,6 +279,12 @@ class JsonRpcResponse(dict):
         assert isinstance(extra, dict)
         if extra.has_key(k): raise RuntimeError("extra dict already has %s key" % k)
         self["extra"][k] = v
+    
+    def getExtraValue(self, k):
+        extra = self.getExtra()
+        if extra is None: return
+        assert isinstance(extra, dict)
+        return extra.get(k)
         
     def setResult(self, result):
         if self.has_key("result"): raise RuntimeError("result is already set")
@@ -334,6 +342,7 @@ class JsonRpcResponse(dict):
             return error_code
 
     def getFieldNames(self):
+        warn("getFieldNames is deprecated. Use getColumns instead.", DeprecationWarning)
         """fieldnames in extra member is non-standard as JSON-RPC but convenient for CSV or TSV output"""
         extra = self.getExtra()
         if not isinstance(extra, dict): return None
@@ -342,6 +351,7 @@ class JsonRpcResponse(dict):
         return fieldnames
     
     def setFieldNames(self, field_names):
+        warn("setFieldNames is deprecated. Use setColumns instead.", DeprecationWarning)
         """fieldnames in extra member is non-standard as JSON-RPC but convenient for CSV or TSV output"""
         self.setExtraValue("fieldnames", field_names)
         
@@ -475,6 +485,9 @@ class JsonRpcDispatcher(RequestHandler):
         if self.request.get("format") == "csv":
             self._writeCsv(json_rpc_response)
             return
+        if self.request.get("format") == "DataTable":
+            self._writeDataTable(json_rpc_response)
+            return
         if self.request.get("callback"):
             self._writeJsonP(json_rpc_response)
             return
@@ -516,6 +529,19 @@ class JsonRpcDispatcher(RequestHandler):
             raise RuntimeError("result is neither dict or list")
         self.response.out.write(dumps(result))
         self.response.content_type = "application/javascript"
+        
+    def _writeDataTable(self, jresponse):
+        debug("format=DataTable")
+        assert isinstance(jresponse, JsonRpcResponse)
+        columns = jresponse.getExtraValue("columns")
+        if columns is None: return
+        assert isinstance(columns, Columns)
+        debug(columns)
+        for x in jresponse.getResult():
+            pass
+            #rows.append(x.to_row)
+        data_table = {"cols": cols, "rows":rows}
+        self.response.out.write(dumps(data_table))
 
     @classmethod
     def _getHttpStatusFromJsonRpcError(cls, json_rpc_error):
