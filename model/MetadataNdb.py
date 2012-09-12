@@ -5,6 +5,7 @@ from model.Counter import Counter
 from datetime import datetime
 from logging import debug, info
 from model.NdbModel import NdbModel
+from lib import isiterable
 
 class Metadata(NdbModel):
     metadataId = ndb.IntegerProperty()
@@ -116,6 +117,36 @@ class Metadata(NdbModel):
         metadata.rawData = raw_data
         metadata.dataList = data_keys
         return metadata.put()
+    
+    @classmethod
+    def fetchDateRangeAndData(cls, start, end, data_key):
+        assert isinstance(start, datetime)
+        assert isinstance(end, datetime)
+        assert isinstance(data_key, ndb.Key)
+        query = ndb.Query(kind="Metadata")
+        query = query.filter(cls.receivedDateTime >= start)
+        query = query.filter(cls.receivedDateTime <= end)
+        query = query.order(cls.receivedDateTime)
+        return query.fetch(keys_only=True)
+
+    @classmethod
+    def fetchDateRangeAndDataList(cls, start, end, data_keys):
+        assert isinstance(start, datetime)
+        assert isinstance(end, datetime)
+        assert isinstance(data_keys, list)
+        
+        metadata_keys_set = set()
+        for data_key in data_keys:
+            metadata_keys_set.update(cls.fetchDateRangeAndData(start, end, data_key))
+        return metadata_keys_set
+    
+    @classmethod
+    def fetchByDataList(cls, data_keys):
+        assert isiterable(data_keys)
+        metadata_keys = set()
+        for data_key in data_keys:
+            metadata_keys.update(cls.fetchByData(data_key))
+        return list(metadata_keys)
 
 def getMetadataByDataList(data_list):
     metadata_set = set()

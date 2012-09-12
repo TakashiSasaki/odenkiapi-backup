@@ -133,6 +133,7 @@ class _ByFieldAndString(JsonRpcDispatcher):
             jresponse.setErrorInvalidParameter(e)
             return
         data_keys = Data.fetchByFieldAndString(field,string)
+        if data_keys is None: return
         for data_key in data_keys:
             data = data_key.get()
             jresponse.addResult(data)
