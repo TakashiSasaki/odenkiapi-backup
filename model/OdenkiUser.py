@@ -1,7 +1,7 @@
 from google.appengine.ext.db import Model, Query
 from google.appengine.ext.db import StringProperty, URLProperty, IntegerProperty, DateTimeProperty
 from datetime import datetime
-from lib.Counter import getNewOdenkiId
+from model.Counter import getNewOdenkiId
 #from GoogleDocs import GoogleDocs
 
 class OdenkiUser(Model):
