@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, print_function
 from logging import info
 from model.DataNdb import Data
 from model.MetadataNdb import Metadata

@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, print_function
 from  google.appengine.ext import db
 #from  google.appengine.ext.webapp import Request
 #from urlparse import urlparse

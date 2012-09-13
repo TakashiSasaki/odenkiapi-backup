@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, print_function
 #import logging
 from urlparse import urlparse
 from google.appengine.ext import db
