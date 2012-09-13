@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, print_function
 from json import JSONEncoder as _JSONEncoder
 from gaesessions import Session
 from gdata.gauth import OAuthHmacToken
