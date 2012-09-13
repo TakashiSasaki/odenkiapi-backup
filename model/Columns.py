@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, print_function
 from logging import debug
+from lib import Singleton
 
 class _Column(dict):
     """
@@ -21,6 +22,7 @@ class _Column(dict):
     
 
 class Columns(object):
+    __metaclass__ = Singleton
     
     _TYPE_STRING = "string"
     _TYPE_NUMBER = "number"
@@ -28,48 +30,41 @@ class Columns(object):
     _TYPE_DATETIME = "datetime"
     _TYPE_BOOLEAN = "boolean"
     _TYPE_TIMEOFDAY = "timeofday"
-    _columns = []
 
-    @classmethod
-    def addColumn(cls, column_id, column_label=None, column_type=None):
-        cls._columns.append(_Column(column_id, column_label, column_type))
+    def __init__(self):
+        self._columns = []
+
+    def addColumn(self, column_id, column_label=None, column_type=None):
+        self._columns.append(_Column(column_id, column_label, column_type))
         
-    @classmethod
-    def addNumber(cls, column_id, column_label=None):
-        cls.addColumn(column_id, column_label, cls._TYPE_NUMBER)
+    def addNumber(self, column_id, column_label=None):
+        self.addColumn(column_id, column_label, self._TYPE_NUMBER)
     
-    @classmethod
-    def addString(cls, column_id, column_label=None):
-        cls.addColumn(column_id, column_label, cls._TYPE_STRING)
+    def addString(self, column_id, column_label=None):
+        self.addColumn(column_id, column_label, self._TYPE_STRING)
     
-    @classmethod
-    def addDate(cls, column_id, column_label=None):
-        cls.addColumn(column_id, column_label, cls._TYPE_DATE)
+    def addDate(self, column_id, column_label=None):
+        self.addColumn(column_id, column_label, self._TYPE_DATE)
 
-    @classmethod
-    def addDateTime(cls, column_id, column_label=None):
-        cls.addColumn(column_id, column_label, cls._TYPE_DATETIME)
+    def addDateTime(self, column_id, column_label=None):
+        self.addColumn(column_id, column_label, self._TYPE_DATETIME)
 
-    @classmethod
-    def addBoolean(cls, column_id, column_label=None):
-        cls.addColumn(column_id, column_label, cls._TYPE_BOOLEAN)
+    def addBoolean(self, column_id, column_label=None):
+        self.addColumn(column_id, column_label, self._TYPE_BOOLEAN)
 
-    @classmethod
-    def addTimeOfDay(cls, column_id, column_label=None):
-        cls.addColumn(column_id, column_label, cls._TYPE_TIMEOFDAY)
+    def addTimeOfDay(self, column_id, column_label=None):
+        self.addColumn(column_id, column_label, self._TYPE_TIMEOFDAY)
 
-    @classmethod
-    def getColumnIds(cls):
-        assert isinstance(cls._columns, list)
+    def getColumnIds(self):
+        assert isinstance(self._columns, list)
         ids = []
-        for x in cls._columns:
+        for x in self._columns:
             debug(x)
             ids.append(x["id"])
         return ids
 
-    @classmethod
-    def getColumnLabels(cls):
+    def getColumnLabels(self):
         labels = []
-        for x in cls._columns:
+        for x in self._columns:
             labels.append(x["label"])
         return labels
