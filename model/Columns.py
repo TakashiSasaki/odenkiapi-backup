@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, print_function
 from logging import debug
-from lib import Singleton
+from lib.util import Singleton
 
 class _Column(dict):
     """
@@ -68,3 +68,7 @@ class Columns(object):
         for x in self._columns:
             labels.append(x["label"])
         return labels
+    
+    def getDataTableCols(self):
+        return self._columns
+

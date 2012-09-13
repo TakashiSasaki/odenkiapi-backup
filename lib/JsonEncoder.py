@@ -6,6 +6,7 @@ from datetime import datetime
 from google.appengine.ext import ndb
 from google.appengine.ext import db
 from logging import debug
+from model.Columns import Columns
 
 from json import dumps as _dumps
 from model.NdbModel import NdbModel
@@ -30,5 +31,8 @@ class JSONEncoder(_JSONEncoder):
             return unicode(o)
         if isinstance(o, NdbModel):
             return o.to_dict()
+        if isinstance(o, Columns):
+            assert isinstance(o, Columns)
+            return o.getDataTableCols()
         debug(o)
         return _JSONEncoder.default(self, o)
