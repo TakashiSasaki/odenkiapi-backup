@@ -1,4 +1,4 @@
-from lib.JsonRpc import JsonRpcRequest, JsonRpcResponse, JsonRpcDispatcher
+from lib.gae import JsonRpcRequest, JsonRpcResponse, JsonRpcDispatcher
 from logging import debug
 
 class Echo(JsonRpcDispatcher):
@@ -29,7 +29,7 @@ class Echo(JsonRpcDispatcher):
                                     })
     
 if __name__ == "__main__":
-    from lib import WSGIApplication
+    from lib.gae import WSGIApplication
     application = WSGIApplication([("/api/echo", Echo)], debug=True)
-    from lib import run_wsgi_app
+    from lib.gae import run_wsgi_app
     run_wsgi_app(application)
