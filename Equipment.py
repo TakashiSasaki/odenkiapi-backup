@@ -7,7 +7,7 @@ from Sender import  Sender
 from RawData import RawData
 from Data import Data
 import datetime
-from Counter import Counter
+from model.Counter import Counter
 from google.appengine.api import memcache
 from google.appengine.ext.webapp import  template
 
