@@ -7,17 +7,18 @@ from datetime import datetime
 from logging import debug, info
 from model.NdbModel import NdbModel
 from model.Columns import Columns
-from lib import isiterable
+from lib.util import isiterable
 
 class MetadataColumns(Columns):
 
-    Columns.addNumber("metadataId")
-    Columns.addDateTime("receivedDateTime")
-    Columns.addString("sender")
-    Columns.addString("rawData")
-    Columns.addString("dataList")
-    Columns.addString("executedCommandIds")
-    Columns.addString("executedResults")
+    def __init__(self):
+        Columns.addNumber("metadataId")
+        Columns.addDateTime("receivedDateTime")
+        Columns.addString("sender")
+        Columns.addString("rawData")
+        Columns.addString("dataList")
+        Columns.addString("executedCommandIds")
+        Columns.addString("executedResults")
 
 class Metadata(NdbModel, MetadataColumns):
     
