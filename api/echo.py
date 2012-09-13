@@ -1,4 +1,5 @@
-from lib.gae import JsonRpcRequest, JsonRpcResponse, JsonRpcDispatcher
+from __future__ import unicode_literals, print_function
+from lib.gae import *
 from logging import debug
 
 class Echo(JsonRpcDispatcher):
@@ -29,7 +30,5 @@ class Echo(JsonRpcDispatcher):
                                     })
     
 if __name__ == "__main__":
-    from lib.gae import WSGIApplication
-    application = WSGIApplication([("/api/echo", Echo)], debug=True)
-    from lib.gae import run_wsgi_app
+    application = WSGIApplication([("/api/echo", Echo)])
     run_wsgi_app(application)
