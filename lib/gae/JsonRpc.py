@@ -1,7 +1,8 @@
+from __future__ import unicode_literals, print_function
 #from google.appengine import runtime
 from model.NdbModel import NdbModel
-from google.appengine.api.memcache import Client
-from model.Columns import Columns
+#from model.Columns import Columns
+#from model.Command import getCommandById
 __all__ = ["JsonRpcError", "JsonRpcRequest", "JsonRpcResponse", "JsonRpcDispatcher"]
 
 from exceptions import Exception
@@ -355,6 +356,13 @@ class JsonRpcResponse(dict):
         """fieldnames in extra member is non-standard as JSON-RPC but convenient for CSV or TSV output"""
         self.setExtraValue("fieldnames", field_names)
         
+    def setColumns(self, columns):
+        assert not hasattr(self, "_columns")
+        self._columns = columns 
+        
+    def getColumns(self, columns):
+        return getattr(self, "_columns")
+        
     def setRedirectTarget(self, target_url):
         assert isinstance(target_url, str)
         assert not hasattr(self, "_redirectTarget") 
@@ -533,14 +541,11 @@ class JsonRpcDispatcher(RequestHandler):
     def _writeDataTable(self, jresponse):
         debug("format=DataTable")
         assert isinstance(jresponse, JsonRpcResponse)
-        columns = jresponse.getExtraValue("columns")
-        if columns is None: return
-        assert isinstance(columns, Columns)
-        debug(columns)
+        rows = []
         for x in jresponse.getResult():
-            pass
-            #rows.append(x.to_row)
-        data_table = {"cols": cols, "rows":rows}
+            assert isinstance(x, NdbModel)
+            rows.append(x.getDataTableRow())
+        data_table = {"cols": jresponse.getColumns(), "rows":rows}
         self.response.out.write(dumps(data_table))
 
     @classmethod
