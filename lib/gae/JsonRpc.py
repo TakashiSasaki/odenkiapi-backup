@@ -1,10 +1,12 @@
 from __future__ import unicode_literals, print_function
 #from google.appengine import runtime
 from model.NdbModel import NdbModel
+from model.Columns import Columns
 #from model.Columns import Columns
 #from model.Command import getCommandById
 __all__ = ["JsonRpcError", "JsonRpcRequest", "JsonRpcResponse", "JsonRpcDispatcher"]
-
+import logging as _logging
+_logging.getLogger().setLevel(_logging.DEBUG)
 from exceptions import Exception
 from encodings.base64_codec import base64_decode
 from json import loads
@@ -360,8 +362,8 @@ class JsonRpcResponse(dict):
         assert not hasattr(self, "_columns")
         self._columns = columns 
         
-    def getColumns(self, columns):
-        return getattr(self, "_columns")
+    def getColumns(self):
+        return getattr(self, "_columns", None)
         
     def setRedirectTarget(self, target_url):
         assert isinstance(target_url, str)
@@ -512,17 +514,22 @@ class JsonRpcDispatcher(RequestHandler):
         assert isinstance(json_rpc_response, JsonRpcResponse)
         output = StringIO()
         csv_writer = csv.writer(output, dialect)
-        fieldnames = json_rpc_response.getFieldNames()
-        if isinstance(fieldnames, list):
-            csv_writer.writerow(fieldnames)
+        columns = json_rpc_response.getColumns()
+        if not columns:
+            warn("Column description is not set in JSON-RPC response object.") 
+            return
+        assert isinstance(columns, Columns)
+        csv_writer.writerow(columns.getColumnIds())
         result = json_rpc_response.getResult()
-        if not isinstance(result, list): result = []
+        if not isinstance(result, list): 
+            warn("Result must be a list to emit CSV.") 
+            return
         for record in result:
+            if isinstance(record, NdbModel):
+                csv_writer.writerow(record.to_list(columns))
+                continue
             if isinstance(record, list):
                 csv_writer.writerow(record)
-                continue
-            if isinstance(record, NdbModel):
-                csv_writer.writerow(record.to_list())
                 continue
             error("result contains neither list nor NdbModel")
         self.response.out.write(output.getvalue())
@@ -541,10 +548,17 @@ class JsonRpcDispatcher(RequestHandler):
     def _writeDataTable(self, jresponse):
         debug("format=DataTable")
         assert isinstance(jresponse, JsonRpcResponse)
+        columns = jresponse.getColumns()
+        if not columns:
+            warn("Column description is not set in JSON-RPC response object.") 
+            return
+        assert isinstance(columns, Columns)
         rows = []
         for x in jresponse.getResult():
             assert isinstance(x, NdbModel)
-            rows.append(x.getDataTableRow())
+            row = x.to_row(columns)
+            debug(row)
+            rows.append(row)
         data_table = {"cols": jresponse.getColumns(), "rows":rows}
         self.response.out.write(dumps(data_table))
 

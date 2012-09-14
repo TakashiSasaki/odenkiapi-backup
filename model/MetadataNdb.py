@@ -12,15 +12,15 @@ from lib.util import isiterable
 class MetadataColumns(Columns):
 
     def __init__(self):
-        Columns.addNumber("metadataId")
-        Columns.addDateTime("receivedDateTime")
-        Columns.addString("sender")
-        Columns.addString("rawData")
-        Columns.addString("dataList")
-        Columns.addString("executedCommandIds")
-        Columns.addString("executedResults")
+        self.addNumber("metadataId")
+        self.addDateTime("receivedDateTime")
+        self.addString("sender")
+        self.addString("rawData")
+        self.addString("dataList")
+        self.addString("executedCommandIds")
+        self.addString("executedResults")
 
-class Metadata(NdbModel, MetadataColumns):
+class Metadata(NdbModel):
     
     metadataId = ndb.IntegerProperty()
     receivedDateTime = ndb.DateTimeProperty()

@@ -13,9 +13,12 @@ class WSGIApplication(_WSGIApplication):
         _WSGIApplication.__init__(self, *args, **keys)
         
 from google.appengine.ext.webapp.util import run_wsgi_app as _run_wsgi_app
-def run_wsgi_app(application):
+def run_wsgi_app(application_or_mapping):
+    """This wrapped version of run_wsgi_app accepts an instance of either WSGIApplication or list"""
+    if isinstance(application_or_mapping, list):
+        application_or_mapping = WSGIApplication(application_or_mapping)
     from google.appengine.ext import ndb
-    _run_wsgi_app(ndb.toplevel(application))
+    _run_wsgi_app(ndb.toplevel(application_or_mapping))
 
 RPC_ERROR_USER_AGENT_DOES_NOT_ACCEPT_HTML = 1
 

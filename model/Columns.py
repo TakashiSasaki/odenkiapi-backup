@@ -1,8 +1,9 @@
 from __future__ import unicode_literals, print_function
-from logging import debug
+from logging import debug,info
 from lib.util import Singleton
+from _pyio import __metaclass__
 
-class _Column(dict):
+class Column(dict):
     """
         type [Required] Data type of the data in the column. Supports the following string values (examples include the v: property, described later):
         'boolean' - JavaScript boolean value ('true' or 'false'). Example value: v:'true'
@@ -19,9 +20,17 @@ class _Column(dict):
         self["id"] = column_id
         self["label"] = column_label if column_label else id
         self["type"] = column_type if column_type else "string"
-    
 
-class Columns(object):
+    def getId(self):
+        return self["id"]
+    
+    def getLabel(self):
+        return self["label"]
+    
+    def getType(self):
+        return self["type"]
+
+class Columns(list):
     __metaclass__ = Singleton
     
     _TYPE_STRING = "string"
@@ -30,12 +39,10 @@ class Columns(object):
     _TYPE_DATETIME = "datetime"
     _TYPE_BOOLEAN = "boolean"
     _TYPE_TIMEOFDAY = "timeofday"
-
-    def __init__(self):
-        self._columns = []
+    
 
     def addColumn(self, column_id, column_label=None, column_type=None):
-        self._columns.append(_Column(column_id, column_label, column_type))
+        self.append(Column(column_id, column_label, column_type))
         
     def addNumber(self, column_id, column_label=None):
         self.addColumn(column_id, column_label, self._TYPE_NUMBER)
@@ -56,16 +63,15 @@ class Columns(object):
         self.addColumn(column_id, column_label, self._TYPE_TIMEOFDAY)
 
     def getColumnIds(self):
-        assert isinstance(self._columns, list)
         ids = []
-        for x in self._columns:
+        for x in self:
             debug(x)
             ids.append(x["id"])
         return ids
 
     def getColumnLabels(self):
         labels = []
-        for x in self._columns:
+        for x in self:
             labels.append(x["label"])
         return labels
     

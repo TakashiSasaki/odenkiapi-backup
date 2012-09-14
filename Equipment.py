@@ -3,9 +3,9 @@ from  google.appengine.ext.webapp import Request, RequestHandler, WSGIApplicatio
 from google.appengine.ext.webapp.util import run_wsgi_app
 from urlparse import urlparse
 import logging
-from Sender import  Sender
-from RawData import RawData
-from Data import Data
+from model.Sender import  Sender
+from model.RawData import RawData
+from model.Data import Data
 import datetime
 from model.Counter import Counter
 from google.appengine.api import memcache

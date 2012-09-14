@@ -1,12 +1,5 @@
 import logging
-import cgi
-from google.appengine.ext import webapp
-from google.appengine.ext.webapp.util import  run_wsgi_app
-#from google.appengine.api import users
-from django.utils import  simplejson as json
-#import json
-from Metadata import Metadata, getDataIds
-from google.appengine.ext import db
+from model.Metadata import Metadata, getDataIds
 from MyRequestHandler import MyRequestHandler
 
 class MetadataRequestHandler(MyRequestHandler):
@@ -32,6 +25,5 @@ class MetadataRequestHandler(MyRequestHandler):
         self.writeWithTemplate(template_values, "Metadata")
 
 if __name__ == "__main__":
-    logging.getLogger().setLevel(logging.DEBUG)
-    application = webapp.WSGIApplication([('/Metadata', MetadataRequestHandler)], debug=True)
-    run_wsgi_app(application)
+    from lib.gae import run_wsgi_app
+    run_wsgi_app([('/Metadata', MetadataRequestHandler)])

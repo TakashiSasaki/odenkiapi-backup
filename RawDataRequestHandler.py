@@ -1,15 +1,11 @@
+from __future__ import unicode_literals, print_function
 from logging import debug
 import cgi
-#from google.appengine.api import users
-from google.appengine.ext.webapp import  template
 from lib.JsonEncoder import dumps
 from model.RawData import RawData
 from MyRequestHandler import MyRequestHandler
 from google.appengine.ext.db import Query, GqlQuery
-from google.appengine.ext.webapp import RequestHandler
 from google.appengine.api import memcache
-from google.appengine.api.datastore import typename, Key
-import lib
 
 class RawDataRequestHandler(MyRequestHandler):
     
@@ -87,9 +83,6 @@ class RawDataCached(MyRequestHandler):
 
 class RawDataRequestHandler2(MyRequestHandler):
     def get(self):
-        client = memcache.Client()
-        LIMIT = 5000
-        
         gql = RawData.gql("ORDER BY rawDataId DESC LIMIT 5000")
         records = gql.run()
         results = []
@@ -110,7 +103,7 @@ if __name__ == "__main__":
     mapping.append(('/RawData', RawDataCached))
     mapping.append(('/RawData2', RawDataRequestHandler2))
     mapping.append(('/RawDataNonCached', RawDataRequestHandler))
-    from lib import WSGIApplication
+    from lib.gae import WSGIApplication
     application = WSGIApplication(mapping)
-    from lib import run_wsgi_app
+    from lib.gae import run_wsgi_app
     run_wsgi_app(application)

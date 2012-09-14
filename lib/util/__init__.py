@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, print_function
 from Singleton import Singleton
 isiterable = lambda obj: isinstance(obj, basestring) or hasattr(obj, '__iter__')
 

@@ -1,6 +1,6 @@
 #from lib.CachedContent import CachedContent
 from datetime import datetime
-from lib.gae import *
+from lib.gae import JsonRpcDispatcher, JsonRpcResponse, run_wsgi_app
 
 class _Version(JsonRpcDispatcher):
     
@@ -32,5 +32,4 @@ class _Version(JsonRpcDispatcher):
 if __name__ == "__main__":
     mapping = []
     mapping.append(("/api/version", _Version))
-    application = WSGIApplication(mapping)
-    run_wsgi_app(application)
+    run_wsgi_app(mapping)

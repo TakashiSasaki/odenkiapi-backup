@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, print_function
 from model.Sender import GetSender
 from model.RawData import putRawData
 from model.Data import Data
