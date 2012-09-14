@@ -1,12 +1,6 @@
+from __future__ import unicode_literals, print_function
 import logging
-import cgi
-from google.appengine.ext import webapp
-from google.appengine.ext.webapp.util import  run_wsgi_app
-#from google.appengine.api import users
-from google.appengine.ext.webapp import  template
-from django.utils import  simplejson as json
-#import json
-from Sender import Sender
+from model.Sender import Sender
 from MyRequestHandler import MyRequestHandler
 
 class SenderRequestHandler(MyRequestHandler):
@@ -27,6 +21,6 @@ class SenderRequestHandler(MyRequestHandler):
         self.writeWithTemplate(template_values, "Sender")
 
 if __name__ == "__main__":
-    logging.getLogger().setLevel(logging.DEBUG)
-    application = webapp.WSGIApplication([('/Sender', SenderRequestHandler)], debug=True)
-    run_wsgi_app(application)
+    mapping = [('/Sender', SenderRequestHandler)]
+    from lib.gae import run_wsgi_app
+    run_wsgi_app(mapping)

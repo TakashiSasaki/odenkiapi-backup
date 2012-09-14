@@ -1,8 +1,9 @@
 from google.appengine.ext.webapp import RequestHandler
 from google.appengine.api.users import get_current_user, create_login_url, create_logout_url
-from lib import getMainModuleName
+from lib.util import getMainModuleName
 from lib.debug import *
-from lib.JsonRpc import JsonRpc
+from lib.gae import JsonRpc
+from logging import debug
 
 class BasicPage(RequestHandler):
     

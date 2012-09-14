@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, print_function
-from lib.JsonRpc import JsonRpcDispatcher, JsonRpcResponse, JsonRpcRequest
+from lib.gae import JsonRpcDispatcher, JsonRpcResponse, JsonRpcRequest, run_wsgi_app
 from model.RawDataNdb import RawData
 from model.MetadataNdb import Metadata
 from google.appengine.api import memcache
@@ -123,7 +123,4 @@ if __name__ == "__main__":
     mapping.append(("/record/RawData/[0-9]+/[0-9]+/[0-9]+/", _OneDay))
     mapping.append(('/record/RawData/[0-9]+/[0-9]+', _Range))
     mapping.append(('/record/RawData', _Recent))
-    from lib import WSGIApplication
-    application = WSGIApplication(mapping)
-    from lib import run_wsgi_app
-    run_wsgi_app(application)
+    run_wsgi_app(mapping)

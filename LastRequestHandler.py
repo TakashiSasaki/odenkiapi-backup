@@ -5,16 +5,10 @@ Created on 2012/03/14
 '''
 
 import logging
-import cgi
-from google.appengine.ext.webapp import WSGIApplication
-from google.appengine.ext.webapp.util import  run_wsgi_app
-#from google.appengine.api import users
-from django.utils import  simplejson as json
-from Sender import Sender
-from Metadata import Metadata
-from google.appengine.ext import db
+from model.Sender import Sender
+from model.Metadata import Metadata
+from model.Data import Data
 from google.appengine.ext.db import Key
-from Data import Data
 from MyRequestHandler import MyRequestHandler
 
 logger = logging.getLogger()
@@ -50,6 +44,5 @@ class LastRequestHandler(MyRequestHandler):
         self.writeWithTemplate(template_values, "Last")
 
 if __name__ == "__main__":
-    logging.getLogger().setLevel(logging.DEBUG)
-    application = WSGIApplication([('/Last', LastRequestHandler)], debug=True)
-    run_wsgi_app(application)
+    from lib.gae import run_wsgi_app
+    run_wsgi_app([('/Last', LastRequestHandler)])

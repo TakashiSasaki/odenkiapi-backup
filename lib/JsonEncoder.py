@@ -1,9 +1,12 @@
+from __future__ import unicode_literals, print_function
 from json import JSONEncoder as _JSONEncoder
 from gaesessions import Session
 from gdata.gauth import OAuthHmacToken
 from datetime import datetime 
 from google.appengine.ext import ndb
 from google.appengine.ext import db
+from logging import debug
+from model.Columns import Columns
 
 from json import dumps as _dumps
 from model.NdbModel import NdbModel
@@ -28,4 +31,8 @@ class JSONEncoder(_JSONEncoder):
             return unicode(o)
         if isinstance(o, NdbModel):
             return o.to_dict()
-        return JSONEncoder.default(self, o)
+        if isinstance(o, Columns):
+            assert isinstance(o, Columns)
+            return o.getDataTableCols()
+        debug(o)
+        return _JSONEncoder.default(self, o)

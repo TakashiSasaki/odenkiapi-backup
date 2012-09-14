@@ -1,13 +1,27 @@
-from  google.appengine.ext import ndb
+from __future__ import unicode_literals, print_function
+from google.appengine.ext import ndb
 from model.SenderNdb import  Sender
 from model.RawDataNdb import RawData
 from model.Counter import Counter
 from datetime import datetime
 from logging import debug, info
 from model.NdbModel import NdbModel
-from lib import isiterable
+from model.Columns import Columns
+from lib.util import isiterable
+
+class MetadataColumns(Columns):
+
+    def __init__(self):
+        self.addNumber("metadataId")
+        self.addDateTime("receivedDateTime")
+        self.addString("sender")
+        self.addString("rawData")
+        self.addString("dataList")
+        self.addString("executedCommandIds")
+        self.addString("executedResults")
 
 class Metadata(NdbModel):
+    
     metadataId = ndb.IntegerProperty()
     receivedDateTime = ndb.DateTimeProperty()
     sender = ndb.KeyProperty()
@@ -15,19 +29,19 @@ class Metadata(NdbModel):
     dataList = ndb.KeyProperty(repeated=True)
     executedCommandIds = ndb.IntegerProperty(repeated=True)
     executedResults = ndb.StringProperty(repeated=True)
-
-    fieldnames = ["metadataId", "receivedDateTime", "sender", "rawData", "dataList", "executedCommandIds", "executedResults" ]
     
-    def getFields(self):
-        fields = []
-        fields.append(self.metadataId)
-        fields.append(self.receivedDateTime)
-        fields.append(self.sender)
-        fields.append(self.rawData)
-        fields.append(self.dataList)
-        #fields.append(self.executedCommandIds)
-        #fields.append(self.executedResults)
-        return fields
+    #fieldnames = ["metadataId", "receivedDateTime", "sender", "rawData", "dataList", "executedCommandIds", "executedResults" ]
+    
+#    def getFields(self):
+#        fields = []
+#        fields.append(self.metadataId)
+#        fields.append(self.receivedDateTime)
+#        fields.append(self.sender)
+#        fields.append(self.rawData)
+#        fields.append(self.dataList)
+#        #fields.append(self.executedCommandIds)
+#        #fields.append(self.executedResults)
+#        return fields
         
     @classmethod
     def queryRecent(cls):

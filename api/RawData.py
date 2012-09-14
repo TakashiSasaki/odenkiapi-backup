@@ -3,8 +3,8 @@ Created on 2012/09/04
 
 @author: sasaki
 '''
-from lib.JsonRpc import JsonRpcDispatcher, JsonRpcRequest, JsonRpcResponse
-from google.appengine.ext.ndb import Key
+from __future__ import unicode_literals, print_function
+from lib.gae import JsonRpcDispatcher, JsonRpcRequest, JsonRpcResponse
 from model.RawDataNdb import RawData
 
 class RecentRawData(JsonRpcDispatcher):
@@ -19,7 +19,7 @@ class RecentRawData(JsonRpcDispatcher):
             limit = int(limit[0])
         
         json_rpc_response = JsonRpcResponse(json_rpc_request.getId())
-        fieldnames = RawData.getFieldNames()
+        fieldnames = RawData.getColumnIds()
         #lib.debug("fieldnames = %s" % fieldnames)
         json_rpc_response.setFieldNames(fieldnames)
         
@@ -36,7 +36,7 @@ class RecentRawData(JsonRpcDispatcher):
 if __name__ == "__main__":
     mapping = []
     mapping.append(("/api/RawData", RecentRawData))
-    from lib import WSGIApplication
+    from lib.gae import WSGIApplication
     application = WSGIApplication(mapping, debug=True)
-    from lib import run_wsgi_app
+    from lib.gae import run_wsgi_app
     run_wsgi_app(application)

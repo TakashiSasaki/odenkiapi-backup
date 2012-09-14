@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, print_function
 from logging import debug 
-from lib.JsonRpc import *
+from lib.gae import JsonRpcDispatcher, JsonRpcRequest, JsonRpcResponse, JsonRpcError, run_wsgi_app
 from model.DataNdb import Data
 from google.appengine.ext import ndb
 from model.MetadataNdb import Metadata
@@ -87,10 +87,6 @@ if __name__ == "__main__":
     mapping = []
     mapping.append(("/record/Arduino/[^/]+", _Recent))
     mapping.append(("/record/Arduino/[^/]+/[0-9]+/[0-9]+/[0-9]+/[0-9]+", _OneDay))
-    from lib import WSGIApplication
-    application = WSGIApplication(mapping)
-    from lib import run_wsgi_app
-    run_wsgi_app(application)
-
+    run_wsgi_app(mapping)
         
         

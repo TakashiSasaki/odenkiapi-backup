@@ -12,8 +12,8 @@ from credentials import GOOGLE_OAUTH_CONSUMER_KEY, GOOGLE_OAUTH_CONSUMER_SECRET
 from gdata.gauth import AeSave, AeLoad, AuthorizeRequestToken, AeDelete
 #from gdata.client import Unauthorized
 from gdata.docs.client import DocsClient
-from test.test_pprint import uni
 #from google.appengine.ext.db import Model, StringProperty, IntegerProperty
+from lib.gae import JsonRpcDispatcher, JsonRpcError, JsonRpcRequest, JsonRpcResponse 
 
 SCOPE_CALENDER = 'https://www.google.com/calendar/feeds/'
 SCOPE_DOCS_LIST = 'https://docs.google.com/feeds/'
@@ -172,5 +172,9 @@ class _GoogleRequestHandler(JsonRpcDispatcher):
         
         
 if __name__ == "__main__":
-    from lib import runWsgiApp
-    runWsgiApp(_GoogleRequestHandler, "/api/google")
+    mapping = []
+    mapping.append(("/api/google", _GoogleRequestHandler))
+    from lib.gae import WSGIApplication
+    application = WSGIApplication(mapping)
+    from lib.gae import run_wsgi_app
+    run_wsgi_app(application)

@@ -1,13 +1,9 @@
 import logging
-import cgi
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import  run_wsgi_app
 #from google.appengine.api import users
-from google.appengine.ext.webapp import  template
-from django.utils import  simplejson as json
 #import json
-from Data import Data
-from google.appengine.ext import db
+from model.Data import Data
 from MyRequestHandler import MyRequestHandler
 
 class DataRequestHandler(MyRequestHandler):

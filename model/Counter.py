@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, print_function
 from google.appengine.ext import db
 
 class Counter(db.Model):

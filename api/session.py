@@ -1,6 +1,6 @@
-#import lib
-from lib.JsonRpc import *
+from __future__ import unicode_literals, print_function
 from google.appengine.api.users import create_login_url, create_logout_url
+from lib.gae import *
 from gaesessions import get_current_session, Session, set_current_session
 from lib.OdenkiSession import OdenkiSession
 
@@ -44,7 +44,5 @@ class UserInfo(JsonRpcDispatcher):
 if __name__ == "__main__":
     url_map = []
     url_map.append(("/api/session", UserInfo))
-    from lib import WSGIApplication
-    application = WSGIApplication(url_map, debug=True)
-    from lib import run_wsgi_app
+    application = WSGIApplication(url_map)
     run_wsgi_app(application)

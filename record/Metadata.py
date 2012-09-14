@@ -1,8 +1,9 @@
-from lib.JsonRpc import JsonRpcDispatcher, JsonRpcResponse, JsonRpcRequest, \
-    JsonRpcError
+from __future__ import unicode_literals, print_function
+from lib.gae import JsonRpcDispatcher, JsonRpcRequest, JsonRpcResponse, JsonRpcError
 from model.MetadataNdb import Metadata as MetadataNdb
 from model.MetadataNdb import Canonicalizer
 from model.Metadata import Metadata as MetadataDb
+from model.MetadataNdb import MetadataColumns
 #from model.DataNdb import getCanonicalDataList, isEquivalentDataKeyList
 from model.DataNdb import Data as DataNdb
 from model.Data import Data as DataDb
@@ -22,6 +23,7 @@ class _Recent(JsonRpcDispatcher):
             metadata = key.get()
             assert isinstance(metadata, MetadataNdb)
             jresponse.addResult(metadata)
+        jresponse.setColumns(MetadataColumns())
         jresponse.setExtraValue("limit", LIMIT)
     
 class _Range(JsonRpcDispatcher):
@@ -214,7 +216,5 @@ if __name__ == "__main__":
     mapping.append(("/record/Metadata/MakeTestData", _MakeTestData))
     mapping.append(("/record/Metadata/dataId/[0-9]+", _ByDataId))
     mapping.append(("/record/Metadata/dataKey/[0-9]+", _ByDataKey))
-    from lib import WSGIApplication
-    application = WSGIApplication(mapping, debug=True)
-    from lib import run_wsgi_app
-    run_wsgi_app(application)
+    from lib.gae import run_wsgi_app
+    run_wsgi_app(mapping)
