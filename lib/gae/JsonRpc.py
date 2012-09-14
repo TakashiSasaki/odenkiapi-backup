@@ -14,7 +14,7 @@ from lib.JsonEncoder import dumps
 from google.appengine.ext.webapp import Request, RequestHandler, Response
 from StringIO import StringIO
 import csv
-from logging import debug, error
+from logging import debug, error, info
 from warnings import warn
 
 class JsonRpcError(object):
@@ -560,7 +560,9 @@ class JsonRpcDispatcher(RequestHandler):
             debug(row)
             rows.append(row)
         data_table = {"cols": jresponse.getColumns(), "rows":rows}
+        info(str(data_table))
         self.response.out.write(dumps(data_table))
+        self.response.content_type = "application/javascript"
 
     @classmethod
     def _getHttpStatusFromJsonRpcError(cls, json_rpc_error):

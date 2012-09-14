@@ -23,16 +23,20 @@ class JSONEncoder(_JSONEncoder):
             return o.isoformat()
         if isinstance(o, ndb.Key):
             assert isinstance(o, ndb.Key)
+            debug("encoding ndb.Key %s to JSON" % o)
             entity = o.get()
             if entity is None: return None
             return unicode(o.get().to_dict())
         if isinstance(o, db.Key):
             assert isinstance(o, db.Key)
+            debug("encoding db.Key %s to JSON" % o)
             return unicode(o)
         if isinstance(o, NdbModel):
             return o.to_dict()
+            debug("encoding NdbModel %s to JSON" % o)
         if isinstance(o, Columns):
             assert isinstance(o, Columns)
+            debug("encoding Columns %s to JSON" % o)
             return o.getDataTableCols()
-        debug(o)
+        debug("encoding unknown object %s, %s " % (type(o), o))
         return _JSONEncoder.default(self, o)

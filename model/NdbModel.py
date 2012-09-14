@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, print_function
 from google.appengine.ext.ndb import Model as _Model
 from logging import debug
-from model.Columns import Column
+from model.Columns import Column, Columns
 
 class NdbModel(_Model):
     
@@ -18,6 +18,7 @@ class NdbModel(_Model):
         """returns an dict object which is convenient for Google Visualization API
            See https://developers.google.com/chart/interactive/docs/reference
         """
+        assert isinstance(_columns, Columns)
         c_val = []
         for column in _columns:
             assert isinstance(column, Column)

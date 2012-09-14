@@ -18,7 +18,7 @@ class Column(dict):
         assert isinstance(column_label, unicode) or column_label is None
         assert isinstance(column_type, unicode) or column_type is None
         self["id"] = column_id
-        self["label"] = column_label if column_label else id
+        self["label"] = column_label if column_label else column_id
         self["type"] = column_type if column_type else "string"
 
     def getId(self):
@@ -76,5 +76,6 @@ class Columns(list):
         return labels
     
     def getDataTableCols(self):
-        return self._columns
+        return self
+
 
