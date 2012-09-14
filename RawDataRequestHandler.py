@@ -29,19 +29,20 @@ class RawDataRequestHandler(MyRequestHandler):
         
 class RawDataCached(MyRequestHandler):
     def get(self):
+        MEMCACHE_KEY = "yw4ct7ntqzh93ioqaxif"
         path_info = self.request.path_info.split("/")
         debug("PATH_INFO = %s" % path_info)
         client = memcache.Client()
         LIMIT = 100
 
         if len(self.request.get("clear")) != 0:
-            client.delete("key_list")
+            client.delete(MEMCACHE_KEY)
             
         template_values = {}
         template_values["all_raw_data"] = []
 
         
-        old_key_list = client.get("key_list")
+        old_key_list = client.get(MEMCACHE_KEY)
         if old_key_list is None:
             old_key_list = []
             query = Query(RawData, keys_only=True)
@@ -56,7 +57,7 @@ class RawDataCached(MyRequestHandler):
             
             all_key_list = new_key_list + old_key_list
             all_key_list = all_key_list[:LIMIT]
-            client.set("key_list", all_key_list, 15)
+            client.set(MEMCACHE_KEY, all_key_list, 15)
         else:
             all_key_list = old_key_list
 
