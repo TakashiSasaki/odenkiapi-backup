@@ -498,17 +498,26 @@ class JsonRpcDispatcher(RequestHandler):
         if self.request.get("format") == "DataTable":
             self._writeDataTable(json_rpc_response)
             return
-        if self.request.get("callback"):
-            self._writeJsonP(json_rpc_response)
-            return
         self._writeJson(json_rpc_response)
     
     def _writeJson(self, json_rpc_response):
         assert isinstance(json_rpc_response, JsonRpcResponse)
         assert isinstance(json_rpc_response, dict)
         self.response.content_type = "application/json"
+        json_string = dumps(json_rpc_response)
+        callback = self.request.get("callback")
+        if callback:
+            self.response.out.write("%s=(%s)" %(callback, json_string))
+            return
         self.response.out.write(dumps(json_rpc_response))
         return
+
+#    def _writeJsonP(self, json_rpc_response):
+#        result = json_rpc_response.getResult()
+#        if not isinstance(result, dict) or not isinstance(result, list):
+#            raise RuntimeError("result is neither dict or list")
+#        self.response.out.write(dumps(result))
+#        self.response.content_type = "application/javascript"
     
     def _writeCsv(self, json_rpc_response, dialect=csv.excel, content_type="text/csv"):
         assert isinstance(json_rpc_response, JsonRpcResponse)
@@ -536,14 +545,7 @@ class JsonRpcDispatcher(RequestHandler):
         self.response.content_type = content_type
     
     def _writeTsv(self, json_rpc_response):
-        self._writeCsv(json_rpc_response, dialect=csv.excel_tab, content_type="application/vnd.ms-excel")
-        
-    def _writeJsonP(self, json_rpc_response):
-        result = json_rpc_response.getResult()
-        if not isinstance(result, dict) or not isinstance(result, list):
-            raise RuntimeError("result is neither dict or list")
-        self.response.out.write(dumps(result))
-        self.response.content_type = "application/javascript"
+        self._writeCsv(json_rpc_response, dialect=csv.excel_tab, content_type="application/vnd.ms-excel")        
         
     def _writeDataTable(self, jresponse):
         debug("format=DataTable")
