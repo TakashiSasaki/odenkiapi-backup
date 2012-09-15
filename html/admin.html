@@ -18,11 +18,12 @@
                 <h1><img width="40px" height="40px" src="https://twimg0-a.akamaihd.net/profile_images/1522990803/___________reasonably_small.png"></img> みんなでおでんき管理用 <img width="40px" height="40px" src="https://twimg0-a.akamaihd.net/profile_images/1522990803/___________reasonably_small.png"></img></h1>
             </div>
             <div data-role="collapsible" id="echo">
-         		<h1>echoチェック （サーバに対する死活確認）</h1>
-       	    	<pre id="echo">x</pre>
+         		<h1>echoチェック （サーバに対する死活確認）取得時刻<span class="time">なし</span></h1>
+       	    	<div><pre>なし</pre></div>
             </div>
 			<script>
 				function onExpandEcho(){
+					$("#echo .time").text(new Date());
 			   		$.ajax({
 						url: "/api/echo?id=1",
 						dataType: "text",
@@ -30,13 +31,37 @@
 							$("#echo pre").text(data);
 							$("#echo pre").css("background", "palegreen");
 						},
-						fail: function(data){alert(2);
+						fail: function(data){
 							$("#echo pre").text(data);
 							$("#echo pre").css("background", "salmon");
 						}
 					});
+					window.setTimeout(onExpandEcho, 10000);
 				}
 				$("#echo").bind("expand", onExpandEcho);
+			</script>
+			<div data-role="collapsible" id="rawData">
+				<h1>RawData 取得時刻<span class="time">なし</span></h1>
+				<div><pre></pre></div>
+			</div>
+			<script>
+				function onExpandRawData(){
+					$("#rawData .time").text(new Date());
+					$.ajax({
+						url: "/record/RawData",
+						dataType: "text",
+						success: function(data){
+							$("#rawData pre").text(data);
+							$("#rawData pre").css("background", "palegreen");
+						},
+						fail: function(data){
+							$("#rawData pre").text(data);
+							$("#rawData pre").css("background", "salmon");
+						}
+					});
+					window.setTimeout(onExpandRawData, 10000);
+				}
+				$("#rawData").bind("expand", onExpandRawData);
 			</script>
         </div>
         <script src="../js/dummy.js"></script>
