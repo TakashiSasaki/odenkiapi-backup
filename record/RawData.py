@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, print_function
-from lib.gae import JsonRpcDispatcher, JsonRpcResponse, JsonRpcRequest, run_wsgi_app
+from lib.gae import JsonRpcDispatcher, run_wsgi_app
+from lib.json import JsonRpcRequest, JsonRpcResponse
 from model.RawDataNdb import RawData
 from model.MetadataNdb import Metadata
 from google.appengine.api import memcache

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, print_function
-from logging import debug,info
+from logging import debug, info
 from lib.util import Singleton
 from _pyio import __metaclass__
 
@@ -77,5 +77,3 @@ class Columns(list):
     
     def getDataTableCols(self):
         return self
-
-

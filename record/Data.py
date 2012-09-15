@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, print_function
-from lib.gae import *
+from lib.gae import JsonRpcDispatcher
+from lib.json import JsonRpcRequest, JsonRpcResponse, JsonRpcError
 from urlparse import urlparse
 from model.DataNdb import Data, getCanonicalData
 from model.UnusedDataEliminator import UnusedDataEliminator
@@ -171,5 +172,5 @@ if __name__ == "__main__":
     mapping.append(("/record/Data/UnusedDataEliminator/[0-9]+/[0-9]+", _DeleteUnused))
     mapping.append(("/record/Data/[^/]+", _ByField))
     mapping.append(("/record/Data/[^/]+/[^/]+", _ByFieldAndString))
-    application = WSGIApplication(mapping, debug=True)
-    run_wsgi_app(application)
+    from lib.gae import run_wsgi_app
+    run_wsgi_app(mapping)

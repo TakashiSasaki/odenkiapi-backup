@@ -8,10 +8,7 @@ from google.appengine.ext import db
 from logging import debug
 from model.Columns import Columns
 
-from json import dumps as _dumps
 from model.NdbModel import NdbModel
-def dumps(d):
-    return _dumps(d, indent=4, cls=JSONEncoder)
 
 class JSONEncoder(_JSONEncoder):
     def default(self, o):

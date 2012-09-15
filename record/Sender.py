@@ -1,4 +1,5 @@
-from lib.gae import *
+from lib.gae import JsonRpcDispatcher
+from lib.json import JsonRpcRequest, JsonRpcResponse, JsonRpcError
 from model.SenderNdb import Sender
 
 class _Range(JsonRpcDispatcher):
@@ -44,5 +45,5 @@ if __name__ == "__main__":
     mapping = []
     mapping.append(('/record/Sender/[0-9]+/[0-9]+', _Range))
     mapping.append(('/record/Sender', _Recent))
-    application = WSGIApplication(mapping)
-    run_wsgi_app(application)
+    from lib.gae import run_wsgi_app
+    run_wsgi_app(mapping)

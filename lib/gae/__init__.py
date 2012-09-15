@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, print_function
 #def runWsgiApp(request_handler, path=None):
 #    """a wrapper to run single RequestHandler."""
 #    from google.appengine.ext.webapp import WSGIApplication
@@ -28,5 +29,4 @@ RPC_ERROR_USER_AGENT_DOES_NOT_ACCEPT_HTML = 1
 #from DateTimeUtil import toRfcFormat, fromRfcFormat, getIfModifiedSince, getNow
 #from MethodsHandler import MethodsHandler
 #from OdenkiSession import OdenkiSession
-from JsonRpc import JsonRpcDispatcher, JsonRpcError, JsonRpcRequest, JsonRpcResponse
-
+from JsonRpcDispatcher import JsonRpcDispatcher

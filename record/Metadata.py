@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, print_function
-from lib.gae import JsonRpcDispatcher, JsonRpcRequest, JsonRpcResponse, JsonRpcError
+from lib.gae import JsonRpcDispatcher
+from lib.json import JsonRpcRequest, JsonRpcResponse, JsonRpcError
 from model.MetadataNdb import Metadata as MetadataNdb
 from model.MetadataNdb import Canonicalizer
 from model.Metadata import Metadata as MetadataDb
