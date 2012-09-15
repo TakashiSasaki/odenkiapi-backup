@@ -5,6 +5,16 @@ from model.Counter import Counter
 #from json import dumps
 from logging import debug
 from model.NdbModel import NdbModel
+from model.Columns import Columns
+
+class RawDataColumns(Columns):
+    def __init__(self):
+        self.addNumber("rawDataId")
+        self.addString("path")
+        self.addString("parameters")
+        self.addString("query")
+        self.addString("fragment")
+        self.addBoolean("body")
 
 class RawData(NdbModel):
     rawDataId = ndb.IntegerProperty()

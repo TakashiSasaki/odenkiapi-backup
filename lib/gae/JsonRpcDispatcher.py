@@ -65,7 +65,7 @@ class JsonRpcDispatcher(RequestHandler):
         assert isinstance(json_rpc_request, JsonRpcRequest)
         json_rpc_response = JsonRpcResponse(json_rpc_request.getId())
         x = self.methodList[method_name](self, json_rpc_request, json_rpc_response)
-        assert x is None
+        if x: warn("dispatched method need not return an object of JsonRpcResponse.")
         return json_rpc_response
     
     def get(self, *args):
