@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, print_function
 from warnings import warn
-from lib.json import JsonRpcError
+from JsonRpcError import JsonRpcError
 
 class JsonRpcResponse(dict):
     """Each JSON-RPC method should return JsonRpcResponse object.

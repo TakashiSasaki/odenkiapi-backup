@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, print_function
 from google.appengine.ext.webapp import Request
 from logging import error, debug
-from lib.json import JsonRpcError
+from JsonRpcError import JsonRpcError
 from encodings.base64_codec import base64_decode
 from json import loads
 

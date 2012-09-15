@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, print_function
 from logging import debug 
 from lib.gae import JsonRpcDispatcher, run_wsgi_app
-from lib.json import JsonRpcRequest, JsonRpcResponse, JsonRpcError
+from lib.json import JsonRpcRequest, JsonRpcResponse
+from lib.json.JsonRpcError import JsonRpcError
 from model.DataNdb import Data
 from google.appengine.ext import ndb
 from model.MetadataNdb import Metadata
@@ -73,8 +74,9 @@ class _Recent(JsonRpcDispatcher):
         jresponse.setId()
         try:
             arduinoid = unicode(jrequest.getPathInfo(3))
+            debug("arduinoid = %s" % arduinoid)
             data_keys = Data.fetchByFieldAndString("arduinoid", arduinoid)
-            assert data_keys
+            debug("data_keys = %s" % data_keys)
         except Exception, e:
             jresponse.setErrorInvalidParameter(e)
             return
