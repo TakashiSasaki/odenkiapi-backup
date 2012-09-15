@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, print_function
 from logging import debug
 import cgi
-from lib.JsonEncoder import dumps
+from lib.json import dumps
 from model.RawData import RawData
 from MyRequestHandler import MyRequestHandler
 from google.appengine.ext.db import Query, GqlQuery

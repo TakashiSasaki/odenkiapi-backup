@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, print_function
-from lib.gae import JsonRpcDispatcher, JsonRpcRequest, JsonRpcResponse, run_wsgi_app
+from lib.gae import JsonRpcDispatcher, run_wsgi_app
+from lib.json import JsonRpcRequest, JsonRpcResponse
 from logging import debug
 
 class Echo(JsonRpcDispatcher):
