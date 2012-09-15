@@ -41,7 +41,8 @@ class _OneDay(JsonRpcDispatcher):
             day = int(jrequest.getPathInfo(6))
             hour = int(jrequest.getPathInfo(7))
         except Exception, e:
-            jresponse.setError(JsonRpcError.INVALID_REQUEST, "Try /record/Arduino/<arduinoid>/<year>/<month>/<day> %s." % e.message())
+            jresponse.setError(JsonRpcError.INVALID_REQUEST,
+                               "Try /record/Arduino/<arduinoid>/<year>/<month>/<day> %s." % e.message())
             return
         
         try:
