@@ -9,6 +9,19 @@ from model.MetadataNdb import Metadata
 from google.appengine.api.memcache import Client
 from datetime import datetime, timedelta
 
+context = ndb.get_context()
+assert isinstance(context, ndb.Context)
+context.set_datastore_policy(lambda key: key.kind() != "Arduino")
+
+class Arduino(ndb.Model):
+    receivedDateTime = ndb.DateTimeProperty(indexed=False)
+    time = ndb.DateTimeProperty(indexed=False)
+    genPowerWatt = ndb.FloatProperty(indexed=False)
+    
+    
+    
+#    ", "time", "gen.power(W)", "duration"
+
 def _getDataListByArduinoId(arduino_id):
     arduino_id = unicode(arduino_id)
     MEMCACHE_KEY = "kjasnbargasenanviajfiafjjoi" + arduino_id

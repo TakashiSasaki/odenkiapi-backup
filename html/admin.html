@@ -4,36 +4,19 @@
         <title>みんなでおでんき管理用</title>
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="../css/odenki-theme.min.css" />
-        <!--<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css" />-->
-        <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css"/>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
         <!--<script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>-->
         <script src="http://ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
         <script src="../js/jquery.json-2.3.min.js"></script>
+        <link rel="stylesheet" href="../css/odenki-theme.min.css" />
+        <!--<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css" />-->
+        <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css"/>
     </head>
     <body>
-        <div data-role="page">
+        <div data-role="page"　id="pageTop">
             <div data-role="header" data-position="inline" data-theme="e" >
                 <h1><img width="40px" height="40px" src="https://twimg0-a.akamaihd.net/profile_images/1522990803/___________reasonably_small.png"></img> みんなでおでんき管理用 <img width="40px" height="40px" src="https://twimg0-a.akamaihd.net/profile_images/1522990803/___________reasonably_small.png"></img></h1>
             </div>
-            <div data-role="fieldcontain">
-            	<label for="versionString">バージョン</label>
-	            <input name="versionString" id="versionString" size="10" data-mini="true"/>
-	            <label for="timeStampString">更新日時</label>
-	            <input name="timeStampString" id="timeStampString" size="10" data-mini="true"/>
-            </div>
-            <script>
-			   		$.ajax({
-						url: "/api/version",
-						dataType: "json",
-						success: function(data){
-							$("#versionString").val(data.result.versionString);
-							$("#timeStampString").val(data.result.timeStampString);
-							//$("#version").text(data);
-						}
-					});
-            </script>
             <div data-role="collapsible" id="echo">
          		<h1>echoチェック （サーバに対する死活確認）取得時刻<span class="time">なし</span></h1>
        	    	<div><pre>なし</pre></div>
@@ -80,6 +63,45 @@
 				}
 				$("#rawData").bind("expand", onExpandRawData);
 			</script>
+			<div data-role="collapsible" id="rawDataTable">
+				<h1>RawData 取得時刻<span class="time">なし</span></h1>
+				<div class="table"></div>
+			</div>
+			<script>
+				function onExpandRawDataTable(){
+					$("#rawDataTable .time").text(new Date());
+					$.ajax({
+						url: "/record/RawData?format=DataTable",
+						dataType: "text",
+						success: function(data){
+							$("#rawDataTable .table").text(data);
+						},
+						fail: function(data){
+							$("#rawDataTable .table").text("取得できません");
+							$("#rawDataTable pre").css("background", "salmon");
+						}
+					});
+					window.setTimeout(onExpandRawData, 10000);
+				}
+				$("#rawDataTable").bind("expand", onExpandRawDataTable);
+			</script>
+	        <div data-role="fieldcontain">
+	        	<label for="versionString">バージョン</label>
+	            <input name="versionString" id="versionString" size="10" data-mini="true"/>
+	            <label for="timeStampString">更新日時</label>
+	            <input name="timeStampString" id="timeStampString" size="10" data-mini="true"/>
+	        </div>
+	        <script>
+			   		$.ajax({
+						url: "/api/version",
+						dataType: "json",
+						success: function(data){
+							$("#versionString").val(data.result.versionString);
+							$("#timeStampString").val(data.result.timeStampString);
+							//$("#version").text(data);
+						}
+					});
+	        </script>
         </div>
         <script src="../js/dummy.js"></script>
         <!--
@@ -95,5 +117,13 @@
         <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/tags/markermanager/1.0/src/markermanager.js"></script>
         <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer_compiled.js"></script>
         -->
+        <script>
+			google.setOnLoadCallback(function(){
+				//ページがロードされたあとこれが実行される
+			});
+			$('#pageTop').live('pagecreate', function(){
+				//ページがロードされたあとこれが実行される
+			});
+        </script>
     </body>
 </html>

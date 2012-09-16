@@ -115,9 +115,10 @@ handlers:
   
 - url: /MyRequestHandler*
   script: MyRequestHandler.py
+
 - url: /
-  static_files: html/top.html
-  upload: html/top.html
+  static_files: html/main.html
+  upload: html/main.html
 
 - url: /RawData
   script: RawDataRequestHandler.py

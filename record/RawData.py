@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, print_function
 from lib.gae import JsonRpcDispatcher, run_wsgi_app
 from lib.json import JsonRpcRequest, JsonRpcResponse
-from model.RawDataNdb import RawData
+from model.RawDataNdb import RawData, RawDataColumns
 from model.MetadataNdb import Metadata
 from google.appengine.api import memcache
 from logging import debug
@@ -33,6 +33,7 @@ class _Range(JsonRpcDispatcher):
             raw_data = key.get()
             assert isinstance(raw_data, RawData)
             jresponse.addResult(raw_data)
+        jresponse.setColumns(RawDataColumns())
         
 class _Recent(JsonRpcDispatcher):
     MEMCACHE_KEY = "2nanjjkzvxnzfdyiwjbdkj8yiqlkj78ghdkhzd"
@@ -54,6 +55,7 @@ class _Recent(JsonRpcDispatcher):
             raw_data = key.get()
             assert isinstance(raw_data, RawData)
             jresponse.addResult(raw_data)
+        jresponse.setColumns(RawDataColumns())
         
         jresponse.setExtraValue("__name__", __name__)
         jresponse.setExtraValue("__package__", __package__)
