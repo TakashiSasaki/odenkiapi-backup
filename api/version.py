@@ -1,6 +1,7 @@
 #from lib.CachedContent import CachedContent
 from datetime import datetime
-from lib.gae import JsonRpcDispatcher, JsonRpcResponse, run_wsgi_app
+from lib.gae import JsonRpcDispatcher, run_wsgi_app
+from lib.json import JsonRpcResponse
 
 class _Version(JsonRpcDispatcher):
     

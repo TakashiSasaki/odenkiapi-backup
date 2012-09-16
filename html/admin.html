@@ -17,6 +17,23 @@
             <div data-role="header" data-position="inline" data-theme="e" >
                 <h1><img width="40px" height="40px" src="https://twimg0-a.akamaihd.net/profile_images/1522990803/___________reasonably_small.png"></img> みんなでおでんき管理用 <img width="40px" height="40px" src="https://twimg0-a.akamaihd.net/profile_images/1522990803/___________reasonably_small.png"></img></h1>
             </div>
+            <div data-role="fieldcontain">
+            	<label for="versionString">バージョン</label>
+	            <input name="versionString" id="versionString" size="10" data-mini="true"/>
+	            <label for="timeStampString">更新日時</label>
+	            <input name="timeStampString" id="timeStampString" size="10" data-mini="true"/>
+            </div>
+            <script>
+			   		$.ajax({
+						url: "/api/version",
+						dataType: "json",
+						success: function(data){
+							$("#versionString").val(data.result.versionString);
+							$("#timeStampString").val(data.result.timeStampString);
+							//$("#version").text(data);
+						}
+					});
+            </script>
             <div data-role="collapsible" id="echo">
          		<h1>echoチェック （サーバに対する死活確認）取得時刻<span class="time">なし</span></h1>
        	    	<div><pre>なし</pre></div>
