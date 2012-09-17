@@ -17,7 +17,10 @@ class Arduino(ndb.Model):
     receivedDateTime = ndb.DateTimeProperty(indexed=False)
     time = ndb.DateTimeProperty(indexed=False)
     genPowerWatt = ndb.FloatProperty(indexed=False)
+    duration = ndb.FloatProperty(indexed=False)
     
+    def __init__(self, metadata_key):
+        assert 
     
     
 #    ", "time", "gen.power(W)", "duration"
