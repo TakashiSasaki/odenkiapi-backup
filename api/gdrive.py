@@ -6,14 +6,13 @@ from lib.GoogleAuthState import GoogleAuthSession
 from gdata.gauth import OAuthHmacToken, ACCESS_TOKEN, AUTHORIZED_REQUEST_TOKEN, REQUEST_TOKEN
 
 from google.appengine.api.users import User
-#from google.appengine.api import users
 #from gdata.docs.data import ResourceFeed, Resource
 from credentials import GOOGLE_OAUTH_CONSUMER_KEY, GOOGLE_OAUTH_CONSUMER_SECRET
 from gdata.gauth import AeSave, AeLoad, AuthorizeRequestToken, AeDelete
 #from gdata.client import Unauthorized
 from gdata.docs.client import DocsClient
-#from google.appengine.ext.db import Model, StringProperty, IntegerProperty
-from lib.gae import JsonRpcDispatcher, JsonRpcError, JsonRpcRequest, JsonRpcResponse 
+from lib.gae import JsonRpcDispatcher
+from lib.json import JsonRpcError, JsonRpcRequest, JsonRpcResponse 
 
 SCOPE_CALENDER = 'https://www.google.com/calendar/feeds/'
 SCOPE_DOCS_LIST = 'https://docs.google.com/feeds/'
