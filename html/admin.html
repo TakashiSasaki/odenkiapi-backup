@@ -102,10 +102,53 @@
 						}
 					});
 	        </script>
+	        <div data-role="fieldcotains">
+	        	管理者モード
+	        	<select data-role="slider" id="sliderAdminMode">
+	        		<option value="off">Off</option>
+	        		<option value="on">On</option>
+	        	</select>
+        	</div>
+        	<script>
+        		$("#sliderAdminMode").bind("change", sliderAdminMode);
+        		$("#sliderAdminMode").slider({
+        			create : sliderAdminMode
+        		});
+        		function sliderAdminMode(event, ui){
+			   		$.ajax({
+						url: "/api/admin/mode?method=" + event.type + "&mode=" + ui.value,
+						dataType: "json",
+						success: function(data){
+							if(data.error){
+								event.target.slider({disabled:true});
+								event.target.slider("refresh");
+								return;	
+							}
+							if(data.result){
+								event.target.slider(data.result.mode);
+								event.target.slider('refresh');
+								return;
+							}
+						},
+						fail: function(data){
+							// HTTP status 4xx or 5xx
+						}
+					});
+				}
+        	</script>
         </div>
         <script src="../js/dummy.js"></script>
-        <!--
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script>
+			google.setOnLoadCallback(function(){
+				//ページがロードされたあとこれが実行される
+				//googleという名前空間はこの直上の jsapi でロードされる
+			});
+			$('#pageTop').live('pagecreate', function(){
+				//ページがロードされたあとこれが実行される
+			});
+        </script>
+        <!--
         <script type="text/javascript">
             google.load("visualization", "1", {
                 packages : ["corechart", 'table']
@@ -117,13 +160,5 @@
         <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/tags/markermanager/1.0/src/markermanager.js"></script>
         <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer_compiled.js"></script>
         -->
-        <script>
-			google.setOnLoadCallback(function(){
-				//ページがロードされたあとこれが実行される
-			});
-			$('#pageTop').live('pagecreate', function(){
-				//ページがロードされたあとこれが実行される
-			});
-        </script>
     </body>
 </html>
