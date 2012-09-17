@@ -12,8 +12,17 @@ class AdminMode(JsonRpcDispatcher):
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
         jresponse.setResult({"mode": "enabled"})
-        #debug(users)
-        #debug(dir(users))
+        user = users.get_current_user()
+        jresponse.setResultValue("login_url", users.create_login_url("/api/admin/mode"))
+        jresponse.setResultValue("logout_url", users.create_logout_url("/api/admin/mode"))
+        if user:
+            jresponse.setResultValue("user_id", user.user_id())
+            jresponse.setResultValue("email", user.email())
+            jresponse.setResultValue("nickname", user.nickname())
+        else:
+            jresponse.setResultValue("user_id", None)
+            jresponse.setResultValue("email", None)
+            jresponse.setResultValue("nickname", None)
         
     def slidecreate(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
