@@ -1,5 +1,11 @@
 # this code was from https://github.com/dound/gae-sessions/blob/master/README.markdown
 from __future__ import unicode_literals, print_function
+import logging as _logging
+_logging.getLogger().setLevel(_logging.DEBUG)
+
+import sys as _sys
+_sys.setrecursionlimit = 5
+
 def webapp_add_wsgi_middleware(app):
     from gaesessions import SessionMiddleware
     from credentials import SESSION_SALT
