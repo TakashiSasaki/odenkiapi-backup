@@ -19,22 +19,24 @@
 			<div data-role="header" id="header"></div>
 			<div data-role="navbar" id="navbar"></div>
 			<div data-role="content"></div>
-			<p>
-				みんなでおでんきではTwitterアカウント、Googleアカウントまたはメールアドレスとパスワードの組み合わせのいずれでもログインできます。
-			</p>
 			<table style="display: none" id="setEmail">
 				<tr>
-					<td>メールアドレスが設定されていません。</td>
+					<td>登録するメールアドレスを入力してください。メールアドレスはログイン時にユーザーIDとして使われます。
+					各種の表示に際しては後に設定するニックネームが使われます。</td>
 				</tr>
 				<tr>
 					<td>
-					<input type="email" placeholder="メールアドレス" id="email">
+					<input type="email" placeholder="sample@example.com" id="email">
 					</input></td>
 				</tr>
 				<tr>
 					<td>
 					<input type="button" onclick="setEmail();" value="登録のためのメールを送信する">
 					</input></td>
+				</tr>
+				<tr>
+					<td> みんなでおでんきではメールアドレスとパスワードの組み合わせのほか、
+					TwitterアカウントおよびGoogleアカウントでもログインできます。 </td>
 				</tr>
 			</table>
 			<script>

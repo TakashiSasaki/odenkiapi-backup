@@ -38,7 +38,7 @@ var c = '<li>\
 		</li>';
 		
 var d = '<li>\
-			<a href="auth/index.html"   data-ajax="false"   data-icon="gear" >\
+			<a href="/auth/index.html"   data-ajax="false"   data-icon="gear" >\
 				<div class="ui-bar-d">\
 					設定\
 				</div>\
