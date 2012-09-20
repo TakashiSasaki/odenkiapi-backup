@@ -12,9 +12,13 @@
 	</head>
 	<body>
 		<div data-role="page">
-			<div>
-				<iframe src="/html/iframe/LoginStatus.html" width="100%" height="40px" seamless="true"></iframe>
+			<!--<div>
+			<iframe src="/html/iframe/LoginStatus.html" width="100%" height="40px" seamless="true"></iframe>
 			</div>
+			-->
+			<div data-role="header" id="header"></div>
+			<div data-role="navbar" id="navbar"></div>
+			<div data-role="content"></div>
 			<p>
 				みんなでおでんきではTwitterアカウント、Googleアカウントまたはメールアドレスとパスワードの組み合わせのいずれでもログインできます。
 			</p>
@@ -138,7 +142,11 @@
 				}
 			</script>
 		</div>
+		</div>
+		<script src="/js/header.js"></script>
 		<script>
+			header("#header");
+			navbar("#navbar");
 			function showAll() {
 				$("table").each(function() {
 					$(this).css("display", "block");
