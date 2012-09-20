@@ -13,35 +13,39 @@ function header(selector){
 	');
 }
 
-function navbar(selector){
-	$(selector).html('\
-			<div data-role="navbar">\
-				<ul>\
-					<li>\
-						<a href="main.html"   data-ajax="false"   data-icon="home" >\
-						<div class="ui-bar-a">\
-							みんなのおでんき\
-						</div></a>\
-					</li>\
-					<li >\
-						<a href="community.html"   data-ajax="false"   data-icon="star" >\
-						<div class="ui-bar-b">\
-							なかまのおでんき\
-						</div></a>\
-					</li>\
-					<li>\
-						<a href="myself.html"   data-ajax="false"   data-icon="info" class="ui-btn-active">\
-						<div class="ui-bar-c">\
-							マイおでんき\
-						</div></a>\
-					</li>\
-					<!--<li>\
-					<a href="input.html"   data-ajax="false"   data-icon="gear" >\
-					<div class="ui-bar-d">\
+var a = '<li>\
+			<a href="main.html"   data-ajax="false"   data-icon="home" >\
+				<div class="ui-bar-a">\
+					みんなのおでんき\
+				</div>\
+			</a>\
+	</li>';
+
+var b = '<li >\
+			<a href="community.html"   data-ajax="false"   data-icon="star" >\
+				<div class="ui-bar-b">\
+					なかまのおでんき\
+				</div>\
+			</a>\
+		</li>';
+
+var c = '<li>\
+			<a href="myself.html"   data-ajax="false"   data-icon="info">\
+				<div class="ui-bar-c">\
+					マイおでんき\
+				</div>\
+			</a>\
+		</li>';
+		
+var d = '<li>\
+			<a href="auth/index.html"   data-ajax="false"   data-icon="gear" >\
+				<div class="ui-bar-d">\
 					入力\
-					</div></a>\
-					</li>-->\
-				</ul>\
-			</div>\
-	');
+				</div>\
+			</a>\
+		</li>';
+
+function navbar(active){
+	$("#navbar").html('<div data-role="navbar"><ul>'+a+b+c+d+'</ul></div>');
+	$(".ui-bar-"+active).closest("a").addClass("ui-btn-active");
 }
