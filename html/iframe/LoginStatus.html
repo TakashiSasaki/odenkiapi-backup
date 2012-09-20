@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>ログイン状態</title>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+		<script src="/js/jquery.json-2.3.min.js"></script>
+		<script src="//ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+		<link rel="stylesheet" href="/css/odenki-theme.min.css" />
+		<link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css"/>
+	</head>
+	<body>
+		<div data-role="collapsible" data-collapsed="false" class="top">
+			<h1>ログイン状態</h1>
+			<table>
+				<tr>
+					<td><span id="odenkiName">ニックネーム取得中</span>(<span id="odenkiId">ID取得中</span>) </td>
+					<td id="twitter"></td>
+					<td id="google"></td>
+					<td id="email"></td>
+					<td id="admin"></td>
+				</tr>
+			</table>
+		</div>
+		<script>
+			function onLoad(ev, ui) {
+				$.ajax({
+					url : "/api/LoginStatus",
+					dataType : "json",
+					success : function(data) {
+						$("#odenkiName").text(data.result.odenkiName);
+						$("#odenkiId").text(data.result.odeniId);
+						if (data.result.admin == true) {
+							$("#admin").text("管理者モード");
+						} else {
+							$("#admin").text("一般ユーザー");
+						}
+						if (data.result.twitter == true) {
+							$("#twitter").text("Twitter OK");
+						} else {
+							$("#twitter").text("Twitter NG");
+						}
+						if (data.result.google == true) {
+							$("#google").text("Google OK");
+						} else {
+							$("#google").text("Google NG");
+						}
+						if (data.result.email == true) {
+							$("#email").text("Email OK");
+						} else {
+							$("#email").text("Email NG");
+						}
+					},
+					error : function(data) {
+						$("#odenkiName").text("ニックネーム取得失敗");
+						$("#odenkiId").text("ID取得失敗");
+						$("table").css("background", "salmon");
+					}
+				});
+			}//ajax
+
+			//alert("before setTimeout");
+			//window.setTimeout(function(){alert("setTimeout");}, 500);
+			$("div .top").collapsible({
+				create : onLoad
+			});
+		</script>
+	</body>
+</html>
