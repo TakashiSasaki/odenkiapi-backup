@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>バージョン情報</title>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+		<script src="/js/jquery.json-2.3.min.js"></script>
+		<script src="//ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+		<link rel="stylesheet" href="/css/odenki-theme.min.css" />
+		<link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css"/>
+	</head>
+	<body>
+		<div data-role="collapsible" data-collapsed="false">
+			<h1>みんなでおでんきサーバのバージョンと更新日時</h1>
+			<table>
+				<tr>
+					<td>バージョン</td>
+					<td><span id="versionString">まだ取得していません</span></td>
+				</tr>
+				<tr>
+					<td>更新日時</td>
+					<td><span id="timeStampString">まだ取得していません</span></td>
+				</tr>
+			</table>
+
+		</div>
+		<script>
+			function onLoad() {
+				$("h1 .time").text(new Date());
+				$.ajax({
+					url : "/api/version",
+					dataType : "json",
+					success : function(data) {
+						$("#versionString").text(data.result.versionString);
+						$("#timeStampString").text(data.result.timeStampString);
+						$("table").css("background", "palegreen");
+					},
+					fail : function(data) {
+						$("#versionString").text(取得できませんでした);
+						$("#timeStampString").text(取得できませんでした);
+						$("table").css("background", "salmon");
+					}
+				});
+			}
+
+
+			window.setTimeout(onLoad, 500);
+		</script>
+	</body>
+</html>
+
