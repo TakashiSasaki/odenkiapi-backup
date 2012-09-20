@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>バージョン情報</title>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+		<script src="../js/jquery.json-2.3.min.js"></script>
+	</head>
+	<body>
+		<h1>echoチェック （サーバに対する死活確認）取得時刻<span class="time">なし</span></h1>
+		<div>
+			<pre>サーバからの応答がまだ返ってきていません。</pre>
+		</div>
+		<script>
+			function onLoad() {
+				$("h1 .time").text(new Date());
+				$.ajax({
+					url : "/api/echo?id=1",
+					dataType : "text",
+					success : function(data) {
+						$("pre").text(data);
+						$("pre").css("background", "palegreen");
+					},
+					fail : function(data) {
+						$("pre").text(data);
+						$("pre").css("background", "salmon");
+					}
+				});
+			}
+
+
+			window.setTimeout(onLoad, 500);
+		</script>
+	</body>
+</html>
