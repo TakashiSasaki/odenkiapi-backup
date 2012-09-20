@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>ログイン状態</title>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+		<script src="/js/jquery.json-2.3.min.js"></script>
+		<script src="//ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+		<link rel="stylesheet" href="/css/odenki-theme.min.css" />
+		<link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css"/>
+	</head>
+	<body>
+		<div data-role="page">
+			<div>
+				<iframe src="/html/iframe/LoginStatus.html" width="100%" height="40px" seamless="true"></iframe>
+			</div>
+			<p>
+				みんなでおでんきではTwitterアカウント、Googleアカウントまたはメールアドレスとパスワードの組み合わせのいずれでもログインできます。
+			</p>
+			<table style="display: none" id="setEmail">
+				<tr>
+					<td>メールアドレスが設定されていません。</td>
+				</tr>
+				<tr>
+					<td>
+					<input type="email" placeholder="メールアドレス" id="email">
+					</input></td>
+				</tr>
+				<tr>
+					<td>
+					<input type="button" onclick="setEmail();" value="登録のためのメールを送信する">
+					</input></td>
+				</tr>
+			</table>
+			<script>
+				function setEmail() {
+					hideAll();
+					$("#sentEmail").css("display", "block");
+					$.ajax({
+						url : "/api/Email?method=setEmail",
+						data : {
+							email : $("#email").val()
+						},
+						dataType : "json",
+						success : function(data) {
+							//$("#sentEmail").css("display", "block");
+						},
+						error : function(data) {
+							//$("#error").css("display", "block");
+						}
+					});
+				}
+			</script>
+			<table style="display:none" id="sentEmail">
+				<tr>
+					<td>確認のためにメールを送信しました。登録を完了するにはメールに書かれている内容をご確認の上、
+					メールに記載されている登録用ページを開いて下さい。</td>
+				</tr>
+				<tr>
+					<td>
+					<input type="button" onclick="startOver();" value="メールアドレスの登録をやりなおす">
+					</input></td>
+				</tr>
+			</table>
+			<table style="display:none" id="setPassword">
+				<tr>
+					<td>メールアドレス</td>
+					<td id="emailAddress"></td>
+				</tr>
+				<tr>
+					<td>新しいパスワード</td>
+					<td>
+					<input name="newPassword">
+					</input></td>
+				</tr>
+				<tr>
+					<td>新しいパスワード（確認）</td>
+					<td>
+					<input name="newPassword2" placeholder="確認のためもう一度入力して下さい">
+					</input></td>
+				</tr>
+				<tr>
+					<td colspan="2">
+					<input type="button" onclick="setPassword();" value="パスワードを設定する">
+					</input></td>
+				</tr>
+				<tr>
+					<td colspan="2">
+					<input type="button" onclick="startOver();" value="メールアドレスの登録をやりなおす">
+					</input></td>
+				</tr>
+			</table>
+			<script>
+				function setPassword() {
+					hideAll();
+					$("#setEmail").css("display", "block");
+					$.ajax({
+						url : "/api/Email",
+						dataType : "json",
+						success : function(data) {
+							$("#setEmail").text(data.result.setEmail);
+							$("#sendEmail").css("display", "block");
+						},
+						error : function(data) {
+							$("#error").css("display", "block");
+						}
+					});
+				}
+			</script>
+			<table id="error" style="display: none">
+				<tr>
+					<td>予期しないエラーが発生しました。</td>
+				</tr>
+				<tr>
+					<td>
+					<input type="button" onclick="startOver();" value="メールアドレスの登録をやりなおす">
+					</input></td>
+				</tr>
+			</table>
+			<script>
+				function startOver() {
+					hideAll();
+					$("#setEmail").css("display", "block");
+					$.ajax({
+						url : "/api/Email?method=startOver",
+						data : {
+							email : $("#email").val()
+						},
+						dataType : "json",
+						success : function(data) {
+							//$("#setEmail").css("visibility", "visible");
+						},
+						error : function(data) {
+							//$("#error").css("visibility", "visible");
+						}
+					});
+				}
+			</script>
+		</div>
+		<script>
+			function showAll() {
+				$("table").each(function() {
+					$(this).css("display", "block");
+					$(this).css("background", "lightgreen");
+					$(this).css("margin", "1px");
+				});
+			}
+
+			function hideAll() {
+				$("table").each(function() {
+					$(this).css("display", "none");
+					$(this).css("background", "lightgreen");
+					$(this).css("margin", "1px");
+				});
+			}
+
+
+			$.ajax({
+				url : "/api/Email",
+				dataType : "json",
+				success : function(data) {
+					if (!data.result.sentEmail) {
+						$("#sendEmail").css("display", "block");
+					} else {
+						$("#setEmail").css("display", "block");
+					}
+				},
+				error : function(data) {
+					$("#error").css("display", "block");
+				}
+			});
+		</script>
+	</body>
+</html>
