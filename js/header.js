@@ -40,7 +40,7 @@ var c = '<li>\
 var d = '<li>\
 			<a href="auth/index.html"   data-ajax="false"   data-icon="gear" >\
 				<div class="ui-bar-d">\
-					入力\
+					設定\
 				</div>\
 			</a>\
 		</li>';
