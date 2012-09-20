@@ -6,13 +6,8 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
 		<script src="/js/jquery.json-2.3.min.js"></script>
-		<script src="//ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
-		<link rel="stylesheet" href="/css/odenki-theme.min.css" />
-		<link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css"/>
 	</head>
 	<body>
-		<div data-role="collapsible" data-collapsed="false" class="top">
-			<h1>ログイン状態</h1>
 			<table>
 				<tr>
 					<td><span id="odenkiName">ニックネーム取得中</span>(<span id="odenkiId">ID取得中</span>) </td>
@@ -62,9 +57,10 @@
 
 			//alert("before setTimeout");
 			//window.setTimeout(function(){alert("setTimeout");}, 500);
-			$("div .top").collapsible({
-				create : onLoad
-			});
+			$(document).ready(onLoad);
+			//$("div .top").collapsible({
+			//	create : onLoad
+			//});
 		</script>
 	</body>
 </html>
