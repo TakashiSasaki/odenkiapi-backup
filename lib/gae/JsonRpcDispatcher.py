@@ -7,6 +7,7 @@ from model.Columns import Columns
 #__all__ = ["JsonRpcError", "JsonRpcRequest", "JsonRpcResponse", "JsonRpcDispatcher"]
 import logging as _logging
 from lib.json.JsonRpcError import JsonRpcException
+import gaesessions
 _logging.getLogger().setLevel(_logging.DEBUG)
 #from exceptions import Exception
 #from lib.JsonEncoder import dumps
@@ -69,6 +70,10 @@ class JsonRpcDispatcher(RequestHandler):
             x = self.methodList[method_name](self, json_rpc_request, json_rpc_response)
             if x: warn("dispatched method need not return an object of JsonRpcResponse.")
         except JsonRpcException, e:
+            from sys import exc_info
+            (etype, value, tb) = exc_info()
+            from traceback import print_exception
+            print_exception(etype, value, tb)
             json_rpc_response.setError(e.code, e.message, e.data)
         return json_rpc_response
     
