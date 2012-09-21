@@ -1,8 +1,8 @@
 function abcde(){
 	alert("abcde");
 }
-function header(selector){
-	$(selector).html('\
+function header(){
+	$("header").html('\
 <div data-role="header" data-position="inline" data-theme="e" >\
 <h1>\
 <img width="40px" height="40px" src="https://twimg0-a.akamaihd.net/profile_images/1522990803/___________reasonably_small.png"></img>\
