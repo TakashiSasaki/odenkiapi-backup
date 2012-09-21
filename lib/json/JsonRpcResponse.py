@@ -43,6 +43,8 @@ class JsonRpcResponse(dict):
         self.setError(JsonRpcError.INVALID_PARAMS, error_message)
     
     def setError(self, error_code, error_message=None, error_data=None):
+        if error_code is None:
+            error_code = JsonRpcError.SERVER_ERROR_RESERVED_MIN
         assert isinstance(error_code, int)
         assert isinstance(self, dict)
         if self.has_key("error"):

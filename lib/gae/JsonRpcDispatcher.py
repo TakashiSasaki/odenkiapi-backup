@@ -6,6 +6,7 @@ from model.Columns import Columns
 #from model.Command import getCommandById
 #__all__ = ["JsonRpcError", "JsonRpcRequest", "JsonRpcResponse", "JsonRpcDispatcher"]
 import logging as _logging
+from lib.json.JsonRpcError import JsonRpcException
 _logging.getLogger().setLevel(_logging.DEBUG)
 #from exceptions import Exception
 #from lib.JsonEncoder import dumps
@@ -64,8 +65,11 @@ class JsonRpcDispatcher(RequestHandler):
     def _invokeMethod(self, method_name, json_rpc_request):
         assert isinstance(json_rpc_request, JsonRpcRequest)
         json_rpc_response = JsonRpcResponse(json_rpc_request.getId())
-        x = self.methodList[method_name](self, json_rpc_request, json_rpc_response)
-        if x: warn("dispatched method need not return an object of JsonRpcResponse.")
+        try:
+            x = self.methodList[method_name](self, json_rpc_request, json_rpc_response)
+            if x: warn("dispatched method need not return an object of JsonRpcResponse.")
+        except JsonRpcException, e:
+            json_rpc_response.setError(e.code, e.message, e.data)
         return json_rpc_response
     
     def get(self, *args):
