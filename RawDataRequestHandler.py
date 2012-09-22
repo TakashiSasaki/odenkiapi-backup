@@ -1,3 +1,4 @@
+#!-*- coding:utf-8 -*-
 from __future__ import unicode_literals, print_function
 from logging import debug
 import cgi
@@ -104,7 +105,5 @@ if __name__ == "__main__":
     mapping.append(('/RawData', RawDataCached))
     mapping.append(('/RawData2', RawDataRequestHandler2))
     mapping.append(('/RawDataNonCached', RawDataRequestHandler))
-    from lib.gae import WSGIApplication
-    application = WSGIApplication(mapping)
     from lib.gae import run_wsgi_app
-    run_wsgi_app(application)
+    run_wsgi_app(mapping)

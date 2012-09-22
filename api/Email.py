@@ -1,9 +1,10 @@
+#!-*- coding:utf-8 -*-
 from __future__ import unicode_literals, print_function
 from lib.gae import JsonRpcDispatcher, run_wsgi_app
 from lib.json.JsonRpcRequest import JsonRpcRequest
 from lib.json.JsonRpcResponse import JsonRpcResponse
 from model.EmailUser import EmailRegistration, EmailUser
-from lib.json.JsonRpcError import JsonRpcError, JsonRpcException, InvalidParams,\
+from lib.json.JsonRpcError import JsonRpcError, JsonRpcException, InvalidParams, \
     UnexpectedState, EntityNotFound
 from gaesessions import get_current_session
 from logging import debug
@@ -22,13 +23,13 @@ class Email(JsonRpcDispatcher):
             assert isinstance(email_user, EmailUser)
             jresponse.setResultValue("email", email_user.email)
             jresponse.setResultValue("emailUserId", email_user.emailUserId)
-        except EntityNotFound, e:
+        except EntityNotFound:
             pass
         session = gaesessions.get_current_session()
         try:
             nonce = session[EMAIL_REGISTRATION_NONCE]
             jresponse.setResultValue("nonce", nonce)
-        except KeyError, e:
+        except KeyError:
             pass
         
     def startOver(self, jrequest, jresponse):
@@ -42,13 +43,21 @@ class Email(JsonRpcDispatcher):
         jresponse.setId()
         try:
             email = unicode(jrequest.getValue("email")[0])
-        except Exception, e:
+        except Exception:
             raise JsonRpcException(None, "email is not given for setEmail method.")
         email_registration = EmailRegistration.createNew(email)
         assert isinstance(email_registration, EmailRegistration)
         jresponse.setResultValue("email", email_registration.email)
         jresponse.setResultValue("nonce", email_registration.nonce)
         jresponse.setResultValue("beginning", email_registration.beginning)
+        
+        from google.appengine.api import mail
+        message = mail.EmailMessage()
+        message.to = email
+        message.body = "http://odenkiapi.appengine.com/api/Email/" + email_registration.nonce + " にアクセスして下さい。"
+        message.sender = "admin@odenki.org"
+        message.subject = "みんなでおでんきへの登録確認メール"
+        message.send()
     
     def invalidateEmail(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)

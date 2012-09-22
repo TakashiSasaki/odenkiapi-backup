@@ -1,3 +1,4 @@
+#!-*- coding:utf-8 -*-
 from __future__ import unicode_literals, print_function
 from google.appengine.ext import db
 from google.appengine.ext.webapp import Request
@@ -63,8 +64,10 @@ class Data(db.Model):
     
     @classmethod
     def putEntity(cls, field, string):
-        assert isinstance(field, unicode)
-        assert isinstance(string, unicode)
+        assert isinstance(field, unicode) or isinstance(field, str)
+        assert isinstance(string, unicode) or isinstance(string, str)
+        if isinstance(field, str): field = field.decode()
+        if isinstance(string, str): string = string.decode()
         key = cls.getKeyByFieldAndString(field, string)
         if key: return key 
         key = cls.getKeyByFieldAndStringFromDatastore(field, string)
@@ -82,7 +85,7 @@ class Data(db.Model):
         data_list = []
         for field in request.arguments():
             vlist = request.get_all(field)
-            #logging.info((k,vlist))
+            debug((field,vlist))
             assert isinstance(vlist, list)
             for string in vlist:
                 data = cls.putEntity(field, string)
