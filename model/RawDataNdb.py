@@ -26,8 +26,8 @@ class RawData(NdbModel):
 
     fieldnames = ["rawDataId", "path", "parameters", "query", "fragment", "body"]
     
-    def to_list(self):
-        return [self.rawDataId, self.path, self.parameters, self.query, self.fragment, self.body]
+    #def to_list(self):
+    #    return [self.rawDataId, self.path, self.parameters, self.query, self.fragment, self.body]
     
     @classmethod
     def queryRange(cls, start, end):
