@@ -82,3 +82,8 @@ class UnexpectedState(JsonRpcException):
     errorCode = -32095
     def __init__(self, message, data=None):
         JsonRpcException.__init__(self, self.errorCode, message, data)
+
+class PasswordMismatch(JsonRpcException):
+    errorCode = -32094
+    def __init__(self, password, password2):
+        JsonRpcException.__init__(self, self.errorCode, "Passwords and do not match.", {"password":password, "password2":password2})

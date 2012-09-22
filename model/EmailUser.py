@@ -71,21 +71,48 @@ class EmailRegistration(NdbModel):
     @classmethod
     def getByNonce(cls, nonce):
         assert isinstance(nonce, unicode)
-        query = ndb.Query(kind="EmailRegistration")
-        query = query.filter(cls.nonce == nonce)
-        key = query.get(keys_only=True)
-        if key is None:
-            raise EntityNotFound(cls, {"nonce": nonce})
+        key = cls.keyByNonce(nonce)
         assert isinstance(key, ndb.Key)
         entity = key.get()
         assert isinstance(entity, EmailRegistration)
         return entity
+    
+    @classmethod
+    def keyByNonce(cls, nonce):
+        assert isinstance(nonce, unicode)
+        query = cls.queryByNonce(nonce)
+        key = query.get(keys_only=True)
+        if key is None:
+            raise EntityNotFound(cls, {"nonce": nonce})
+        return key
+
+    @classmethod
+    def fetchByNonce(cls, nonce):
+        assert isinstance(nonce, unicode)
+        query = cls.queryByNonce(nonce)
+        keys = query.fetch(keys_only=True)
+        return keys
+
+    @classmethod
+    def queryByNonce(cls, nonce):
+        assert isinstance(nonce, unicode)
+        query = ndb.Query(kind="EmailRegistration")
+        query = query.filter(cls.nonce == nonce)
+        return query
+
+    @classmethod
+    def deleteByNonce(cls, nonce):
+        assert isinstance(nonce, unicode)
+        keys = cls.fetchByNonce(nonce)
+        for key in keys:
+            assert isinstance(key, ndb.Key)
+            key.delete()
 
 class EmailUser(NdbModel):
     
     emailUserId = ndb.IntegerProperty()
     email = ndb.StringProperty()
-    hashedPassword = ndb.StringProperty()
+    hashedPassword = ndb.StringProperty(indexed=False)
     registeredDateTime = ndb.DateTimeProperty()
     
     def matchPassword(self, raw_password):
@@ -93,6 +120,7 @@ class EmailUser(NdbModel):
         hashed_password = _hashPassword(raw_password)
         return hashed_password == self.hashedPassword
 
+    @ndb.toplevel
     def setPassword(self, raw_password):
         assert isinstance(raw_password, unicode)
         self.hashedPassword = _hashPassword(raw_password)
@@ -132,7 +160,7 @@ class EmailUser(NdbModel):
         email_user.email = email
         email_user.registeredDateTime = datetime.now()
         email_user.emailUserId = Counter.GetNextId("emailUserId")
-        email_user.put_async()
+        email_user.put()
         return email_user
 
     SESSION_KEY = "nasfuafhasjlafapsiofhap"
@@ -146,9 +174,13 @@ class EmailUser(NdbModel):
             email_user = session[cls.SESSION_KEY]
         except KeyError:
             raise EntityNotFound(cls, "loadFromSession")
+        if email_user is None:
+            raise EntityNotFound(cls, "loadFromSession")
         assert isinstance(email_user, EmailUser)
+        return email_user
         
     def saveToSession(self):
+        assert isinstance(self.key, ndb.Key)
         session = gaesessions.get_current_session()
         session[self.SESSION_KEY] = self
 

@@ -5,7 +5,7 @@ from lib.json.JsonRpcRequest import JsonRpcRequest
 from lib.json.JsonRpcResponse import JsonRpcResponse
 from model.EmailUser import EmailRegistration, EmailUser
 from lib.json.JsonRpcError import JsonRpcError, JsonRpcException, InvalidParams, \
-    UnexpectedState, EntityNotFound
+    UnexpectedState, EntityNotFound, PasswordMismatch
 from gaesessions import get_current_session
 from logging import debug
 import gaesessions
@@ -36,6 +36,9 @@ class Email(JsonRpcDispatcher):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
+        session = gaesessions.get_current_session()
+        nonce = session[EMAIL_REGISTRATION_NONCE]
+        EmailRegistration.deleteByNonce(nonce)
 
     def setEmail(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
@@ -86,12 +89,22 @@ class Email(JsonRpcDispatcher):
         except Exception, e:
             raise InvalidParams("setPassword method requires password and password2. %s" % e)
         if raw_password != raw_password2:
-            jresponse.setError(JsonRpcError.SERVER_ERROR_RESERVED_MIN, "two passwords do not match.")
-            return
+            raise PasswordMismatch(raw_password, raw_password2)
         email_user.setPassword(raw_password)
         email_user.saveToSession()
         assert isinstance(email_user.hashedPassword, unicode)
         jresponse.setResultValue("hashed_password", email_user.hashedPassword)
+    
+    def deleteEmail(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
+        email_user = EmailUser.loadFromSession()
+        assert isinstance(email_user, EmailUser)
+        key = email_user.key
+        from google.appengine.ext import ndb
+        assert isinstance(key, ndb.Key)
+        key.delete()
 
 class SetNonce(JsonRpcDispatcher):
     
