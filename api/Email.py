@@ -79,6 +79,7 @@ class Email(JsonRpcDispatcher):
             session = gaesessions.get_current_session()
             nonce = session[EMAIL_REGISTRATION_NONCE]
         except Exception, e:
+            session.pop(EMAIL_REGISTRATION_NONCE);
             raise UnexpectedState("Nonce is not stored in session data.")
         assert isinstance(nonce, unicode)
         email_user = EmailUser.getByNonce(nonce)
@@ -93,7 +94,10 @@ class Email(JsonRpcDispatcher):
         email_user.setPassword(raw_password)
         email_user.saveToSession()
         assert isinstance(email_user.hashedPassword, unicode)
-        jresponse.setResultValue("hashed_password", email_user.hashedPassword)
+        #jresponse.setResultValue("hashed_password", email_user.hashedPassword)
+        session.pop(EMAIL_REGISTRATION_NONCE);
+        jresponse.setResultValue("email", email_user.email)
+        jresponse.setResultValue("emailUserId", email_user.emailUserId)
     
     def deleteEmail(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
@@ -105,6 +109,29 @@ class Email(JsonRpcDispatcher):
         from google.appengine.ext import ndb
         assert isinstance(key, ndb.Key)
         key.delete()
+    
+    def login(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
+        try:
+            email = jrequest.getValue("email")[0]
+            raw_password = jrequest.getValue("password")[0]
+        except Exception:
+            raise InvalidParams("email and password are required for method=login.")
+        try:
+            email_user = EmailUser.getByEmail(email)
+        except Exception:
+            raise EntityNotFound("EmailUser entity is not found", {"email": email})
+        assert isinstance(email_user, EmailUser)
+        email_user.matchPassword(raw_password)
+        jresponse.setResultValue("email", email_user.email)
+        jresponse.setResultValue("emailUserId", email_user.emailUserId)
+        
+    def logout(self, jrequest, jresponse):
+        jresponse.setId()
+        session = gaesessions.get_current_session()
+        session.terminate()
 
 class SetNonce(JsonRpcDispatcher):
     

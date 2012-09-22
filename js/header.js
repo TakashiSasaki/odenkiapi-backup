@@ -66,3 +66,10 @@ lib.ui.hideElement = function (selector){
 				});
 }//hideElement
 
+lib.ui.collapse = function(selector){
+    $(selector).trigger("collapse");
+}
+
+lib.ui.expand = function(selector){
+    $(selector).trigger("expand");
+}

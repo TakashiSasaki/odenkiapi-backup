@@ -5,7 +5,8 @@ from model.Counter import Counter
 from uuid import uuid4, UUID
 from hashlib import sha1
 from datetime import datetime
-from lib.json.JsonRpcError import JsonRpcException, EntityNotFound, EntityExists
+from lib.json.JsonRpcError import JsonRpcException, EntityNotFound, EntityExists, \
+    PasswordMismatch
 from logging import debug
 import gaesessions
 
@@ -32,15 +33,18 @@ class EmailRegistration(NdbModel):
         assert isinstance(email, unicode)
         email_registration = EmailRegistration()
         email_registration.email = email
+        debug("creating EmailRegistration entity with email=%s" % email)
         assert isinstance(email_registration, EmailRegistration)
         try:
             email_user = EmailUser.loadFromSession()
             assert isinstance(email_user, EmailUser)
             email_registration.emailUserId = email_user.emailUserId
+            debug("already logged in by email=%s, emailUserId=%s" % (email_user.email, email_user.emailUserId))
         except EntityNotFound:
             try:
                 email_user = EmailUser.getByEmail(email)
                 email_registration.emailUserId = email_user.emailUserId
+                debug("EmailUser instance already exists with email=%s, emailUserId=%s" % (email_user.email, email_user.emailUserId))
             except EntityNotFound:
                 pass
         cls.deleteOld(email)
@@ -118,12 +122,17 @@ class EmailUser(NdbModel):
     def matchPassword(self, raw_password):
         assert isinstance(raw_password, unicode)
         hashed_password = _hashPassword(raw_password)
-        return hashed_password == self.hashedPassword
+        debug("given password = %s, given hashed password = %s, stored hashed password = %s" % (raw_password, hashed_password, self.hashedPassword))
+        if hashed_password != self.hashedPassword:
+            raise PasswordMismatch(hashed_password)
 
     @ndb.toplevel
     def setPassword(self, raw_password):
         assert isinstance(raw_password, unicode)
-        self.hashedPassword = _hashPassword(raw_password)
+        hashed_password = _hashPassword(raw_password)
+        assert len(hashed_password) == 40
+        debug("hashed_password=%s" % hashed_password)
+        self.hashedPassword = hashed_password
         self.put()
         
 
@@ -190,6 +199,8 @@ class EmailUser(NdbModel):
         email_registration = EmailRegistration.getByNonce(nonce)
         debug(type(email_registration.email))
         assert isinstance(email_registration, EmailRegistration)
+        assert isinstance(email_registration.email, unicode)
+        debug("email_registration.email=%s" % email_registration.email)
         if email_registration.emailUserId:
             email_user = EmailUser.getByEmailUserId(email_registration.emailUserId)
         else:
