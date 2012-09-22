@@ -125,6 +125,7 @@ class Email(JsonRpcDispatcher):
             raise EntityNotFound("EmailUser entity is not found", {"email": email})
         assert isinstance(email_user, EmailUser)
         email_user.matchPassword(raw_password)
+        email_user.saveToSession()
         jresponse.setResultValue("email", email_user.email)
         jresponse.setResultValue("emailUserId", email_user.emailUserId)
         

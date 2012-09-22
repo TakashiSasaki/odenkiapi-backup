@@ -26,9 +26,9 @@ lib.ui.c = '<li>\
             </li>';
             
 lib.ui.d = '<li>\
-                <a href="/auth/index.html"   data-ajax="false"   data-icon="gear" >\
+                <a href="/html/auth/index.html"   data-ajax="false"   data-icon="gear" >\
                     <div class="ui-bar-d">\
-                        設定\
+                        ユーザー登録\
                     </div>\
                 </a>\
             </li>';

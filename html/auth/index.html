@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>ユーザー情報</title>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+		<script src="/js/jquery.json-2.3.min.js"></script>
+		<script src="//ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+		<link rel="stylesheet" href="/css/odenki-theme.min.css" />
+		<link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css"/>
+	</head>
+	<body>
+		<div data-role="page">
+			<div data-role="content">
+				<div data-role="collapsible" id="emailLogin" data-collapsed="false">
+					<h1>メールアドレスによるログインの状態</h1>
+					<input readonly="readonly" class="email">
+					</input>
+					<input type="button" onclick="alert(1);window.location.href='/html/auth/Email.html';alert(2);" value="メールアドレスによるログインおよび詳細の確認">
+					</input>
+				</div>
+				<div data-role="collapsible" id="twitterLogin" data-collapsed="false">
+					<h1>Twitterアカウントによるログインの状態</h1>
+					<input readonly="readonly" class="screenName">
+					</input>
+				</div>
+				<div data-role="collapsible" id="gmailLogin" data-collapsed="false">
+					<h1>Googleアカウントによるログインの状態</h1>
+					<input readonly="readonly" class="gmail">
+					</input>
+				</div>
+				<div data-role="collapsible" id="admin">
+					<textarea></textarea>
+				</div>
+
+				<div data-role="fieldcotains">
+					管理者モード
+					<select data-role="slider" id="sliderAdminMode">
+						<option value="off">Off</option>
+						<option value="on">On</option>
+					</select>
+				</div>
+			</div>
+		</div>
+		<script src="/js/header.js"></script>
+		<script>
+            lib.ui.makeTab('d');
+		</script>
+		<!--
+		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+		<script type="text/javascript" src="http://maps.google.com/maps/api/js?key=AIzaSyDYYXbxjq_CZePgdVU2x9AMRPsuX4PBSPE&sensor=false"></script>
+		<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/tags/markermanager/1.0/src/markermanager.js"></script>
+		<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer_compiled.js"></script>
+		-->
+	</body>
+</html>
