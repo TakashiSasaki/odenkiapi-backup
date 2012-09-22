@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>バージョン確認</title>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+		<script src="/js/jquery.json-2.3.min.js"></script>
+		<script src="//ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+		<link rel="stylesheet" href="/css/odenki-theme.min.css" />
+		<link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css"/>
+	</head>
+	<body>
+		<div data-role="page">
+			<div data-role="content">
+			<h1>みんなでおでんきサーバのバージョン情報</h1>
+				<div data-role="fieldcontain">
+					<label for="requestDate">取得時刻</label>
+					<input name="requestDate" id="requestDate" size="10">
+					</input>
+				</div>
+				<div data-role="fieldcontain">
+					<label for="versionString">バージョン</label>
+					<input name="versionString" id="versionString" size="10">
+					</input>
+				</div>
+				<div data-role="fieldcontain">
+					<label for="timeStampString">更新日時</label>
+					<input name="timeStampString" id="timeStampString" size="10">
+					</input>
+				</div>
+			</div>
+		</div>
+		<script src="../../js/header.js"></script>
+		<script>
+            lib.ui.makeTab()
+            $.ajax({
+                url : "/api/version",
+                dataType : "json",
+                success : function(data) {
+                    $("#versionString").val(data.result.versionString);
+                    $("#timeStampString").val(data.result.timeStampString);
+                    $("#requestDate").val(new Date());
+                }
+            });
+		</script>
+	</body>
+</html>
