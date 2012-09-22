@@ -34,7 +34,8 @@ lib.ui.d = '<li>\
             </li>';
 
 lib.ui.makeHeader = function(){
-	   $("header").html('\
+    $('div[data-role="header"]').remove();
+	$('div[data-role="page"]').prepend('\
 <div data-role="header" data-position="inline" data-theme="e" >\
 <h1>\
 <img width="40px" height="40px" src="https://twimg0-a.akamaihd.net/profile_images/1522990803/___________reasonably_small.png"></img>\
@@ -46,9 +47,15 @@ lib.ui.makeHeader = function(){
 }//header
 
 lib.ui.makeNavbar = function(active){
-    	$("#navbar").html('<div data-role="navbar"><ul>'+lib.ui.a+lib.ui.b+lib.ui.c+lib.ui.d+'</ul></div>');
-    	$(".ui-bar-"+active).closest("a").addClass("ui-btn-active");
+    $('div[data-role="navbar"]').remove();
+    $('div[data-role="page"]').prepend('<div data-role="navbar"><ul>'+lib.ui.a+lib.ui.b+lib.ui.c+lib.ui.d+'</ul></div>');
+    $(".ui-bar-"+active).closest("a").addClass("ui-btn-active");
 }//makeNavbar
+
+lib.ui.makeTab = function(active){
+    lib.ui.makeNavbar(active);
+    lib.ui.makeHeader();
+}
 
 lib.ui.showElement=function(selector){
 				$(selector).each(function() {
@@ -72,4 +79,22 @@ lib.ui.collapse = function(selector){
 
 lib.ui.expand = function(selector){
     $(selector).trigger("expand");
+}
+
+lib.ui.onExpand = function(selector, handler) {
+    $(selector).bind("expand", handler);
+}
+
+lib.ui.livePageCreate = function(selector, handler){
+    $(selector).live('pagecreate', handler);
+}
+
+lib.ui.loadVisualization = function(){
+    google.load("visualization", "1", {
+        packages : ["corechart", 'table']
+    });
+}
+
+lib.ui.setOnLoadCallback = function(callback){
+    google.setOnLoadCallback(callback);
 }

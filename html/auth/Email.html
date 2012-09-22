@@ -12,8 +12,6 @@
 	</head>
 	<body>
 		<div data-role="page">
-			<div data-role="header" id="header"></div>
-			<div data-role="navbar" id="navbar"></div>
 			<div data-role="content">
 				<div data-role="collapsible" id="login">
 					<h1>メールアドレスによるログイン</h1>
@@ -55,8 +53,7 @@
 		</div>
 		<script src="../../js/header.js"></script>
 		<script>
-            lib.ui.makeHeader();
-            lib.ui.makeNavbar("d");
+            lib.ui.makeTab("d");
             $.ajax({
                 url : "/api/Email",
                 dataType : "json",
