@@ -92,3 +92,9 @@ class MixedAuthentication(JsonRpcException):
     errorCode = -32093
     def __init__(self, data):
         JsonRpcException.__init__(self, self.errorCode, "Authentication with different odenkiId was detected.", data)
+
+class OAuthError(JsonRpcException):
+    errorCode = -32092
+    def __init__(self, message):
+        JsonRpcException.__init__(self, self.errorCode, message)
+
