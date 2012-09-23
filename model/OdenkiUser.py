@@ -1,73 +1,71 @@
-from google.appengine.ext.db import Model, Query
-from google.appengine.ext.db import StringProperty, URLProperty, IntegerProperty, DateTimeProperty
 from datetime import datetime
-from model.Counter import getNewOdenkiId
-#from GoogleDocs import GoogleDocs
+from model.Counter import  Counter
+from google.appengine.ext import ndb
+from model.NdbModel import NdbModel
+import gaesessions
+from lib.json.JsonRpcError import EntityNotFound, EntityExists
 
-class OdenkiUser(Model):
-    odenkiId = IntegerProperty(required=True)
-    createdDateTime = DateTimeProperty(required=True)
-    invalidatedDateTime = DateTimeProperty()
-    canonicalOdenkiId = IntegerProperty(required=True)
+class OdenkiUser(NdbModel):
+    odenkiId = ndb.IntegerProperty(required=True)
+    createdDateTime = ndb.DateTimeProperty(indexed=False)
+    invalidatedDateTime = ndb.DateTimeProperty(indexed=False)
     
-    def getDictionary(self):
-        d = {}
-        d["odenkiId"] = self.odenkiId
-        d["createDateTime"] = self.createdDateTime
-        d["invalidateDateTime"] = self.invalidatedDateTime
-        d["canonicalOdenkiId"] = self.canonicalOdenkiId
-        return d
-    
-    def getOdenkiId(self):
-        return self.odenkiId
+    SESSION_KEY = "rgznkwbIBUTIdrvcy"
 
-    def setOdenkiId(self, odenki_id):
-        assert self.odenkiId is None
-        assert isinstance(odenki_id, int)
-        self.odenkiId = odenki_id
-        self.put()
+    def saveToSession(self):
+        session = gaesessions.get_current_session()
+        assert isinstance(session, gaesessions.Session)
+        try:
+            existing = self.getFromSession()
+            assert isinstance(existing, OdenkiUser)
+            if existing.odenkiId != self.odenkiId:
+                raise EntityExists(self.__class__, {"existing": existing.odenkiId, "odenkiId": self.odenkiId})
+        except EntityNotFound: pass
+        session[self.SESSION_KEY] = self
     
-    def getCanonicalOdenkiId(self):
-        return self.canonicalOdenkiId
-    
-    def setCanonicalOdenkiId(self, canonical_odenki_id):
-        assert isinstance(canonical_odenki_id, int)
-        assert self.odenkiId >= canonical_odenki_id
-        assert self.canonicalOdenkiId > canonical_odenki_id
-        self.canonicalOdenkiId = canonical_odenki_id
-        self.put()
-    
-    def isInvalid(self):
-        if self.invalidatedDateTime:
-            return True
-        else:
-            return False
-    
-    def invalidate(self):
-        assert self.invalidatedDateTime is None
-        self.invalidatedDateTime = datetime.now()
-        assert self.invalidatedDateTime >= self.createdDateTime
-        self.put()
-    
-def getOdenkiUser(odenki_id):
-    assert isinstance(odenki_id, long)
-    query = OdenkiUser.all()
-    assert isinstance(query, Query)
-    query.filter("odenkiId = ", odenki_id)
-    result = query.run()
-    try:
-        odenki_user = result.next()
+    @classmethod
+    def loadFromSession(cls):
+        session = gaesessions.get_current_session()
+        assert isinstance(session, gaesessions.Session)
+        if not session.has_key(cls.SESSION_KEY):
+            raise EntityNotFound(cls, {"in": "session"})
+        odenki_user = session[cls.SESSION_KEY]
         assert isinstance(odenki_user, OdenkiUser)
         return odenki_user
-    except:
-        return None
+    
+    @classmethod
+    def getNew(cls):
+        odenki_user = OdenkiUser()
+        odenki_user.odenkiId = Counter.GetNextId("odenkiId")
+        odenki_user.createdDateTime = datetime.now()
+        key = odenki_user.put()
+        assert isinstance(key, ndb.Key)
+        return key.get()
 
-def createOdenkiUser():
-    odenki_id = getNewOdenkiId()
-    odenki_user = OdenkiUser(odenkiId=odenki_id, canonicalOdenkiId=odenki_id, createdDateTime=datetime.now())
-    odenki_user.put()
-    return odenki_user
-
+    @classmethod
+    def queryByOdenkiId(cls, odenki_id):
+        assert isinstance(odenki_id, int)
+        query = ndb.Query(kind="Odenki")
+        query = query.filter(cls.odenkiId == odenki_id)
+        return query
+    
+    @classmethod
+    def keyByOdenkiId(cls, odenki_id):
+        assert isinstance(odenki_id, int)
+        query = cls.queryByOdenkiId(odenki_id)
+        key = query.get(keys_only=True)
+        if key is None:
+            raise EntityNotFound(cls, {"odenkiId": odenki_id})
+        assert(key, ndb.Key)
+        return key
+    
+    @classmethod
+    def getByOdenkiId(cls, odenki_id):
+        key = cls.keyByOdenkiId()
+        entity = key.get()
+        assert isinstance(entity, OdenkiUser)
+        return entity
+    
 #===============================================================================
 # class _RequestHandler(MyRequestHandler):
 #    def get(self):

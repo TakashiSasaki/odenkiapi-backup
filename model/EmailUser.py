@@ -5,8 +5,7 @@ from model.Counter import Counter
 from uuid import uuid4, UUID
 from hashlib import sha1
 from datetime import datetime
-from lib.json.JsonRpcError import JsonRpcException, EntityNotFound, EntityExists, \
-    PasswordMismatch
+from lib.json.JsonRpcError import EntityNotFound, EntityExists, PasswordMismatch
 from logging import debug
 import gaesessions
 
@@ -117,7 +116,8 @@ class EmailUser(NdbModel):
     emailUserId = ndb.IntegerProperty()
     email = ndb.StringProperty()
     hashedPassword = ndb.StringProperty(indexed=False)
-    registeredDateTime = ndb.DateTimeProperty()
+    registeredDateTime = ndb.DateTimeProperty(indexed=False)
+    odenkiId = ndb.IntegerProperty()
     
     def matchPassword(self, raw_password):
         assert isinstance(raw_password, unicode)
@@ -191,6 +191,13 @@ class EmailUser(NdbModel):
     def saveToSession(self):
         assert isinstance(self.key, ndb.Key)
         session = gaesessions.get_current_session()
+        assert isinstance(session, gaesessions.Session)
+        try:
+            existing = self.loadFromSession()
+            assert isinstance(existing, EmailUser)
+            if existing.emailUserId != self.emailUserId:
+                raise EntityExists(self.__class__, {"existing.emailUserId": existing.emailUserId, "self.emailUserId": self.emailUserId})
+        except EntityNotFound: pass
         session[self.SESSION_KEY] = self
 
     @classmethod

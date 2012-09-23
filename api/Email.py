@@ -9,6 +9,7 @@ from lib.json.JsonRpcError import JsonRpcError, JsonRpcException, InvalidParams,
 from gaesessions import get_current_session
 from logging import debug
 import gaesessions
+from model.OdenkiUser import OdenkiUser
 
 EMAIL_REGISTRATION_NONCE = str("f5464d0jVbvde1Uxtur")
 
@@ -36,9 +37,10 @@ class Email(JsonRpcDispatcher):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
+
         session = gaesessions.get_current_session()
-        nonce = session[EMAIL_REGISTRATION_NONCE]
-        EmailRegistration.deleteByNonce(nonce)
+        assert isinstance(session, gaesessions.Session)
+        session.terminate()
 
     def setEmail(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
@@ -126,8 +128,19 @@ class Email(JsonRpcDispatcher):
         assert isinstance(email_user, EmailUser)
         email_user.matchPassword(raw_password)
         email_user.saveToSession()
+        
+        if email_user.odenkiId:
+            odenki_user = OdenkiUser.getByOdenkiId(email_user.odenkiId)
+            odenki_user.saveToSession()
+        else:
+            odenki_user = OdenkiUser.getNew()
+            assert isinstance(odenki_user, OdenkiUser)
+            email_user.odenkiId = odenki_user.odenkiId
+            email_user.put()
+            email_user.saveToSession()
         jresponse.setResultValue("email", email_user.email)
         jresponse.setResultValue("emailUserId", email_user.emailUserId)
+        jresponse.setResultValue("odenkiId", email_user.odenkiId)
         
     def logout(self, jrequest, jresponse):
         jresponse.setId()
