@@ -122,7 +122,7 @@ class Email(JsonRpcDispatcher):
             raw_password = jrequest.getValue("password")[0]
         except Exception:
             raise InvalidParams("email and password are required for method=login.")
-        try:
+        try:    
             email_user = EmailUser.getByEmail(email)
         except Exception:
             raise EntityNotFound("EmailUser entity is not found", {"email": email})
