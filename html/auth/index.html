@@ -13,39 +13,153 @@
 	<body>
 		<div data-role="page">
 			<div data-role="content">
+				<div data-role="collapsible" id="odenkiUser" data-collapsed="false">
+					<h1>ログインの状態</h1>
+					<table>
+						<tr>
+							<td>おでんきネーム</td>
+							<td width="*">
+							<input readonly="readonly" class="odenkiName">
+							</input></td>
+							<td width="10%">
+							<input readonly="readonly" class="odenkiId">
+							</input></td>
+						</tr>
+					</table>
+					<input type="button" onclick="setOdenkiName();" value="おでんきネームの変更">
+					</input>
+					<textarea value="デバッグ用"></textarea>
+				</div>
 				<div data-role="collapsible" id="emailLogin" data-collapsed="false">
 					<h1>メールアドレスによるログインの状態</h1>
-					<input readonly="readonly" class="email">
+					<table>
+						<tr>
+							<td>メールアドレス</td>
+							<td width="*">
+							<input readonly="readonly" class="email">
+							</input> </td><td width="10%">
+							<input readonly="readonly" class="odenkiId">
+							</input></td>
+						</tr>
+					</table>
+					<input type="button" onclick="window.location.href='/html/auth/Email.html'" value="メールアドレスによるログインおよび詳細の確認">
 					</input>
-					<input type="button" onclick="alert(1);window.location.href='/html/auth/Email.html';alert(2);" value="メールアドレスによるログインおよび詳細の確認">
-					</input>
+					<textarea value="デバッグ用"></textarea>
 				</div>
 				<div data-role="collapsible" id="twitterLogin" data-collapsed="false">
 					<h1>Twitterアカウントによるログインの状態</h1>
 					<input readonly="readonly" class="screenName">
 					</input>
+					<textarea value="デバッグ用"></textarea>
 				</div>
 				<div data-role="collapsible" id="gmailLogin" data-collapsed="false">
 					<h1>Googleアカウントによるログインの状態</h1>
-					<input readonly="readonly" class="gmail">
+					<table>
+						<tr>
+							<td >Googleアカウント名</td>
+							<td width="*">
+							<input readonly="readonly" class="gmail">
+							</input></td><td width="10%">
+							<input readonly="readonly" class="odenkiId">
+							</input></td>
+						</tr>
+					</table>
+					<input type="button" value="Googleアカウントによるログイン" >
 					</input>
-				</div>
-				<div data-role="collapsible" id="admin">
-					<textarea></textarea>
-				</div>
-
-				<div data-role="fieldcotains">
-					管理者モード
-					<select data-role="slider" id="sliderAdminMode">
-						<option value="off">Off</option>
-						<option value="on">On</option>
-					</select>
+					<textarea value="デバッグ用"></textarea>
 				</div>
 			</div>
 		</div>
 		<script src="/js/header.js"></script>
 		<script>
             lib.ui.makeTab('d');
+            $.ajax({
+                url : "/api/Odenki",
+                dataType : "json",
+                success : function(data) {
+                    $("#odenkiUser textarea").val($.toJSON(data));
+                    if (!data.result) {
+                        $("#odenkiUser .odenkiName").val("ログインしていません");
+                    }
+                    if (data.result.odenkiId) {
+                        $("#odenkiUser .odenkiId").val(data.result.odenkiId);
+                    }
+                    if (data.result.odenkiName) {
+                        $("#odenkiUser .odenkiName").val(data.result.odenkiName);
+                    }
+                },
+                error : function(data) {
+                    $("#odenkiUser textarea").val($.toJSON(data));
+                    $("#odenkiUser .odenkiId").val(null);
+                    $("#odenkiUser .nickname").val(null);
+                }
+            });
+            $.ajax({
+                url : "/api/Email",
+                dataType : "json",
+                success : function(data) {
+                    $("#emailLogin textarea").val($.toJSON(data));
+                    if (!data.result) {
+                        $("#emailLogin .email").val("ログインしていません");
+                    }
+                    if (!data.result.email) {
+                        $("#emailLogin .email").val("ログインしていません");
+                    }
+                    if (data.result.odenkiId) {
+                        $("#emailLogin .odenkiId").val(data.result.odenkiId);
+                    }
+                    if (data.result.email) {
+                        $("#emailLogin .email").val(data.result.email);
+                    }
+                },
+                error : function(data) {
+                    $("#admin textarea").val($.toJSON(data));
+                    $("#emailUser .email").val(data.result.email);
+                    $("#emailUser .emailUserId").val(data.result.emailUserId);
+                    $("#emailUser").val(data.result.email);
+                }
+            });
+            $.ajax({
+                url : "/api/Gmail",
+                dataType : "json",
+                success : function(data) {
+                    $("#gmailLogin textarea").val($.toJSON(data));
+                    if (!data.result) {
+                        $("#gmailLogin .gmail").val("ログインしていません");
+                    }
+                    if (!data.result.gmail) {
+                        $("#gmailLogin .gmail").val("ログインしていません");
+                    }
+                    if (data.result.gmail) {
+                        $("#gmailLogin .gmail").val(data.result.gmail);
+                    }
+                    if (data.result.odenkiId) {
+                        $("#gmailLogin .odenkiId").val(data.result.odenkiId);
+                    }
+                    $("#gmailLogin [type='button']").attr("onclick", "window.location.href='" + data.result.login_url + "'");
+                },
+                error : function(data) {
+                    $("#admin textarea").val($.toJSON(data));
+                    $("#emailUser .email").val(data.result.email);
+                    $("#emailUser .emailUserId").val(data.result.emailUserId);
+                    $("#emailUser").val(data.result.email);
+                }
+            });
+
+            function setOdenkiName() {
+                $.ajax({
+                    url : "/api/Odenki?method=setOdenkiName",
+                    dataType : "json",
+                    success : function(data) {
+                        $("#odenkiUser textarea").val($.toJSON(data));
+                        $("#odenkiUser .odenkiName").val(data.reult.odenkiName);
+                        $("#odenkiUser .odenkiId").val(data.reesult.odenkiId);
+                    },
+                    error : function(data) {
+                        $("#odenkiUser textarea").val($.toJSON(data));
+                    }
+                });
+            }
 		</script>
 		<!--
 		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
