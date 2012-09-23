@@ -87,9 +87,10 @@
                         $("#admin textarea").val($.toJSON(data));
                         $("#setPassword .password").val("");
                         $("#setPassword .password2").val("");
-                        $("#emailUser email").val(data.result.email);
+                        $("#emailUser .email").val(data.result.email);
                         lib.ui.collapse("#setPassword");
                         lib.ui.expand("#emailUser");
+                        lib.ui.expand("#login");
                     },
                     error : function(data) {
                         $("#admin textarea").val($.toJSON(data));

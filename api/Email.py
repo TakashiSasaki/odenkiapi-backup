@@ -100,6 +100,7 @@ class Email(JsonRpcDispatcher):
         session.pop(EMAIL_REGISTRATION_NONCE);
         jresponse.setResultValue("email", email_user.email)
         jresponse.setResultValue("emailUserId", email_user.emailUserId)
+        jresponse.setResultValue("odenkiId", email_user.odenkiId)
     
     def deleteEmail(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
