@@ -7,7 +7,8 @@ from lib.json.JsonRpcError import EntityNotFound, EntityExists
 
 class OdenkiUser(NdbModel):
     odenkiId = ndb.IntegerProperty(required=True)
-    createdDateTime = ndb.DateTimeProperty(indexed=False)
+    odenkiName = ndb.StringProperty(required=True, indexed=False)
+    createdDateTime = ndb.DateTimeProperty(required=True, indexed=False)
     invalidatedDateTime = ndb.DateTimeProperty(indexed=False)
     
     SESSION_KEY = "rgznkwbIBUTIdrvcy"
@@ -16,7 +17,7 @@ class OdenkiUser(NdbModel):
         session = gaesessions.get_current_session()
         assert isinstance(session, gaesessions.Session)
         try:
-            existing = self.getFromSession()
+            existing = self.loadFromSession()
             assert isinstance(existing, OdenkiUser)
             if existing.odenkiId != self.odenkiId:
                 raise EntityExists(self.__class__, {"existing": existing.odenkiId, "odenkiId": self.odenkiId})
@@ -37,15 +38,18 @@ class OdenkiUser(NdbModel):
     def getNew(cls):
         odenki_user = OdenkiUser()
         odenki_user.odenkiId = Counter.GetNextId("odenkiId")
+        odenki_user.odenkiName = "Odenki %s" % odenki_user.odenkiId
         odenki_user.createdDateTime = datetime.now()
         key = odenki_user.put()
         assert isinstance(key, ndb.Key)
-        return key.get()
+        entity = key.get()
+        assert isinstance(entity, OdenkiUser)
+        return entity
 
     @classmethod
     def queryByOdenkiId(cls, odenki_id):
         assert isinstance(odenki_id, int)
-        query = ndb.Query(kind="Odenki")
+        query = ndb.Query(kind="OdenkiUser")
         query = query.filter(cls.odenkiId == odenki_id)
         return query
     
@@ -61,7 +65,8 @@ class OdenkiUser(NdbModel):
     
     @classmethod
     def getByOdenkiId(cls, odenki_id):
-        key = cls.keyByOdenkiId()
+        assert isinstance(odenki_id, int)
+        key = cls.keyByOdenkiId(odenki_id)
         entity = key.get()
         assert isinstance(entity, OdenkiUser)
         return entity

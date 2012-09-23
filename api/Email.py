@@ -6,7 +6,6 @@ from lib.json.JsonRpcResponse import JsonRpcResponse
 from model.EmailUser import EmailRegistration, EmailUser
 from lib.json.JsonRpcError import JsonRpcError, JsonRpcException, InvalidParams, \
     UnexpectedState, EntityNotFound, PasswordMismatch
-from gaesessions import get_current_session
 from logging import debug
 import gaesessions
 from model.OdenkiUser import OdenkiUser
@@ -24,6 +23,7 @@ class Email(JsonRpcDispatcher):
             assert isinstance(email_user, EmailUser)
             jresponse.setResultValue("email", email_user.email)
             jresponse.setResultValue("emailUserId", email_user.emailUserId)
+            jresponse.setResultValue("odenkiId", email_user.odenkiId)
         except EntityNotFound:
             pass
         session = gaesessions.get_current_session()
@@ -130,14 +130,31 @@ class Email(JsonRpcDispatcher):
         email_user.saveToSession()
         
         if email_user.odenkiId:
-            odenki_user = OdenkiUser.getByOdenkiId(email_user.odenkiId)
-            odenki_user.saveToSession()
+            debug("email_user.odenkiId = %s" % email_user.odenkiId)
+            try:
+                odenki_user = OdenkiUser.getByOdenkiId(email_user.odenkiId)
+                assert isinstance(odenki_user, OdenkiUser)
+                odenki_user.saveToSession()
+            except EntityNotFound:
+                debug("OdenkiUser with odenkiId %s was not found" % email_user.odenkiId)
+                odenki_user = OdenkiUser.getNew()
+                #assert isinstance(OdenkiUser.getByOdenkiId(odenki_user.odenkiId), OdenkiUser)
+                assert isinstance(odenki_user, OdenkiUser)
+                odenki_user.saveToSession()
+                email_user.odenkiId = odenki_user.odenkiId
+                email_user.put()
+
         else:
+            debug("email_user.odenkiId is not set.")
             odenki_user = OdenkiUser.getNew()
+            #assert isinstance(OdenkiUser.getByOdenkiId(odenki_user.odenkiId), OdenkiUser)
             assert isinstance(odenki_user, OdenkiUser)
+            odenki_user.saveToSession()
             email_user.odenkiId = odenki_user.odenkiId
             email_user.put()
-            email_user.saveToSession()
+            
+        email_user.saveToSession()
+        assert odenki_user.odenkiId == email_user.odenkiId
         jresponse.setResultValue("email", email_user.email)
         jresponse.setResultValue("emailUserId", email_user.emailUserId)
         jresponse.setResultValue("odenkiId", email_user.odenkiId)
