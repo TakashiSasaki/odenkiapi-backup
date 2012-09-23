@@ -3,6 +3,7 @@ from google.appengine.ext import ndb
 from model.NdbModel import NdbModel
 from logging import debug, info, error
 from google.appengine.api.memcache import Client
+from gaesessions import Session
 
 context = ndb.get_context()
 assert isinstance(context, ndb.Context)
@@ -42,3 +43,16 @@ class AdminUser(NdbModel):
             if email == admin_user.adminUserName:
                 return True
         return False
+
+class AdminMode(bool):
+    
+    SESSION_KEY = "bezxcgpopiu45eadgobirvuy2"
+    
+    def setAdminMode(self, admin_mode):
+        assert isinstance(admin_mode, bool)
+        from gaesessions import get_current_session
+        session = get_current_session()
+        assert isinstance(session, Session)
+        session.set(self.SESSION_KEY, admin_mode)
+
+    def getAdmin
