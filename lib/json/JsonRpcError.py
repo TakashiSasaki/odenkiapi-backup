@@ -87,3 +87,8 @@ class PasswordMismatch(JsonRpcException):
     errorCode = -32094
     def __init__(self, hashed_password):
         JsonRpcException.__init__(self, self.errorCode, "Passwords and do not match.", {"hashed_password": hashed_password})
+
+class MixedAuthentication(JsonRpcException):
+    errorCode = -32093
+    def __init__(self, data):
+        JsonRpcException.__init__(self, self.errorCode, "Authentication with different odenkiId was detected.", data)
