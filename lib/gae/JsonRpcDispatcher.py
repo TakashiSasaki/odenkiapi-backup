@@ -75,6 +75,13 @@ class JsonRpcDispatcher(RequestHandler):
             from traceback import print_exception
             print_exception(etype, value, tb)
             json_rpc_response.setError(e.code, e.message, e.data)
+
+        # cancel redirection for debug purpose
+        if json_rpc_request.getValue("debug"):
+            if json_rpc_response.getRedirectTarget():
+                json_rpc_response.setResultValue("cancelled_redirect_target_for_debug", json_rpc_response.getRedirectTarget())
+                del(json_rpc_response._redirectTarget)
+
         return json_rpc_response
     
     def get(self, *args):
@@ -116,7 +123,7 @@ class JsonRpcDispatcher(RequestHandler):
         """write JSON-RPC response as it is"""
         assert isinstance(json_rpc_response, JsonRpcResponse)
         assert isinstance(json_rpc_response, dict)
-        
+
         if json_rpc_response.getRedirectTarget():
             assert isinstance(self.response, Response)
             self.redirect(json_rpc_response.getRedirectTarget())
