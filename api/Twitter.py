@@ -9,7 +9,6 @@ from logging import debug
 from model.TwitterUser import TwitterUser
 from model.OdenkiUser import OdenkiUser
 from lib.json.JsonRpcError import EntityNotFound, MixedAuthentication
-from lib2to3.fixer_util import Call
 
 class Twitter(JsonRpcDispatcher):
     
