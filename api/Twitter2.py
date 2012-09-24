@@ -50,8 +50,11 @@ class RedirectToAuthorizeUrl(JsonRpcDispatcher):
         if resp['status'] != '200':
             raise OAuthError({"consumer_key": TWITTER_CONSUMER_KEY, "request token url" :REQUET_TOKEN_URL})
         request_token_dict = dict(parse_qsl(content))
-        request_token = request_token_dict["oauth_token"]
-        request_token_secret = request_token_dict["oauth_token_secret"]
+        try:
+            request_token = request_token_dict["oauth_token"]
+            request_token_secret = request_token_dict["oauth_token_secret"]
+        except KeyError:
+            raise OAuthError("RedirectToAuthorizeUrl failed to obtain request token.")
         authorize_url_param = urlencode([("oauth_token", request_token)])
         authorize_url = AUTHORIZE_URL + "?" + authorize_url_param
         jresponse.setResultValue("authorize_url_param", authorize_url_param)
@@ -83,12 +86,10 @@ class OAuthCallback(JsonRpcDispatcher):
             request_token = session[REQUEST_TOKEN_SESSION_KEY]
             request_token_secret = session[REQUEST_TOKEN_SECRET_SESSION_KEY]
         except KeyError:
-            jresponse.setRedirectTarget("/api/Twitter2/RedirectToAuthorizeUrl")
-            return
+            raise OAuthError("Request token have not been obtained.")
         
         if oauth_token != request_token:
-            jresponse.setRedirectTarget("/api/Twitter2/RedirectToAuthorizeUrl")
-            return
+            raise OAuthError("OAuthCallback gets token which is not identical to retaining request token.")
 
         token = oauth2.Token(request_token, request_token_secret)
         token.set_verifier(oauth_verifier)
