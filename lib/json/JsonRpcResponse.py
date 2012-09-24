@@ -195,7 +195,7 @@ class JsonRpcResponse(dict):
         
     def setRedirectTarget(self, target_url):
         assert isinstance(target_url, unicode)
-        assert not hasattr(self, "_redirectTarget") 
+        #assert not hasattr(self, "_redirectTarget") 
         self._redirectTarget = target_url
         
     def getRedirectTarget(self):
