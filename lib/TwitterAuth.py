@@ -31,13 +31,4 @@ class ImplicitFlow(TwitterUser):
         self.accessToken = request.get("oauth_access_token")
         if self.accessToken is None:
             raise OAuthError({"url":request.url})
-        self._verifyCredentials()
-        
-    def _verifyCredentials(self):
-        assert isinstance(self.accessToken, str)
-        verification_result = urlfetch.fetch("https://api.twitter.com/1/account/verify_credentials.json?oauth_access_token=" + self.accessToken)
-        if verification_result.status_code != 200:
-            raise OAuthError("Can't get verify_credentials with %s as an access token." % self.accessToken)
-        d = json.loads(verification_result.content)
-        self.twitterId = d["id"]
-        self.screenName = d["screen_name"]
+        self.verifyCredentials()

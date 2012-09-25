@@ -10,6 +10,9 @@ from model.TwitterUser import TwitterUser
 from model.OdenkiUser import OdenkiUser
 from lib.json.JsonRpcError import EntityNotFound, MixedAuthentication
 
+"""This module should not be used because it implements Twitter@Anywhere
+which does not fit to server side OAuth consumer."""
+
 class Twitter(JsonRpcDispatcher):
     
     def GET(self, jrequest, jresponse):
@@ -29,7 +32,7 @@ class Twitter(JsonRpcDispatcher):
         jresponse.setResultValue("callback_url", callback_url)
         auth_url = implicit_flow.getAuthUrl(TWITTER_CONSUMER_KEY, callback_url)
         jresponse.setResultValue("auth_url", auth_url)
-
+        
     @staticmethod
     def _makeCallbackUrl(url):
         parsed_url = urlparse(url)
