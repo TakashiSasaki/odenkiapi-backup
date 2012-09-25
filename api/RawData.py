@@ -13,6 +13,7 @@ class RecentRawData(JsonRpcDispatcher):
     def GET(self, json_rpc_request, jresponse):
         assert isinstance(json_rpc_request, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
         #start = json_rpc_request.getValue("start")
         #end = json_rpc_request.getValue("end")
         try:
@@ -20,8 +21,9 @@ class RecentRawData(JsonRpcDispatcher):
         except:
             limit = 100
         
-        json_rpc_response = JsonRpcResponse(json_rpc_request.getId())
-        json_rpc_response.setFieldNames(RawDataColumns().getColumnIds())
+        #json_rpc_response = JsonRpcResponse(json_rpc_request.getId())
+        #jresponse.setFieldNames(RawDataColumns().getColumnIds())
+        jresponse.setColumns(RawDataColumns())
         
         q = RawData.queryRecent()
         for key in q.fetch(keys_only=True, limit=limit):
@@ -29,7 +31,7 @@ class RecentRawData(JsonRpcDispatcher):
             if not isinstance(entity, RawData) : continue
             json_dict = entity.to_dict()
             if not isinstance(json_dict, dict) : continue
-            json_rpc_response.addResult(json_dict)
+            jresponse.addResult(json_dict)
 
 if __name__ == "__main__":
     mapping = []

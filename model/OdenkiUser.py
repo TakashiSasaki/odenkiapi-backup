@@ -45,6 +45,11 @@ class OdenkiUser(NdbModel):
         entity = key.get()
         assert isinstance(entity, OdenkiUser)
         return entity
+    
+    def setOdenkiName(self, new_odenki_name):
+        assert isinstance(new_odenki_name, unicode)
+        self.odenkiName = new_odenki_name
+        self.put()
 
     @classmethod
     def queryByOdenkiId(cls, odenki_id):

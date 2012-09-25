@@ -189,7 +189,8 @@ class JsonRpcDispatcher(RequestHandler):
             warn("Column description is not set in JSON-RPC response object.") 
             return
         assert isinstance(columns, Columns)
-        csv_writer.writerow(columns.getColumnIds())
+        column_ids = columns.getColumnIds()
+        csv_writer.writerow(column_ids)
         result = json_rpc_response.getResult()
         if not isinstance(result, list): 
             warn("Result must be a list to emit CSV.") 
@@ -197,6 +198,12 @@ class JsonRpcDispatcher(RequestHandler):
         for record in result:
             if isinstance(record, NdbModel):
                 csv_writer.writerow(record.to_list(columns))
+                continue
+            if isinstance(record, dict):
+                l = []
+                for column_id in column_ids:
+                    l.append(record[column_id])
+                csv_writer.writerow(l)
                 continue
             if isinstance(record, list):
                 csv_writer.writerow(record)
