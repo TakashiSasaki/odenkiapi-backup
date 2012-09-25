@@ -56,3 +56,26 @@ class GmailUser(NdbModel):
         key = cls.keyByGmailId(gmail_id)
         entity = key.get()
         assert isinstance(entity, cls)
+
+    @classmethod
+    def getByOdenkiId(cls, odenki_id):
+        key = cls.keyByOdenkiId(odenki_id)
+        entity = key.get()
+        assert isinstance(entity, GmailUser)
+        return entity
+    
+    @classmethod
+    def keyByOdenkiId(cls, odenki_id):
+        query = cls.queryByOdenkiId(odenki_id)
+        key = query.get(keys_only=True)
+        if key is None:
+            raise EntityNotFound(cls, {"odenki_id": odenki_id})
+        assert isinstance(key, ndb.Key)
+        return key
+
+    @classmethod
+    def queryByOdenkiId(cls, odenki_id):
+        query = ndb.Query(kind="GmailUser")
+        query = query.filter(cls.odenkiId == odenki_id)
+        assert isinstance(query, ndb.Query)
+        return query
