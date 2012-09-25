@@ -4,9 +4,7 @@ from lib.json.JsonRpcRequest import JsonRpcRequest
 from lib.json.JsonRpcResponse import JsonRpcResponse
 from credentials import TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET
 from model.TwitterUser import TwitterUser
-from lib.json.JsonRpcError import EntityNotFound, MixedAuthentication, \
-    OAuthError
-import httplib2
+from lib.json.JsonRpcError import EntityNotFound, OAuthError
 import oauth2
 from urlparse import parse_qsl
 from urllib import urlencode
@@ -32,7 +30,7 @@ class Twitter2(JsonRpcDispatcher):
         jresponse.setResultValue("screenName", twitter_user.screenName)
         jresponse.setResultValue("odenkiId", twitter_user.odenkiId)
         jresponse.setResultValue("name", twitter_user.name)
-        jresponse.setResultValue("locatioin", twitter_user.location)
+        jresponse.setResultValue("location", twitter_user.location)
         jresponse.setResultValue("profile_image_url", twitter_user.profile_image_url)
         jresponse.setResultValue("profile_image_url_https", twitter_user.profile_image_url_https)
         jresponse.setResultValue("description", twitter_user.description)
@@ -127,7 +125,7 @@ class OAuthCallback(JsonRpcDispatcher):
         jresponse.setResultValue("oauth_verifier", oauth_verifier)
         
         callback_twitter_user = TwitterUser()
-        callback_twitter_user.setAccessToken(access_token, access_token_secret)
+        callback_twitter_user.setAccessToken(access_token, access_token_secret, int(user_id), screen_name)
         callback_twitter_user.verifyCredentials11()
         callback_twitter_user.saveToSession()
 

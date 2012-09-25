@@ -17,55 +17,82 @@
 					<h1>ログインの状態</h1>
 					<table>
 						<tr>
+							<td><img src="/image/odenki.png" width="50px" height="50px"></img></td>
 							<td>おでんきネーム</td>
-							<td width="*">
-							<input readonly="readonly" class="odenkiName">
+							<td>
+							<input class="odenkiName">
 							</input></td>
-							<td width="10%">
+							<td>
 							<input readonly="readonly" class="odenkiId">
 							</input></td>
 						</tr>
+						<tr>
+							<td colspan="4">
+							<input type="button" onclick="setOdenkiName();" value="おでんきネームの変更">
+							</input> </td>
 					</table>
-					<input type="button" onclick="setOdenkiName();" value="おでんきネームの変更">
-					</input>
 					<textarea value="デバッグ用"></textarea>
 				</div>
 				<div data-role="collapsible" id="emailLogin" data-collapsed="false">
 					<h1>メールアドレスによるログインの状態</h1>
 					<table>
 						<tr>
+							<td><img src="http://code.google.com/p/outlook-unread-notifier/logo" width="50px" height="50px"></img></td>
 							<td>メールアドレス</td>
-							<td width="*">
+							<td>
 							<input readonly="readonly" class="email">
-							</input> </td><td width="10%">
+							</input> </td><td>
 							<input readonly="readonly" class="odenkiId">
 							</input></td>
 						</tr>
+						<tr>
+							<td colspan="4">
+							<input type="button" onclick="window.location.href='/html/auth/Email.html'" value="メールアドレスによるログインおよび詳細の確認">
+							</input></td>
+						</tr>
 					</table>
-					<input type="button" onclick="window.location.href='/html/auth/Email.html'" value="メールアドレスによるログインおよび詳細の確認">
-					</input>
-					<textarea value="デバッグ用"></textarea>
+					<textarea value="デバッグ用"></textarea>					
+
+
 				</div>
 				<div data-role="collapsible" id="twitterLogin" data-collapsed="false">
 					<h1>Twitterアカウントによるログインの状態</h1>
-					<input readonly="readonly" class="screenName">
-					</input>
+					<table>
+						<tr>
+							<td><img width="50px" height="50px"></img></td>
+							<td>Twitterユーザ</td>
+							<td>
+							<input readonly="readonly" class="screenName">
+							</input></td><td>
+							<input readonly="readonly" class="location">
+							</input></td><td>
+							<input readonly="readonly" class="odenkiId">
+							</input></td>
+						</tr>
+						<tr>
+							<td colspan="5">
+							<input type="button" value="Twitterによるログイン" onclick="window.location.href='/api/Twitter2/RedirectToAuthorizeUrl'">
+							</input> </td>
+						</tr>
+					</table>
 					<textarea value="デバッグ用"></textarea>
 				</div>
 				<div data-role="collapsible" id="gmailLogin" data-collapsed="false">
 					<h1>Googleアカウントによるログインの状態</h1>
 					<table>
 						<tr>
-							<td >Googleアカウント名</td>
-							<td width="*">
+							<td><img src="http://code.google.com/p/google-api-dotnet-client/logo" width="50px" height="50px"></img></td>
+							<td >Googleアカウント</td>
+							<td>
 							<input readonly="readonly" class="gmail">
-							</input></td><td width="10%">
+							</input></td><td>
 							<input readonly="readonly" class="odenkiId">
 							</input></td>
 						</tr>
+						<tr><td colspan="4"><input type="button" value="Googleアカウントによるログイン" >
+					</input></td></tr>
 					</table>
-					<input type="button" value="Googleアカウントによるログイン" >
-					</input>
+					
 					<textarea value="デバッグ用"></textarea>
 				</div>
 			</div>
@@ -73,6 +100,13 @@
 		<script src="/js/header.js"></script>
 		<script>
             lib.ui.makeTab('d');
+            lib.ui.hideElement("#odenkiUser .odenkiId");
+            lib.ui.hideElement("#emailLogin .odenkiId");
+            lib.ui.hideElement("#gmailLogin .odenkiId");
+            lib.ui.hideElement("#twitterLogin .odenkiId");
+            lib.ui.hideElement("#twitterLogin .location");
+            lib.ui.hideElement("textarea");
+
             $.ajax({
                 url : "/api/Odenki",
                 dataType : "json",
@@ -146,10 +180,46 @@
                 }
             });
 
+            $.ajax({
+                url : "/api/Twitter2",
+                dataType : "json",
+                success : function(data) {
+                    $("#twitterLogin textarea").val($.toJSON(data));
+                    if (!data.result) {
+                        $("#twitterLogin .screenName").val("ログインしていません");
+                    }
+                    if (!data.result.screenName) {
+                        $("#twitterLogin .screenName").val("ログインしていません");
+                    }
+                    if (data.result.screenName) {
+                        $("#twitterLogin .screenName").val(data.result.screenName);
+                    }
+                    if (data.result.odenkiId) {
+                        $("#twitterLogin .odenkiId").val(data.result.odenkiId);
+                    }
+                    if (data.result.location) {
+                        $("#twitterLogin .location").val(data.result.location);
+                    }
+                    if (data.result.profile_image_url) {
+                        $("#twitterLogin img").attr("src", data.result.profile_image_url);
+                    }
+                    $("#gmailLogin [type='button']").attr("onclick", "window.location.href='" + data.result.login_url + "'");
+                },
+                error : function(data) {
+                    $("#admin textarea").val($.toJSON(data));
+                    $("#emailUser .email").val(data.result.email);
+                    $("#emailUser .emailUserId").val(data.result.emailUserId);
+                    $("#emailUser").val(data.result.email);
+                }
+            });
+
             function setOdenkiName() {
                 $.ajax({
                     url : "/api/Odenki?method=setOdenkiName",
                     dataType : "json",
+                    data : {
+                        newOdenkiName : $("#odenkiUser .odenkiName")[0].value
+                    },
                     success : function(data) {
                         $("#odenkiUser textarea").val($.toJSON(data));
                         $("#odenkiUser .odenkiName").val(data.reult.odenkiName);

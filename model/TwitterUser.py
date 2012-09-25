@@ -48,7 +48,7 @@ class TwitterUser(NdbModel):
             twitter_user = self.loadFromSession()
             assert isinstance(twitter_user, TwitterUser)
             if twitter_user.twitterId == self.twitterId:
-                raise EntityExists(self.__class__, {"in":"the current session."})
+                raise EntityExists(self.__class__, {"in_session": twitter_user.twitterId, "to_be_saved": self.twitterId})
         except EntityNotFound: pass
         session = gaesessions.get_current_session()
         assert isinstance(session, gaesessions.Session)
@@ -71,11 +71,15 @@ class TwitterUser(NdbModel):
             raise EntityNotFound(self.__class__, {"twitterId":twitter_id})
         return key
 
-    def setAccessToken(self, access_token, access_token_secret):
+    def setAccessToken(self, access_token, access_token_secret, user_id, screen_name):
         assert isinstance(access_token, str)
         assert isinstance(access_token_secret, str)
+        assert isinstance(user_id, int)
+        assert isinstance(screen_name, str)
         self.accessToken = access_token
         self.accessTokenSecret = access_token_secret
+        self.twitterId = user_id
+        self.screenName = screen_name
 
     def verifyCredentials1(self):
         """this only works with Twitter@Anywhere access token"""
@@ -95,6 +99,8 @@ class TwitterUser(NdbModel):
     def verifyCredentials11(self):
         import oauth2
         token = oauth2.Token(self.accessToken, self.accessTokenSecret)
+        assert isinstance(self.screenName, str)
+        assert isinstance(self.twitterId, int)
         #token.set_verifier(oauth_verifier)
         consumer = oauth2.Consumer(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET)
         client = oauth2.Client(consumer, token)
