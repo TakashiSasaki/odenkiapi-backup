@@ -126,7 +126,7 @@ class TwitterUser(NdbModel):
 
     def overrideBy(self, callback_twitter_user):
         assert isinstance(callback_twitter_user, TwitterUser)
-        self.setAccessToken(callback_twitter_user.accessToken, callback_twitter_user.accessTokenSecret)
+        self.setAccessToken(callback_twitter_user.accessToken, callback_twitter_user.accessTokenSecret, callback_twitter_user.twitterId, callback_twitter_user.screenName)
         self.twitterId = callback_twitter_user.twitterId
         self.screenName = callback_twitter_user.screenName
         

@@ -72,7 +72,6 @@ class OdenkiUser(NdbModel):
     
     @classmethod
     def getByOdenkiId(cls, odenki_id):
-        assert isinstance(odenki_id, int)
         key = cls.keyByOdenkiId(odenki_id)
         entity = key.get()
         assert isinstance(entity, OdenkiUser)

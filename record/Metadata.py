@@ -5,7 +5,6 @@ from model.MetadataNdb import Metadata as MetadataNdb
 from model.MetadataNdb import Canonicalizer
 from model.Metadata import Metadata as MetadataDb
 from model.MetadataNdb import MetadataColumns
-#from model.DataNdb import getCanonicalDataList, isEquivalentDataKeyList
 from model.DataNdb import Data as DataNdb
 from model.Data import Data as DataDb
 from datetime import datetime, timedelta
@@ -146,6 +145,28 @@ class _OneDay(JsonRpcDispatcher):
         keys = query.fetch(limit=24 * 60 + 100, keys_only=True)
         for key in keys:
             jresponse.addResult(key.get())
+
+class _OneHour(JsonRpcDispatcher):
+    def GET(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
+        path_info = jrequest.getPathInfo()
+        try:
+            year = int(path_info[3])
+            month = int(path_info[4])
+            day = int(path_info[5])
+            hour = int(path_info[6])
+        except:
+            year = 2012
+            month = 8
+            day = 20
+        start = datetime(year=year, month=month, day=day, hour=hour)
+        end = start + timedelta(hours=1)
+        query = MetadataNdb.queryDateRange(start, end)
+        keys = query.fetch(limit=24 * 60 + 100, keys_only=True)
+        for key in keys:
+            jresponse.addResult(key.get())
             
 class _ByMetadataId(JsonRpcDispatcher):
     def GET(self, jrequest, jresponse):
@@ -213,8 +234,9 @@ if __name__ == "__main__":
     mapping.append(("/record/Metadata/[0-9]+", _ByMetadataId))
     mapping.append(("/record/Metadata/[0-9]+/[0-9]+", _Range))
     mapping.append(("/record/Metadata/[0-9]+/[0-9]+/[0-9]+", _OneDay))
-    mapping.append(("/record/Metadata/CanonicalizeData/[0-9]+/[0-9]+", _CanonicalizeData))
-    mapping.append(("/record/Metadata/MakeTestData", _MakeTestData))
+    mapping.append(("/record/Metadata/[0-9]+/[0-9]+/[0-9]+/[0-9]+", _OneHour))
+    #mapping.append(("/record/Metadata/CanonicalizeData/[0-9]+/[0-9]+", _CanonicalizeData))
+    #mapping.append(("/record/Metadata/MakeTestData", _MakeTestData))
     mapping.append(("/record/Metadata/dataId/[0-9]+", _ByDataId))
     mapping.append(("/record/Metadata/dataKey/[0-9]+", _ByDataKey))
     from lib.gae import run_wsgi_app
