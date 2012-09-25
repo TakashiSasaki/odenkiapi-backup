@@ -6,7 +6,7 @@ from lib.json.JsonRpcError import EntityNotFound, EntityExists, OAuthError
 from google.appengine.api import urlfetch
 import json
 from credentials import TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET
-import httplib2
+
 
 class TwitterUser(NdbModel):
     twitterId = ndb.IntegerProperty()

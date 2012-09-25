@@ -60,6 +60,8 @@ class OdenkiUser(NdbModel):
     
     @classmethod
     def keyByOdenkiId(cls, odenki_id):
+        if odenki_id is None:
+            raise EntityNotFound(cls, {"odenkiId" : odenki_id})
         assert isinstance(odenki_id, int)
         query = cls.queryByOdenkiId(odenki_id)
         key = query.get(keys_only=True)
