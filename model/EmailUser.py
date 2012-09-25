@@ -214,3 +214,23 @@ class EmailUser(NdbModel):
             email_user = EmailUser.createByEmail(email_registration.email)
         assert isinstance(email_user, EmailUser)
         return email_user
+
+    @classmethod
+    def getByOdenkiId(cls, odenki_id):
+        key = cls.keyByOdenkiId(odenki_id)
+        return key.get()
+
+    @classmethod
+    def keyByOdenkiId(cls, odenki_id):
+        query = cls.queryByOdenkiId(odenki_id)
+        key = query.get(keys_only=True)
+        if key is None:
+            raise EntityNotFound(cls, {"odenki_id": odenki_id})
+        return key
+    
+    @classmethod
+    def queryByOdenkiId(cls, odenki_id):
+        query = ndb.Query(kind="EmailUser")
+        query = query.filter(cls.odenkiId == odenki_id)
+        return query
+
