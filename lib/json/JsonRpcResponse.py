@@ -72,10 +72,14 @@ class JsonRpcResponse(dict):
         return self["error"]["data"]
         
     def getError(self):
-        return self.get("error")
+        self["error"]
+    
+    def hasError(self):
+        if self.has_key("error"): return True
+        else: return False
 
     def setResultValue(self, key, value):
-        if self.getError(): 
+        if self.hasError(): 
             raise RuntimeError("JSON-RPC error is already set and any result can't exist simultaneously.")
         if self.get("result") is None: self["result"] = {}
         if not isinstance(self.get("result"), dict):
