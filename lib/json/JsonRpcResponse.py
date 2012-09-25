@@ -55,12 +55,13 @@ class JsonRpcResponse(dict):
                       "message": error_message,
                       "data":error_data
                       }
-        if self.getResult(): 
-            self.setErrorData(self.getResult())
+        if self.getResult():  
+            self["canceled_result"] = self.getResult()
             self.delResult()
         #http_status = _getHttpStatusFromJsonRpcerror(error_code)
         #self.setHttpStatus(http_status)
-        
+        return
+
     def setErrorData(self, error_data):
         assert isinstance(error_data, list) or isinstance(error_data, dict)
         assert self.has_key("error")
