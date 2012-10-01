@@ -14,14 +14,14 @@ from google.appengine.ext.deferred import defer
 
 class _Recent(JsonRpcDispatcher):
     def GET(self, jrequest, jresponse):
-        LIMIT = 100
+        LIMIT = 10
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
         query = MetadataNdb.queryRecent()
         keys = query.fetch(keys_only=True, limit=LIMIT)
         for key in keys:
             metadata = key.get()
-            assert isinstance(metadata, MetadataNdb)
+            #assert isinstance(metadata, MetadataNdb)
             jresponse.addResult(metadata)
         jresponse.setColumns(MetadataColumns())
         jresponse.setExtraValue("limit", LIMIT)
