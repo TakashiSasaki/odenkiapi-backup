@@ -30,12 +30,11 @@ class Data(db.Model):
     @classmethod
     def getKeyByFieldAndStringFromDatastore(cls, field, string):
         gql_query = Data.gql("WHERE field = :1 AND string = :2", field, string)
-        key = gql_query.get(keys_only=True)
-        key2 = gql_query.get(keys_only=True)
-        if key2:
-            debug("two entities having key %s and %s are identical" % (key, key2))
+        keys = gql_query.fetch(keys_only=True, limit=2)
+        if len(keys) == 2:
+            debug("two entities found for field=%s and string=%s" % (field, string))
         # TODO: duplicated entity should be merged
-        return key
+        return keys[0]
     
     @classmethod
     def getKeyByFieldAndString(cls, field, string):
@@ -85,7 +84,7 @@ class Data(db.Model):
         data_list = []
         for field in request.arguments():
             vlist = request.get_all(field)
-            debug((field,vlist))
+            debug((field, vlist))
             assert isinstance(vlist, list)
             for string in vlist:
                 data = cls.putEntity(field, string)
