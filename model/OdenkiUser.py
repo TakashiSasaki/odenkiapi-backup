@@ -4,6 +4,7 @@ from google.appengine.ext import ndb
 from model.NdbModel import NdbModel
 import gaesessions
 from lib.json.JsonRpcError import EntityNotFound, EntityExists
+from gaesessions import Session
 
 class OdenkiUser(NdbModel):
     odenkiId = ndb.IntegerProperty(required=True)
@@ -35,6 +36,12 @@ class OdenkiUser(NdbModel):
         return odenki_user
     
     @classmethod
+    def deleteFromSession(cls):
+        session = gaesessions.get_current_session()
+        assert isinstance(session, Session)
+        session.pop(cls.SESSION_KEY)
+    
+    @classmethod
     def createNew(cls):
         """create new OdenkiUser with new odenkiId and put it to datastore"""
         odenki_user = OdenkiUser()
@@ -50,7 +57,7 @@ class OdenkiUser(NdbModel):
     def setOdenkiName(self, new_odenki_name):
         assert isinstance(new_odenki_name, unicode)
         self.odenkiName = new_odenki_name
-        self.put()
+        self.put_async()
 
     @classmethod
     def queryByOdenkiId(cls, odenki_id):
