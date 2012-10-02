@@ -2,6 +2,7 @@ eclipse.preferences.version=1
 encoding//api/Email.py=utf-8
 encoding//html/Spreadsheet.html=UTF-8
 encoding//model/Data.py=utf-8
+encoding//model/GmailUser.py=utf-8
 encoding//template/footer.html=UTF-8
 encoding//template/header.html=UTF-8
 encoding//template/index.html=UTF-8
