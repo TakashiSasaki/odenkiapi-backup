@@ -11,7 +11,9 @@ def webapp_add_wsgi_middleware(app):
     from credentials import SESSION_SALT
     newapp = SessionMiddleware(app, cookie_key=SESSION_SALT)
 
-    from google.appengine.ext.appstats import recording
-    newapp = recording.appstats_wsgi_middleware(newapp)
+    # Appstats is temporarily removed to prevent the following message
+    # "Full proto too large to save, cleared variables."
+    #from google.appengine.ext.appstats import recording
+    #newapp = recording.appstats_wsgi_middleware(newapp)
 
     return newapp
