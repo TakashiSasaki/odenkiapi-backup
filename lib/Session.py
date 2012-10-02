@@ -4,7 +4,6 @@ from lib.json.JsonRpcError import EntityNotFound
 from model.TwitterUser import TwitterUser
 from model.GmailUser import GmailUser
 from model.EmailUser import EmailUser
-from gdata.marketplace.data import Entity
 
 def fillOdenkiUserByTwitterUser():
     try:
@@ -61,6 +60,10 @@ def fillUser():
     fillOdenkiUser()
     
 def fillTwitterUser():
+    """fillTwitterUser() loads TwitterUser into the session if OdenkiUser is already in the session
+    and fill TwitterUser.odenkiId if it does not exist.
+    It also loads OdenkiUser into the session if TwitterUser is already in it and TwitterUser.odenkiId exists.  
+    """
     odenki_user = OdenkiUser.loadFromSession()
     assert isinstance(odenki_user, OdenkiUser)
     try:
@@ -71,7 +74,7 @@ def fillTwitterUser():
     
     if twitter_user.odenkiId is None:
         twitter_user.odenkiId = odenki_user.odenkiId
-        twitter_user.put()
+        twitter_user.put() # put TwitterUser if odenkiId is updated
     twitter_user.saveToSession()
 
 def fillEmailUser():
@@ -85,7 +88,7 @@ def fillEmailUser():
 
     if email_user.odenkiId is None:
         email_user.odenkiId = odenki_user.odenkiId
-        email_user.put()
+        email_user.put() # put EmailUser if odenkiId is updated
     email_user.saveToSession()
 
 def fillGmailUser():
@@ -99,5 +102,5 @@ def fillGmailUser():
 
     if gmail_user.odenkiId is None:
         gmail_user.odenkiId = odenki_user.odenkiId
-        gmail_user.put()
+        gmail_user.put() # put GmailUser if odenkiId is updated
     gmail_user.saveToSession()
