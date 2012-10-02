@@ -9,7 +9,7 @@ class OdenkiUser(NdbModel):
     odenkiId = ndb.IntegerProperty(required=True)
     odenkiName = ndb.StringProperty(required=True, indexed=False)
     createdDateTime = ndb.DateTimeProperty(required=True, indexed=False)
-    invalidatedDateTime = ndb.DateTimeProperty(indexed=False)
+    invalidatedDateTime = ndb.DateTimeProperty()
     
     SESSION_KEY = "rgznkwbIBUTIdrvcy"
 
@@ -35,7 +35,8 @@ class OdenkiUser(NdbModel):
         return odenki_user
     
     @classmethod
-    def getNew(cls):
+    def createNew(cls):
+        """create new OdenkiUser with new odenkiId and put it to datastore"""
         odenki_user = OdenkiUser()
         odenki_user.odenkiId = Counter.GetNextId("odenkiId")
         odenki_user.odenkiName = "Odenki %s" % odenki_user.odenkiId
