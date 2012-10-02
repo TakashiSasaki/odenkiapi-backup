@@ -97,3 +97,8 @@ class OAuthError(JsonRpcException):
     errorCode = -32092
     def __init__(self, message):
         JsonRpcException.__init__(self, self.errorCode, message)
+
+class InvalidatedUser(JsonRpcException):
+    errorCode = -32091
+    def __init__(self, data):
+        JsonRpcException.__init__(self, self.errorCode, "Invalidated user.", data)
