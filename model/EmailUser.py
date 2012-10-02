@@ -5,9 +5,10 @@ from model.Counter import Counter
 from uuid import uuid4, UUID
 from hashlib import sha1
 from datetime import datetime
-from lib.json.JsonRpcError import EntityNotFound, EntityExists, PasswordMismatch
+from lib.json.JsonRpcError import EntityNotFound, EntityExists, PasswordMismatch, EntityDuplicated
 from logging import debug
 import gaesessions
+from gaesessions import Session
 
 def _hashPassword(raw_password):
     assert isinstance(raw_password, unicode)
@@ -26,6 +27,7 @@ class EmailRegistration(NdbModel):
     email = ndb.StringProperty()
     nonce = ndb.StringProperty()
     beginning = ndb.DateTimeProperty(indexed=False)
+    
     
     @classmethod
     def createNew(cls, email):
@@ -117,6 +119,7 @@ class EmailUser(NdbModel):
     email = ndb.StringProperty()
     hashedPassword = ndb.StringProperty(indexed=False)
     registeredDateTime = ndb.DateTimeProperty(indexed=False)
+    invalidatedDateTime = ndb.DateTimeProperty()
     odenkiId = ndb.IntegerProperty()
     
     def matchPassword(self, raw_password):
@@ -141,20 +144,27 @@ class EmailUser(NdbModel):
         assert isinstance(email, unicode)
         query = ndb.Query(kind="EmailUser")
         query = query.filter(cls.email == email)
-        entity = query.get()
-        if entity is None:
+        query = query.filter(cls.invalidatedDateTime == None)
+        keys = query.fetch(limit=2, keys_only=True)
+        if len(keys) == 2:
+            raise EntityDuplicated({"email":email})
+        if len(keys) == 0:
             raise EntityNotFound(cls, {"email":email})
-        return entity
+        return keys[0].get()
+        return 
     
     @classmethod
     def getByEmailUserId(cls, email_user_id):
         assert isinstance(email_user_id, int)
         query = ndb.Query(kind="EmailUser")
         query = query.filter(cls.emailUserId == email_user_id)
-        entity = query.get()
-        if entity is None:
+        query = query.filter(cls.invalidatedDateTime == None)
+        keys = query.fetch(limit=2, keys_only=True)
+        if len(keys) == 0:
             raise EntityNotFound(cls, {"emailUserId": email_user_id})
-        return entity
+        if len(keys) == 2:
+            raise EntityDuplicated(cls, {"emailUserId": email_user_id})
+        return keys[0].get()
     
     @classmethod
     def createByEmail(cls, email):
@@ -172,6 +182,11 @@ class EmailUser(NdbModel):
         email_user.put()
         return email_user
 
+    def invalidate(self):
+        """TODO: It should not be deleted but invalidated."""
+        self.invalidatedDateTime = datetime.now()
+        self.put()
+        
     SESSION_KEY = "nasfuafhasjlafapsiofhap"
 
     @classmethod    
@@ -199,6 +214,14 @@ class EmailUser(NdbModel):
                 raise EntityExists(self.__class__, {"existing.emailUserId": existing.emailUserId, "self.emailUserId": self.emailUserId})
         except EntityNotFound: pass
         session[self.SESSION_KEY] = self
+        
+    @classmethod
+    def deleteFromSession(cls):
+        """delete EmailUser instance from the session"""
+        from gaesessions import get_current_session
+        session = get_current_session()
+        assert isinstance(session, Session)
+        session.pop(cls.SESSION_KEY)
 
     @classmethod
     def getByNonce(cls, nonce):
@@ -217,20 +240,21 @@ class EmailUser(NdbModel):
 
     @classmethod
     def getByOdenkiId(cls, odenki_id):
-        key = cls.keyByOdenkiId(odenki_id)
-        return key.get()
+        return cls.keyByOdenkiId(odenki_id).get()
 
     @classmethod
     def keyByOdenkiId(cls, odenki_id):
         query = cls.queryByOdenkiId(odenki_id)
-        key = query.get(keys_only=True)
-        if key is None:
-            raise EntityNotFound(cls, {"odenki_id": odenki_id})
-        return key
+        keys = query.fetch(keys_only=True, limit=2)
+        if len(keys) == 0:
+            raise EntityNotFound(cls, {"odenkiId": odenki_id})
+        if len(keys) == 2:
+            raise EntityDuplicated(cls, {"odenkiId:": odenki_id})
+        return keys[0]
     
     @classmethod
     def queryByOdenkiId(cls, odenki_id):
         query = ndb.Query(kind="EmailUser")
+        query = query.filter(cls.invalidatedDateTime == None)
         query = query.filter(cls.odenkiId == odenki_id)
         return query
-

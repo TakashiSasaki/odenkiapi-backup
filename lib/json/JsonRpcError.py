@@ -77,6 +77,7 @@ class EntityExists(JsonRpcException):
         else:
             kind = unicode(model)
         JsonRpcException.__init__(self, self.errorCode, "Entity of %s already exists" % kind, {"kind":kind, "condition":condition})
+        
 
 class UnexpectedState(JsonRpcException):
     errorCode = -32095
@@ -98,7 +99,17 @@ class OAuthError(JsonRpcException):
     def __init__(self, message):
         JsonRpcException.__init__(self, self.errorCode, message)
 
-class InvalidatedUser(JsonRpcException):
-    errorCode = -32091
+#class InvalidatedUser(JsonRpcException):
+#    errorCode = -32091
+#    def __init__(self, data):
+#        JsonRpcException.__init__(self, self.errorCode, "Invalidated user.", data)
+
+class EntityDuplicated(JsonRpcException):
+    errorCode = -32090
     def __init__(self, data):
-        JsonRpcException.__init__(self, self.errorCode, "Invalidated user.", data)
+        JsonRpcException.__init__(self, self.errorCode, "Duplicated entity found.", data)
+
+class EntityInvalidated(JsonRpcException):
+    errorCode = -32089
+    def __init__(self, data):
+        JsonRpcException.__init__(self, self.errorCode, "Entity was found but invalidated.", data)
