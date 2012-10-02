@@ -51,7 +51,9 @@
 							</input></td>
 						</tr>
 					</table>
-					<textarea value="デバッグ用"></textarea>					
+					<textarea value="デバッグ用"></textarea>															
+
+
 
 
 				</div>
@@ -89,11 +91,27 @@
 							<input readonly="readonly" class="odenkiId">
 							</input></td>
 						</tr>
-						<tr><td colspan="4"><input type="button" value="Googleアカウントによるログイン" >
-					</input></td></tr>
+						<tr>
+							<td colspan="4">
+							<input type="button" value="Googleアカウントによるログイン" >
+							</input></td>
+						</tr>
 					</table>
-					
-					<textarea value="デバッグ用"></textarea>
+					<textarea value="デバッグ用"></textarea>					
+
+
+				</div>
+				<div data-role="collapsible" data-collapsed="true">
+					<h1>デバッグ用</h1>
+					<table>
+						<tr>
+							<td >
+							<input type="button" value="デバッグ表示有効" onclick="lib.ui.showElement('textarea');">
+							</input></td><td >
+							<input type="button" value="デバッグ表示無効" onclick='lib.ui.hideElement("textarea");'>
+							</input></td>
+						</tr>
+					</table>
 				</div>
 			</div>
 		</div>
@@ -123,6 +141,7 @@
                     }
                 },
                 error : function(data) {
+                    $("#odenkiUser .odenkiName").val("ログインしていません");
                     $("#odenkiUser textarea").val($.toJSON(data));
                     $("#odenkiUser .odenkiId").val(null);
                     $("#odenkiUser .nickname").val(null);
@@ -206,7 +225,7 @@
                     $("#gmailLogin [type='button']").attr("onclick", "window.location.href='" + data.result.login_url + "'");
                 },
                 error : function(data) {
-					$("#twitterLogin .screenName").val("ログインしていません");
+                    $("#twitterLogin .screenName").val("ログインしていません");
                     $("#admin textarea").val($.toJSON(data));
                     $("#emailUser .email").val(data.result.email);
                     $("#emailUser .emailUserId").val(data.result.emailUserId);
