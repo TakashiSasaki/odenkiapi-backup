@@ -3,7 +3,7 @@ from model.Counter import  Counter
 from google.appengine.ext import ndb
 from model.NdbModel import NdbModel
 import gaesessions
-from lib.json.JsonRpcError import EntityNotFound, EntityExists
+from lib.json.JsonRpcError import EntityNotFound, EntityExists, EntityDuplicated
 from gaesessions import Session
 
 class OdenkiUser(NdbModel):
@@ -64,26 +64,25 @@ class OdenkiUser(NdbModel):
         assert isinstance(odenki_id, int)
         query = ndb.Query(kind="OdenkiUser")
         query = query.filter(cls.odenkiId == odenki_id)
+        query = query.filter(cls.invalidatedDateTime == None)
         return query
     
     @classmethod
     def keyByOdenkiId(cls, odenki_id):
-        if odenki_id is None:
-            raise EntityNotFound(cls, {"odenkiId" : odenki_id})
+        #if odenki_id is None:
+        #    raise EntityNotFound(cls, {"odenkiId" : odenki_id})
         assert isinstance(odenki_id, int)
         query = cls.queryByOdenkiId(odenki_id)
-        key = query.get(keys_only=True)
-        if key is None:
+        keys = query.fetch(keys_only=True, limit=2)
+        if len(keys == 0):
             raise EntityNotFound(cls, {"odenkiId": odenki_id})
-        assert(key, ndb.Key)
-        return key
+        if len(keys == 2):
+            raise EntityDuplicated(cls, {"odenkiId":odenki_id})
+        return keys[0]
     
     @classmethod
     def getByOdenkiId(cls, odenki_id):
-        key = cls.keyByOdenkiId(odenki_id)
-        entity = key.get()
-        assert isinstance(entity, OdenkiUser)
-        return entity
+        return cls.keyByOdenkiId(odenki_id).get()
     
 #===============================================================================
 # class _RequestHandler(MyRequestHandler):
