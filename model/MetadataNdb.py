@@ -8,6 +8,7 @@ from logging import debug, info
 from model.NdbModel import NdbModel
 from model.Columns import Columns
 from lib.util import isiterable
+from model.DataNdb import Data
 
 class MetadataColumns(Columns):
 
@@ -22,6 +23,8 @@ class MetadataColumns(Columns):
 
 class Metadata(NdbModel):
     
+    omitFields = ["ad0", "ad1", "ad2", "ad3", "ad4", "ad5"]
+    
     metadataId = ndb.IntegerProperty()
     receivedDateTime = ndb.DateTimeProperty()
     sender = ndb.KeyProperty()
@@ -29,6 +32,7 @@ class Metadata(NdbModel):
     dataList = ndb.KeyProperty(repeated=True)
     executedCommandIds = ndb.IntegerProperty(repeated=True)
     executedResults = ndb.StringProperty(repeated=True)
+    dataJson = ndb.JsonProperty(indexed=False)
     
     #fieldnames = ["metadataId", "receivedDateTime", "sender", "rawData", "dataList", "executedCommandIds", "executedResults" ]
     
@@ -161,6 +165,21 @@ class Metadata(NdbModel):
         for data_key in data_keys:
             metadata_keys.update(cls.fetchByData(data_key))
         return list(metadata_keys)
+    
+    def adjustDataList(self):
+        """adjustDatalist removes Data instances to be omitted and save all Data instances to dataJson."""
+        if self.dataJson is None:
+            d = {}
+            for data in self.dataList:
+                assert isinstance(data, Data)
+                d[data.field] = data.string
+            self.dataJson = d
+        l = []
+        for data in self.dataList:
+            if data.field in self.omitFields: continue
+            l.append(data)
+        self.dataList = l
+        self.put_async()  
 
 def getMetadataByDataList(data_list):
     metadata_set = set()
