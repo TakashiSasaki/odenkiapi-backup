@@ -9,8 +9,7 @@ from datetime import datetime
 from lib.json.JsonRpcError import EntityNotFound, EntityExists, PasswordMismatch, EntityDuplicated
 from logging import debug
 import gaesessions
-from gaesessions import Session
-from msilib.schema import DuplicateFile
+#from gaesessions import Session
 
 def _hashPassword(raw_password):
     assert isinstance(raw_password, unicode)
@@ -21,104 +20,6 @@ def _hashPassword(raw_password):
     hashed_password = s.hexdigest()
     assert isinstance(hashed_password, str)
     return hashed_password
-
-class EmailRegistration(NdbModel):
-    
-    @classmethod
-    def __new__(cls, *args):
-        raise DeprecationWarning
-        return NdbModel.__new__(cls, args)
-
-    emailUserId = ndb.IntegerProperty(indexed=False)
-    #registrationId = ndb.IntegerProperty()
-    email = ndb.StringProperty()
-    nonce = ndb.StringProperty()
-    beginning = ndb.DateTimeProperty(indexed=False)
-    
-    
-    @classmethod
-    def createNew(cls, email):
-        assert isinstance(email, unicode)
-        email_registration = EmailRegistration()
-        email_registration.email = email
-        debug("creating EmailRegistration entity with email=%s" % email)
-        assert isinstance(email_registration, EmailRegistration)
-        try:
-            email_user = EmailUser.loadFromSession()
-            assert isinstance(email_user, EmailUser)
-            email_registration.emailUserId = email_user.emailUserId
-            debug("already logged in by email=%s, emailUserId=%s" % (email_user.email, email_user.emailUserId))
-        except EntityNotFound:
-            try:
-                email_user = EmailUser.getByEmail(email)
-                email_registration.emailUserId = email_user.emailUserId
-                debug("EmailUser instance already exists with email=%s, emailUserId=%s" % (email_user.email, email_user.emailUserId))
-            except EntityNotFound:
-                pass
-        cls.deleteOld(email)
-        uuid = uuid4()
-        assert isinstance(uuid, UUID)
-        nonce = uuid.get_hex().decode()
-        assert isinstance(nonce, unicode)
-        email_registration.nonce = nonce
-        debug("nonce = %s" % email_registration.nonce)
-        email_registration.beginning = datetime.utcnow()
-        key = email_registration.put()
-        x = EmailRegistration.getByNonce(nonce)
-        assert x.nonce == nonce
-        assert isinstance(key, ndb.Key)
-        return key.get()
-    
-    @classmethod
-    def deleteOld(cls, email):
-        assert isinstance(email, unicode)
-        query = cls.query()
-        assert isinstance(query, ndb.Query)
-        query = query.filter(cls.email == email)
-        keys = query.fetch(keys_only=True)
-        for key in keys:
-            key.delete()
-
-
-    @classmethod
-    def getByNonce(cls, nonce):
-        assert isinstance(nonce, unicode)
-        key = cls.keyByNonce(nonce)
-        assert isinstance(key, ndb.Key)
-        entity = key.get()
-        assert isinstance(entity, EmailRegistration)
-        return entity
-    
-    @classmethod
-    def keyByNonce(cls, nonce):
-        assert isinstance(nonce, unicode)
-        query = cls.queryByNonce(nonce)
-        key = query.get(keys_only=True)
-        if key is None:
-            raise EntityNotFound(cls, {"nonce": nonce})
-        return key
-
-    @classmethod
-    def fetchByNonce(cls, nonce):
-        assert isinstance(nonce, unicode)
-        query = cls.queryByNonce(nonce)
-        keys = query.fetch(keys_only=True)
-        return keys
-
-    @classmethod
-    def queryByNonce(cls, nonce):
-        assert isinstance(nonce, unicode)
-        query = ndb.Query(kind="EmailRegistration")
-        query = query.filter(cls.nonce == nonce)
-        return query
-
-    @classmethod
-    def deleteByNonce(cls, nonce):
-        assert isinstance(nonce, unicode)
-        keys = cls.fetchByNonce(nonce)
-        for key in keys:
-            assert isinstance(key, ndb.Key)
-            key.delete()
 
 class EmailUser(NdbModel):
     
@@ -231,7 +132,7 @@ class EmailUser(NdbModel):
         """delete EmailUser instance from the session"""
         from gaesessions import get_current_session
         session = get_current_session()
-        assert isinstance(session, Session)
+        assert isinstance(session, gaesessions.Session)
         session.pop(cls.SESSION_KEY)
 
     @classmethod

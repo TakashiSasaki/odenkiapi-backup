@@ -3,7 +3,7 @@ from __future__ import unicode_literals, print_function
 from lib.gae import JsonRpcDispatcher, run_wsgi_app
 from lib.json.JsonRpcRequest import JsonRpcRequest
 from lib.json.JsonRpcResponse import JsonRpcResponse
-from model.EmailUser import EmailRegistration, EmailUser
+from model.EmailUser import EmailUser
 from lib.json.JsonRpcError import JsonRpcError, JsonRpcException, InvalidParams, \
     UnexpectedState, EntityNotFound, PasswordMismatch
 from logging import debug
