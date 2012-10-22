@@ -31,9 +31,11 @@ class Data(db.Model):
     def getKeyByFieldAndStringFromDatastore(cls, field, string):
         gql_query = Data.gql("WHERE field = :1 AND string = :2", field, string)
         keys = gql_query.fetch(keys_only=True, limit=2)
+        if len(keys) == 0:
+            return None
         if len(keys) == 2:
             debug("two entities found for field=%s and string=%s" % (field, string))
-        # TODO: duplicated entity should be merged
+            # TODO: duplicated entity should be merged
         return keys[0]
     
     @classmethod
