@@ -41,7 +41,7 @@ handlers:
   static_files: image/odenki.png
   upload: image/odenki.png
 
-- url: /api/([A-Za-z0-9_]+).*
+- url: /api/([A-Za-z_]+).*
   script: api/\1.py
 
 - url: /record/([A-Za-z_]+).*
