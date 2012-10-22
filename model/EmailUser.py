@@ -1,3 +1,4 @@
+#!-*- coding:utf-8 -*-
 from __future__ import unicode_literals, print_function
 from model.NdbModel import NdbModel
 from google.appengine.ext import ndb
@@ -9,6 +10,7 @@ from lib.json.JsonRpcError import EntityNotFound, EntityExists, PasswordMismatch
 from logging import debug
 import gaesessions
 from gaesessions import Session
+from msilib.schema import DuplicateFile
 
 def _hashPassword(raw_password):
     assert isinstance(raw_password, unicode)
@@ -22,6 +24,11 @@ def _hashPassword(raw_password):
 
 class EmailRegistration(NdbModel):
     
+    @classmethod
+    def __new__(cls, *args):
+        raise DeprecationWarning
+        return NdbModel.__new__(cls, args)
+
     emailUserId = ndb.IntegerProperty(indexed=False)
     #registrationId = ndb.IntegerProperty()
     email = ndb.StringProperty()
@@ -121,6 +128,10 @@ class EmailUser(NdbModel):
     registeredDateTime = ndb.DateTimeProperty(indexed=False)
     invalidatedDateTime = ndb.DateTimeProperty()
     odenkiId = ndb.IntegerProperty()
+    nonce = ndb.StringProperty()
+    nonceDateTime = ndb.DateTimeProperty(indexed=False)
+    lastFail = ndb.DateTimeProperty(indexed=False)
+    failCount = ndb.IntegerProperty(indexed=False)
     
     def matchPassword(self, raw_password):
         assert isinstance(raw_password, unicode)
@@ -226,17 +237,24 @@ class EmailUser(NdbModel):
     @classmethod
     def getByNonce(cls, nonce):
         assert isinstance(nonce, unicode)
-        email_registration = EmailRegistration.getByNonce(nonce)
-        debug(type(email_registration.email))
-        assert isinstance(email_registration, EmailRegistration)
-        assert isinstance(email_registration.email, unicode)
-        debug("email_registration.email=%s" % email_registration.email)
-        if email_registration.emailUserId:
-            email_user = EmailUser.getByEmailUserId(email_registration.emailUserId)
-        else:
-            email_user = EmailUser.createByEmail(email_registration.email)
-        assert isinstance(email_user, EmailUser)
-        return email_user
+        query = ndb.Query(kind="EmailUser")
+        query = query.filter(cls.nonce == nonce)
+        query = query.filter(cls.invalidatedDateTime == None)
+        keys = query.fetch(limit=2, keys_only=True)
+        if len(keys) == 2:
+            raise EntityDuplicated(cls, {"nonce" : nonce})
+        if len(keys) == 0:
+            raise EntityNotFound(cls, {"nonce": nonce})
+        return keys[0].get()
+    
+    def setNonce(self):
+        uuid = uuid4()
+        assert isinstance(uuid, UUID)
+        nonce = uuid.get_hex().decode()
+        assert isinstance(nonce, unicode)
+        self.nonce = nonce
+        self.nonceDateTime = datetime.utcnow()
+        self.put()
 
     @classmethod
     def getByOdenkiId(cls, odenki_id):
