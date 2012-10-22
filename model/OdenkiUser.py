@@ -71,14 +71,12 @@ class OdenkiUser(NdbModel):
     
     @classmethod
     def keyByOdenkiId(cls, odenki_id):
-        #if odenki_id is None:
-        #    raise EntityNotFound(cls, {"odenkiId" : odenki_id})
         assert isinstance(odenki_id, int)
         query = cls.queryByOdenkiId(odenki_id)
         keys = query.fetch(keys_only=True, limit=2)
-        if len(keys == 0):
+        if len(keys) == 0:
             raise EntityNotFound(cls, {"odenkiId": odenki_id})
-        if len(keys == 2):
+        if len(keys) == 2:
             raise EntityDuplicated(cls, {"odenkiId":odenki_id})
         return keys[0]
     
