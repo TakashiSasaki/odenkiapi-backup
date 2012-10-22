@@ -14,7 +14,7 @@
 		<div data-role="page">
 			<div data-role="content">
 				<div data-role="collapsible" id="odenkiUser" data-collapsed="false">
-					<h1>ログインの状態</h1>
+					<h1>おでんきユーザー情報</h1>
 					<table>
 						<tr>
 							<td><img src="/image/odenki.png" width="50px" height="50px"></img></td>
@@ -52,10 +52,6 @@
 						</tr>
 					</table>
 					<textarea value="デバッグ用"></textarea>															
-
-
-
-
 				</div>
 				<div data-role="collapsible" id="twitterLogin" data-collapsed="false">
 					<h1>Twitterアカウントによるログインの状態</h1>
@@ -74,7 +70,8 @@
 						<tr>
 							<td colspan="5">
 							<input type="button" value="Twitterによるログイン" onclick="window.location.href='/api/Twitter2/RedirectToAuthorizeUrl'">
-							</input> </td>
+							</input> 
+							</td>
 						</tr>
 					</table>
 					<textarea value="デバッグ用"></textarea>
@@ -141,6 +138,7 @@
                     }
                 },
                 error : function(data) {
+					
                     $("#odenkiUser .odenkiName").val("ログインしていません");
                     $("#odenkiUser textarea").val($.toJSON(data));
                     $("#odenkiUser .odenkiId").val(null);
@@ -166,6 +164,7 @@
                     }
                 },
                 error : function(data) {
+                	lib.ui.collapse("#emailLogin");
                     $("#admin textarea").val($.toJSON(data));
                     $("#emailUser .email").val(data.result.email);
                     $("#emailUser .emailUserId").val(data.result.emailUserId);
@@ -192,6 +191,7 @@
                     $("#gmailLogin [type='button']").attr("onclick", "window.location.href='" + data.result.login_url + "'");
                 },
                 error : function(data) {
+                	lib.ui.collapse("#gmailLogin");
                     $("#admin textarea").val($.toJSON(data));
                     $("#emailUser .email").val(data.result.email);
                     $("#emailUser .emailUserId").val(data.result.emailUserId);
@@ -225,6 +225,7 @@
                     $("#gmailLogin [type='button']").attr("onclick", "window.location.href='" + data.result.login_url + "'");
                 },
                 error : function(data) {
+                	lib.ui.collapse("#twitterLogin");
                     $("#twitterLogin .screenName").val("ログインしていません");
                     $("#admin textarea").val($.toJSON(data));
                     $("#emailUser .email").val(data.result.email);
