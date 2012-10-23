@@ -1,6 +1,7 @@
 eclipse.preferences.version=1
 encoding//api/Email.py=utf-8
 encoding//api/Equipment.py=utf-8
+encoding//api/OdenkiUser.py=utf-8
 encoding//api/RawData.py=utf-8
 encoding//html/Spreadsheet.html=UTF-8
 encoding//model/Data.py=utf-8
