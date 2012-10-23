@@ -43,7 +43,7 @@ class _Recent(JsonRpcDispatcher):
 
 if __name__ == "__main__":
     mapping = []
-    mapping.append(('/record/Sender/[0-9]+/[0-9]+', _Range))
-    mapping.append(('/record/Sender', _Recent))
+    mapping.append(('/api/Sender/[0-9]+/[0-9]+', _Range))
+    mapping.append(('/api/Sender', _Recent))
     from lib.gae import run_wsgi_app
     run_wsgi_app(mapping)
