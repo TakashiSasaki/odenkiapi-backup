@@ -9,6 +9,7 @@ from model.Counter import Counter
 from json import loads
 from model.NdbModel import NdbModel
 from google.appengine.api.memcache import Client
+from lib.json.JsonRpcError import EntityDuplicated, EntityNotFound, EntityExists
 
 class Data(NdbModel):
     dataId = ndb.IntegerProperty()
@@ -19,6 +20,28 @@ class Data(NdbModel):
     
     def to_list(self):
         return [self.dataId, self.field, self.string]
+    
+    @classmethod
+    def prepare(cls, field, string):
+        try:
+            data = cls.getByFieldAndString(field, string)
+            return data
+        except EntityNotFound:
+            data = cls.create(field, string)
+            return data
+    
+    @classmethod
+    def create(cls, field, string):
+        try:
+            existing = cls.getByFieldAndString(field, string)
+            raise EntityExists("Data", {"field": field, "string":string})
+        except EntityNotFound:
+            data = Data()
+            data.dataId = Counter.GetNextId("dataId")
+            data.field = field
+            data.string = string
+            data.put()
+            return data
     
     @classmethod
     def queryByField(cls, field):
@@ -53,6 +76,16 @@ class Data(NdbModel):
         if len(data_keys) >= 2: warn("duplicated data entities with field=%s and string=%s" % (field, string))
         client.set(MEMCACHE_KEY, data_keys)
         return data_keys
+    
+    @classmethod
+    def getByFieldAndString(cls, field, string):
+        query = cls.queryByFieldAndString(field, string)
+        keys = query.fetch(keys_only=True, limit=2)
+        if len(keys) == 2:
+            raise EntityDuplicated()
+        if len(keys) == 0:
+            raise EntityNotFound("Data", {"field": field, "string":string})
+        return keys[0].get()
     
     @classmethod
     def querySingle(cls, data_id):
