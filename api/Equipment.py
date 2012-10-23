@@ -4,7 +4,7 @@ from lib.gae.JsonRpcDispatcher import JsonRpcDispatcher
 from lib.json.JsonRpcRequest import JsonRpcRequest
 from lib.json.JsonRpcResponse import JsonRpcResponse
 from google.appengine.ext import ndb
-from model.Equipment import Equipment
+from model.Sensor import Sensor
 from google.appengine.ext.webapp import Request
 from lib.gae import run_wsgi_app
 from lib.json.JsonRpcError import InvalidParams, EntityExists, EntityNotFound
