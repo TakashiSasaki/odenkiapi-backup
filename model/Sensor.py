@@ -11,12 +11,12 @@ class Sensor(NdbModel):
     uniqueSensorId = ndb.IntegerProperty()
     #senderIds = ndb.IntegerProperty(repeated=True)
     #equipmentName = ndb.StringProperty(indexed=False)
-    productName = ndb.IntegerProperty()
-    serialNumber = ndb.IntegerProperty()
-    moduleId = ndb.IntegerProperty()
-    sensorId = ndb.IntegerProperty()
+    productName = ndb.IntegerProperty(required=True)
+    serialNumber = ndb.IntegerProperty(required=True)
+    moduleId = ndb.IntegerProperty(required=True)
+    sensorId = ndb.IntegerProperty(required=True)
     sensorName = ndb.IntegerProperty(indexed=False)
-    odenkiId = ndb.IntegerProperty()
+    odenkiId = ndb.IntegerProperty(required=True)
     #field = ndb.StringProperty()
     #string = ndb.StringProperty()
 
@@ -40,6 +40,9 @@ class Sensor(NdbModel):
             sensor.moduleId = module_id_data.dataId
             sensor.sensorId = sensor_id_data.dataId
             sensor.odenkiId = odenki_user.odenkiId
+            assert sensor_name_data.dataId is not None
+            sensor.sensorName = sensor_name_data.dataId
+            assert sensor.sensorName is not None
             sensor.put()
             return sensor
     

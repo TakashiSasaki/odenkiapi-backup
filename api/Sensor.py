@@ -30,7 +30,7 @@ class Enumerate(JsonRpcDispatcher):
         jresponse.setId()
         request = jrequest.request
         assert isinstance(request, Request)
-        if len(request.params) <3:
+        if len(request.params) < 3:
             raise InvalidParams("method=register&x=y&z=w&moduleId=mid&sensorId=sid&sensorName=mysensor where x is product field, y is product string, z is serial field, is serial string")
         assert request.params.items()[0][0] == "method"
         assert request.params.items()[0][1] == "register"
@@ -56,7 +56,9 @@ class Enumerate(JsonRpcDispatcher):
         except EntityNotFound: pass
         odenki_user = OdenkiUser.loadFromSession()
         assert isinstance(odenki_user, OdenkiUser)
-        sensor_name_data = Data.prepare("sensorName", request.get("sensorName"))
+        sensor_name = request.get("sensorName")
+        if len(sensor_name) == 0: sensor_name = unicode(sensor_name)
+        sensor_name_data = Data.prepare("sensorName", sensor_name)
         sensor = Sensor.create(product_name_data, serial_number_data, module_id_data, sensor_id_data, sensor_name_data, odenki_user)
         jresponse.addResult(sensor)
 
