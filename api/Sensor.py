@@ -1,17 +1,16 @@
-#!-*- coding:utf-8 -*-
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
 from lib.gae.JsonRpcDispatcher import JsonRpcDispatcher
 from lib.json.JsonRpcRequest import JsonRpcRequest
 from lib.json.JsonRpcResponse import JsonRpcResponse
 from google.appengine.ext import ndb
-from model.Sensor import Sensor
+from model.Sensor import Sensor, SensorColumns
 from google.appengine.ext.webapp import Request
 from lib.gae import run_wsgi_app
 from lib.json.JsonRpcError import InvalidParams, EntityExists, EntityNotFound
 from model.DataNdb import Data
 from gaesessions import get_current_session
 from model.OdenkiUser import OdenkiUser
-from test.test_pprint import uni
 
 class Enumerate(JsonRpcDispatcher):
     def GET(self, jrequest, jresponse):
@@ -23,6 +22,7 @@ class Enumerate(JsonRpcDispatcher):
         keys = query.fetch(keys_only=True, limit=100)
         for key in keys:
             jresponse.addResult(key.get())
+        jresponse.setColumns(SensorColumns())
             
     def register(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
