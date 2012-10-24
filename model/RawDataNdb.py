@@ -8,6 +8,7 @@ from logging import debug
 #from model.NdbModel import NdbModel
 from model.Columns import Columns
 from model.CsvMixin import CsvMixin
+from lib.DataTableMixin import DataTableMixin
 
 class RawDataColumns(Columns):
     def __init__(self):
@@ -18,7 +19,7 @@ class RawDataColumns(Columns):
         self.addString("fragment")
         self.addBoolean("body")
 
-class RawData(ndb.Model, CsvMixin):
+class RawData(ndb.Model, CsvMixin, DataTableMixin):
     rawDataId = ndb.IntegerProperty()
     path = ndb.StringProperty(indexed=False)
     parameters = ndb.StringProperty(indexed=False)

@@ -11,6 +11,7 @@ import logging as _logging
 from lib.json.JsonRpcError import JsonRpcException
 import gaesessions
 from model.CsvMixin import CsvMixin
+from lib.DataTableMixin import DataTableMixin
 _logging.getLogger().setLevel(_logging.DEBUG)
 #from exceptions import Exception
 #from lib.JsonEncoder import dumps
@@ -230,7 +231,7 @@ class JsonRpcDispatcher(RequestHandler):
         assert isinstance(columns, Columns)
         rows = []
         for x in jresponse.getResult():
-            assert isinstance(x, NdbModel)
+            assert isinstance(x, DataTableMixin)
             row = x.to_row(columns)
             debug(row)
             rows.append(row)
