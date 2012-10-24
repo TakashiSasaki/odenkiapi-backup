@@ -4,10 +4,23 @@ from model.Counter import Counter
 from google.appengine.ext import ndb
 from lib.json.JsonRpcError import EntityDuplicated, EntityNotFound, EntityExists
 from model.DataNdb import Data
-from model.NdbModel import NdbModel
+#from model.NdbModel import NdbModel
 from model.OdenkiUser import OdenkiUser
+from model.CsvMixin import CsvMixin
+from lib.DataTableMixin import DataTableMixin
+from model.Columns import Columns
 
-class Sensor(NdbModel):
+class SensorColumns(Columns):
+    def __init__(self):
+        self.addNumber("uniqueSensorId")
+        self.addDataString("productName")
+        self.addDataString("serialNumber")
+        self.addDataString("moduleId")
+        self.addDataString("sensorId")
+        self.addDataString("sensorName")
+        self.addNumber("odenkiId")
+
+class Sensor(ndb.Model, CsvMixin, DataTableMixin):
     uniqueSensorId = ndb.IntegerProperty()
     #senderIds = ndb.IntegerProperty(repeated=True)
     #equipmentName = ndb.StringProperty(indexed=False)
