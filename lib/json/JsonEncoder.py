@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
 from json import JSONEncoder as _JSONEncoder
 from gaesessions import Session
@@ -7,8 +8,6 @@ from google.appengine.ext import ndb
 from google.appengine.ext import db
 from logging import debug
 from model.Columns import Columns
-
-from model.NdbModel import NdbModel
 
 class JSONEncoder(_JSONEncoder):
     def default(self, o):
@@ -28,7 +27,7 @@ class JSONEncoder(_JSONEncoder):
             assert isinstance(o, db.Key)
             debug("encoding db.Key %s to JSON" % o)
             return unicode(o)
-        if isinstance(o, NdbModel):
+        if isinstance(o, ndb.Model):
             return o.to_dict()
             debug("encoding NdbModel %s to JSON" % o)
         if isinstance(o, Columns):
