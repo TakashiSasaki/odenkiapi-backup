@@ -1,5 +1,6 @@
 eclipse.preferences.version=1
 encoding//api/Email.py=utf-8
+encoding//api/Metadata.py=utf-8
 encoding//api/OdenkiUser.py=utf-8
 encoding//api/RawData.py=utf-8
 encoding//api/Sensor.py=utf-8
@@ -9,6 +10,7 @@ encoding//lib/json/JsonEncoder.py=utf-8
 encoding//model/Data.py=utf-8
 encoding//model/EmailUser.py=utf-8
 encoding//model/GmailUser.py=utf-8
+encoding//model/MetadataNdb.py=utf-8
 encoding//model/OdenkiUser.py=utf-8
 encoding//model/RawDataNdb.py=utf-8
 encoding//model/Sensor.py=utf-8

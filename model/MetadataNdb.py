@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
 from google.appengine.ext import ndb
 from model.SenderNdb import  Sender
@@ -5,10 +6,11 @@ from model.RawDataNdb import RawData
 from model.Counter import Counter
 from datetime import datetime
 from logging import debug, info
-from model.NdbModel import NdbModel
+#from model.NdbModel import NdbModel
 from model.Columns import Columns
 from lib.util import isiterable
 from model.DataNdb import Data
+from model.CsvMixin import CsvMixin
 
 class MetadataColumns(Columns):
 
@@ -21,7 +23,7 @@ class MetadataColumns(Columns):
         self.addString("executedCommandIds")
         self.addString("executedResults")
 
-class Metadata(NdbModel):
+class Metadata(ndb.Model, CsvMixin):
     
     omitFields = ["ad0", "ad1", "ad2", "ad3", "ad4", "ad5"]
     

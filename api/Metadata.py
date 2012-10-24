@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
 from lib.gae import JsonRpcDispatcher
 from lib.json import JsonRpcRequest, JsonRpcResponse, JsonRpcError
@@ -145,6 +146,7 @@ class _OneDay(JsonRpcDispatcher):
         keys = query.fetch(limit=24 * 60 + 100, keys_only=True)
         for key in keys:
             jresponse.addResult(key.get())
+        jresponse.setColumns(MetadataColumns())
 
 class _OneHour(JsonRpcDispatcher):
     def GET(self, jrequest, jresponse):
@@ -167,6 +169,7 @@ class _OneHour(JsonRpcDispatcher):
         keys = query.fetch(limit=24 * 60 + 100, keys_only=True)
         for key in keys:
             jresponse.addResult(key.get())
+        jresponse.setColumns(MetadataColumns())
             
 class _ByMetadataId(JsonRpcDispatcher):
     def GET(self, jrequest, jresponse):
