@@ -1,4 +1,4 @@
-#!-*- coding:utf-8 -*-
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
 from lib.gae import JsonRpcDispatcher
 from lib.json import JsonRpcRequest, JsonRpcResponse
@@ -115,6 +115,7 @@ class _OneDay(JsonRpcDispatcher):
             assert isinstance(rawdata, RawData)
             #jresponse.addResult([metadata.receivedDateTime.isoformat(), rawdata.query])
             jresponse.addResult(rawdata)
+        jresponse.setColumns(RawDataColumns())
 
 class _OneHour(JsonRpcDispatcher):
     
@@ -147,6 +148,7 @@ class _OneHour(JsonRpcDispatcher):
             assert isinstance(rawdata, RawData)
             #jresponse.addResult([metadata.receivedDateTime.isoformat(), rawdata.query])
             jresponse.addResult(rawdata)
+        jresponse.setColumns(RawDataColumns())
 
 if __name__ == "__main__":
     mapping = []

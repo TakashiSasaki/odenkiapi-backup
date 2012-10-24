@@ -10,6 +10,7 @@ encoding//model/Data.py=utf-8
 encoding//model/EmailUser.py=utf-8
 encoding//model/GmailUser.py=utf-8
 encoding//model/OdenkiUser.py=utf-8
+encoding//model/RawDataNdb.py=utf-8
 encoding//model/Sensor.py=utf-8
 encoding//model/TwitterUser.py=utf-8
 encoding//template/footer.html=UTF-8

@@ -30,6 +30,7 @@ class CsvMixin(object):
                 assert isinstance(data, Data)
                 assert isinstance(data.field, unicode)
                 l.append(data.field)
+                continue
             if column.isDataString():
                 data_id = getattr(self, column.getId())
                 if data_id is None:
@@ -40,5 +41,7 @@ class CsvMixin(object):
                 assert isinstance(data, Data)
                 assert isinstance(data.string, unicode)
                 l.append(data.string)
+                continue
+            l.append(getattr(self, column.getId()))
         return l
     
