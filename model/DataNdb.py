@@ -105,21 +105,22 @@ class Data(NdbModel):
     def getByDataId(cls, data_id):
         assert isinstance(data_id, int)
         client = Client()
-        MEMCACHE_KEY = "jkijwxpmuqzkldruoinj" + unicode(data_id)
-        data_key = client.get(MEMCACHE_KEY)
-        if data_key: return data_key
+        MEMCACHE_KEY = "jkijwxpmuqzkldruoinjx" + unicode(data_id)
+        data = client.get(MEMCACHE_KEY)
+        if data: return data
         query = ndb.Query(kind="Data")
         query = query.filter(cls.dataId == data_id)
         #query = query.order(cls.dataId)
-        data_keys = query.fetch(keys_only=True)
+        data_keys = query.fetch(keys_only=True, limit=2)
         if data_keys is None: return
-        if len(data_keys) == 0: return
+        if len(data_keys) == 0: 
+            raise EntityNotFound("Data", {"dataId":data_id})
         if len(data_keys) > 1:
             warn("%s Data entities with dataId %s were found" % (len(data_keys), data_id), RuntimeWarning)
-        data_key = data_keys[0]
-        if data_key: client.set(MEMCACHE_KEY, data_key)
-        assert isinstance(data_key, ndb.Key)
-        return data_key
+        data = data_keys[0].get()
+        assert isinstance(data, Data)
+        client.set(MEMCACHE_KEY, data)
+        return data
     
     @classmethod
     def queryRecent(cls):
