@@ -86,7 +86,7 @@ class Data(db.Model):
         data_list = []
         for field in request.arguments():
             vlist = request.get_all(field)
-            debug((field, vlist))
+            #debug((field, vlist))
             assert isinstance(vlist, list)
             for string in vlist:
                 data = cls.putEntity(field, string)
@@ -104,5 +104,46 @@ class Data(db.Model):
                 data = cls.putEntity(field, string)
                 if data is None: continue
                 data_list.append(data)
+        
+        getDataFromRequest(request)
     
         return data_list
+
+def getDataFromQueryPart(request):
+    assert isinstance(request, Request)
+    data_list = []
+    for field in request.arguments():
+        field = field.decode()
+        assert isinstance(field, unicode)
+        vlist = request.get_all(field)
+        #debug((field, vlist))
+        assert isinstance(vlist, list)
+        for string in vlist:
+            assert isinstance(string, unicode)
+            #data = cls.putEntity(field, string)
+            #if data is None: continue
+            data_list.append((field, string))
+    return data_list
+
+def getDataFromBody(request):
+    assert isinstance(request, Request)
+    data_list = []
+    try:
+        parsed_json = simplejson.loads(request.body)
+    except ValueError:
+        parsed_json = {}
+
+    for field, string in parsed_json.iteritems() :
+        #logging.log(logging.INFO, type(v))
+        #data = cls.putEntity(field, string)
+        #if data is None: continue
+        data_list.append((field, string))
+    return data_list
+
+def getDataFromRequest(request):
+    assert isinstance(request, Request)
+    l1 = getDataFromQueryPart(request)
+    assert isinstance(l1, list) 
+    l2 = getDataFromBody(request)
+    assert isinstance(l2, list)
+    return l1 + l2
