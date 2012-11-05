@@ -25,6 +25,7 @@ class EmailUser(NdbModel):
     
     emailUserId = ndb.IntegerProperty()
     email = ndb.StringProperty()
+    nonceEmail = ndb.StringProperty(indexed=False)
     hashedPassword = ndb.StringProperty(indexed=False)
     registeredDateTime = ndb.DateTimeProperty(indexed=False)
     invalidatedDateTime = ndb.DateTimeProperty()
@@ -148,13 +149,14 @@ class EmailUser(NdbModel):
             raise EntityNotFound(cls, {"nonce": nonce})
         return keys[0].get()
     
-    def setNonce(self):
+    def setNonce(self, nonce_email):
         uuid = uuid4()
         assert isinstance(uuid, UUID)
         nonce = uuid.get_hex().decode()
         assert isinstance(nonce, unicode)
         self.nonce = nonce
         self.nonceDateTime = datetime.utcnow()
+        self.nonceEmail = nonce_email
         self.put()
 
     @classmethod
