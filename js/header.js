@@ -60,16 +60,16 @@ lib.ui.makeTab = function(active){
 lib.ui.showElement=function(selector){
 				$(selector).each(function() {
 					$(this).css("display", "block");
-					$(this).css("background", "lightgreen");
-					$(this).css("margin", "1px");
+					//$(this).css("background", "lightgreen");
+					//$(this).css("margin", "1px");
 				});
 }//showElement
 
 lib.ui.hideElement = function (selector){
 				$(selector).each(function() {
 					$(this).css("display", "none");
-					$(this).css("background", "lightgreen");
-					$(this).css("margin", "1px");
+					//$(this).css("background", "lightgreen");
+					//$(this).css("margin", "1px");
 				});
 }//hideElement
 

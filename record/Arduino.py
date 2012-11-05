@@ -20,7 +20,7 @@ class Arduino(ndb.Model):
     duration = ndb.FloatProperty(indexed=False)
     
     def __init__(self, metadata_key):
-        assert 
+        pass
     
     
 #    ", "time", "gen.power(W)", "duration"

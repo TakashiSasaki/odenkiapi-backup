@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
+from google.appengine.ext import ndb
 #from google.appengine import runtime
-from model.NdbModel import NdbModel
+#from model.NdbModel import NdbModel
 from model.Columns import Columns
 #from model.Columns import Columns
 #from model.Command import getCommandById
@@ -8,6 +10,8 @@ from model.Columns import Columns
 import logging as _logging
 from lib.json.JsonRpcError import JsonRpcException
 import gaesessions
+from model.CsvMixin import CsvMixin
+from lib.DataTableMixin import DataTableMixin
 _logging.getLogger().setLevel(_logging.DEBUG)
 #from exceptions import Exception
 #from lib.JsonEncoder import dumps
@@ -168,7 +172,7 @@ class JsonRpcDispatcher(RequestHandler):
         json_string = dumps(json_rpc_response)
         callback = self.request.get("callback")
         if callback:
-            self.response.out.write("%s=(%s)" %(callback, json_string))
+            self.response.out.write("%s=(%s)" % (callback, json_string))
             return
         self.response.out.write(dumps(json_rpc_response))
         return
@@ -180,13 +184,13 @@ class JsonRpcDispatcher(RequestHandler):
 #        self.response.out.write(dumps(result))
 #        self.response.content_type = "application/javascript"
     
-    def _writeCsv(self, json_rpc_response, dialect=csv.excel, content_type="text/csv"):
+    def _writeCsv(self, json_rpc_response, dialect=csv.excel, content_type="text/plain"):
         assert isinstance(json_rpc_response, JsonRpcResponse)
         output = StringIO()
         csv_writer = csv.writer(output, dialect)
         columns = json_rpc_response.getColumns()
         if not columns:
-            warn("Column description is not set in JSON-RPC response object.") 
+            raise RuntimeError("Column description is not set in JSON-RPC response object.") 
             return
         assert isinstance(columns, Columns)
         column_ids = columns.getColumnIds()
@@ -196,7 +200,9 @@ class JsonRpcDispatcher(RequestHandler):
             warn("Result must be a list to emit CSV.") 
             return
         for record in result:
-            if isinstance(record, NdbModel):
+            if isinstance(record, ndb.Model):
+                assert isinstance(record, CsvMixin)
+            if isinstance(record, CsvMixin):
                 csv_writer.writerow(record.to_list(columns))
                 continue
             if isinstance(record, dict):
@@ -225,7 +231,7 @@ class JsonRpcDispatcher(RequestHandler):
         assert isinstance(columns, Columns)
         rows = []
         for x in jresponse.getResult():
-            assert isinstance(x, NdbModel)
+            assert isinstance(x, DataTableMixin)
             row = x.to_row(columns)
             debug(row)
             rows.append(row)

@@ -7,6 +7,7 @@ from google.appengine.api import users
 from lib.json.JsonRpcError import EntityNotFound
 from model.OdenkiUser import OdenkiUser
 from logging import debug
+from lib.Session import fillUser
 
 class Gmail(JsonRpcDispatcher):
     
@@ -42,24 +43,21 @@ class RedirectedFromGoogle(JsonRpcDispatcher):
         debug("type of current_user.user_id() is %s " % type(current_user.user_id()))
         try:
             gmail_user = GmailUser.getByGmailId(current_user.user_id())
-            assert isinstance(gmail_user, GmailUser)
+            gmail_user.saveToSession()
         except EntityNotFound:
             gmail_user = GmailUser()
-
-        if gmail_user.odenkiId:
-            odenki_user = OdenkiUser.getByOdenkiId(gmail_user.odenkiId)
-            assert isinstance(odenki_user, OdenkiUser)
-            odenki_user.saveToSession()
-        else:
-            try:
-                odenki_user = OdenkiUser.loadFromSession()
-                gmail_user.odenkiId = odenki_user.odenkiId
-            except EntityNotFound: pass
-
-        gmail_user.gmail = current_user.email()
-        gmail_user.nickname = current_user.nickname()
-        gmail_user.saveToSession()
-        gmail_user.put()
+            gmail_user.gmailId = current_user.user_id()
+            gmail_user.gmail = current_user.email()
+            gmail_user.nickname = current_user.nickname()
+            gmail_user.put()
+            gmail_user.saveToSession()
+        fillUser()
+        
+        try:
+            odenki_user = OdenkiUser.loadFromSession()
+        except EntityNotFound, e:
+            odenki_user = OdenkiUser.createNew()
+        fillUser()
 
 if __name__ == "__main__":
     mapping = []
@@ -67,4 +65,3 @@ if __name__ == "__main__":
     mapping.append(("/api/Gmail", Gmail))
     from lib.gae import run_wsgi_app
     run_wsgi_app(mapping)
-

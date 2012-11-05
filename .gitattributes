@@ -1,6 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
-*.html text
 # Custom for Visual Studio
 *.cs     diff=csharp
 *.sln    merge=union
@@ -22,4 +21,10 @@
 *.RTF	 diff=astextplain
 
 *.js	text=true
+
+*.py    text=true
+*.yaml	text=true
+*.xml	text=true whitespace=false
+*.html  text=true whitespace=false
+
 

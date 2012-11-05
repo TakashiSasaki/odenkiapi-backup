@@ -15,39 +15,79 @@
 			<div data-role="content">
 				<div data-role="collapsible" id="login">
 					<h1>メールアドレスによるログイン</h1>
-					<input type="email" placeholder="myname@example.com" class="email">
-					</input>
-					<input type="password" placeholder="password" class="password">
-					</input>
-					<input type="button" value="ログイン" onclick="login();">
-					</input>
+					<table>
+						<tr>
+							<td>
+							<input type="email" placeholder="myname@example.com" class="email">
+							</input></td>
+						</tr>
+						<tr>
+							<td>
+							<input type="password" placeholder="password" class="password">
+							</input></td>
+						</tr>
+						<tr>
+							<td>
+							<input type="button" value="ログイン" onclick="login();">
+							</input></td>
+						</tr>
+					</table>
 				</div>
 				<div data-role="collapsible" id="emailUser">
 					<h1>ログイン済みのメールアドレス</h1>
-					<input type="email" placeholder="sample@example.com" class="email">
-					</input>
-					<input type="button" value="ログアウト" onclick="logout();">
-					</input>
+					<table>
+						<tr>
+							<td>
+							<input type="email" placeholder="sample@example.com" class="email">
+							</input></td>
+						</tr>
+						<tr>
+							<td>
+							<input type="button" value="ログアウト" onclick="logout();">
+							</input>
+						</tr></td>
+					</table>
 				</div>
 				<div data-role="collapsible" id="setEmail">
 					<h1>メールアドレスの登録・変更</h1>
-					<input type="email" placeholder="myname@example.com" class="email">
-					</input>
-					<input type="button" value="登録確認のためのメールを送信する" onclick="setEmail();">
-					</input>
+					<table>
+						<tr>
+							<td>
+							<input type="email" placeholder="myname@example.com" class="email">
+							</input></td>
+						</tr>
+						<tr>
+							<td>
+							<input type="button" value="登録確認のためのメールを送信する" onclick="setEmail();">
+							</input></td>
+						</tr>
+					</table>
 				</div>
 				<div data-role="collapsible" id="setPassword">
 					<h1>パスワードの設定・変更</h1>
-					<input type="password" placeholder="password" class="password">
-					</input>
-					<input type="password" placeholder="確認のためもう一度" class="password2">
-					</input>
-					<input type="button" value="パスワードを設定する" onclick="setPassword();">
-					</input>
+					<table>
+						<tr>
+							<td>
+							<input type="password" placeholder="password" class="password">
+							</input></td>
+						</tr>
+						<tr>
+							<td>
+							<input type="password" placeholder="確認のためもう一度" class="password2">
+							</input></td>
+						</tr>
+						<tr>
+							<td>
+							<input type="button" value="パスワードを設定する" onclick="setPassword();">
+							</input></td>
+						</tr>
+					</table>
 				</div>
 				<div data-role="collapsible" id="admin">
 					<h1>デバッグ用</h1>
+					<table><tr><td>
 					<textarea readonly="readonly"> </textarea>
+					</td></tr></table>
 				</div>
 			</div>
 		</div>
@@ -59,12 +99,17 @@
                 dataType : "json",
                 success : function(data) {
                     $("#admin textarea").val($.toJSON(data));
-                    if(!data.result) {lib.ui.expand("#login"); return;}
-                	if(data.result.nonce) lib.ui.expand("#setPassword");
-                	if(!data.result.nonce && !data.result.email) lib.ui.expand("#login");
-                    if(data.result.email) {
-                    	lib.ui.expand("#emailUser");
-                    	$("#emailUser .email").val(data.result.email);
+                    if (!data.result) {
+                        lib.ui.expand("#login");
+                        return;
+                    }
+                    if (data.result.nonce)
+                        lib.ui.expand("#setPassword");
+                    if (!data.result.nonce && !data.result.email)
+                        lib.ui.expand("#login");
+                    if (data.result.email) {
+                        lib.ui.expand("#emailUser");
+                        $("#emailUser .email").val(data.result.email);
                     }
                 },
                 error : function(data) {
@@ -109,56 +154,56 @@
                     dataType : "json",
                     success : function(data) {
                         $("#admin textarea").val($.toJSON(data));
-                    	$("#setEmail .email").val("登録のためのメールを送信しました。メールに記載されているURLを開いて登録作業を続けて下さい。");
+                        $("#setEmail .email").val("登録のためのメールを送信しました。メールに記載されているURLを開いて登録作業を続けて下さい。");
                     },
                     error : function(data) {
                         $("#admin textarea").val($.toJSON(data));
-                    	$("#setEmail .email").val("指定されたメールアドレスでは登録できません。");
-                    }
-                });
-            }
-            
-            function login(){
-                $.ajax({
-                	method : "post",
-                    url : "/api/Email?method=login",
-                    data : {
-                        email : $("#login .email")[0].value,
-                    	password : $("#login .password")[0].value,
-                    },
-                    dataType : "json",
-                    success : function(data) {
-                        $("#admin textarea").val($.toJSON(data));
-                    	$("#login .email").val("");
-                    	$("#login .password").val("");
-                    	$("#emailUser .email").val(data.result.email);
-                    	lib.ui.collapse("#login");
-                    	lib.ui.expand("#emailUser");
-                    },
-                    error : function(data) {
-                        $("#admin textarea").val($.toJSON(data));
-                    	$("#emailUser .email").val("ログインできませんでした");
-                    	lib.ui.expand("#emailUser");
+                        $("#setEmail .email").val("指定されたメールアドレスでは登録できません。");
                     }
                 });
             }
 
-            function logout(){
+            function login() {
                 $.ajax({
-                	method : "post",
+                    method : "post",
+                    url : "/api/Email?method=login",
+                    data : {
+                        email : $("#login .email")[0].value,
+                        password : $("#login .password")[0].value,
+                    },
+                    dataType : "json",
+                    success : function(data) {
+                        $("#admin textarea").val($.toJSON(data));
+                        $("#login .email").val("");
+                        $("#login .password").val("");
+                        $("#emailUser .email").val(data.result.email);
+                        lib.ui.collapse("#login");
+                        lib.ui.expand("#emailUser");
+                    },
+                    error : function(data) {
+                        $("#admin textarea").val($.toJSON(data));
+                        $("#emailUser .email").val("ログインできませんでした");
+                        lib.ui.expand("#emailUser");
+                    }
+                });
+            }
+
+            function logout() {
+                $.ajax({
+                    method : "post",
                     url : "/api/Email?method=logout",
                     data : {
                     },
                     dataType : "json",
                     success : function(data) {
-                    	$("#emailUser .email").val("");
-                    	lib.ui.collapse("#emailUser");
-                    	lib.ui.expand("#login");
+                        $("#emailUser .email").val("");
+                        lib.ui.collapse("#emailUser");
+                        lib.ui.expand("#login");
                         $("#admin textarea").val($.toJSON(data));
                     },
                     error : function(data) {
-                    	lib.ui.expand("#emailUser");
-                    	lib.ui.collapse("#login");
+                        lib.ui.expand("#emailUser");
+                        lib.ui.collapse("#login");
                         $("#admin textarea").val($.toJSON(data));
                     }
                 });

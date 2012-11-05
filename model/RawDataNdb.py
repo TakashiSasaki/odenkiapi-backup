@@ -1,11 +1,14 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
 from google.appengine.ext import ndb
 #from google.appengine.ext.webapp import Request
-from model.Counter import Counter
+#from model.Counter import Counter
 #from json import dumps
 from logging import debug
-from model.NdbModel import NdbModel
+#from model.NdbModel import NdbModel
 from model.Columns import Columns
+from model.CsvMixin import CsvMixin
+from lib.DataTableMixin import DataTableMixin
 
 class RawDataColumns(Columns):
     def __init__(self):
@@ -16,7 +19,7 @@ class RawDataColumns(Columns):
         self.addString("fragment")
         self.addBoolean("body")
 
-class RawData(NdbModel):
+class RawData(ndb.Model, CsvMixin, DataTableMixin):
     rawDataId = ndb.IntegerProperty()
     path = ndb.StringProperty(indexed=False)
     parameters = ndb.StringProperty(indexed=False)
@@ -24,10 +27,7 @@ class RawData(NdbModel):
     fragment = ndb.StringProperty(indexed=False)
     body = ndb.StringProperty(indexed=False)
 
-    fieldnames = ["rawDataId", "path", "parameters", "query", "fragment", "body"]
-    
-    #def to_list(self):
-    #    return [self.rawDataId, self.path, self.parameters, self.query, self.fragment, self.body]
+    #fieldnames = ["rawDataId", "path", "parameters", "query", "fragment", "body"]
     
     @classmethod
     def queryRange(cls, start, end):
@@ -73,10 +73,3 @@ class RawData(NdbModel):
             q = q.filter(cls.rawDataId <= end_rawdata_id)
             q = q.filter(cls.rawDataId >= start_rawdata_id)
         return q
-
-    #def toDict(self):
-    #    return self.to_dict()
-    
-    #def toJson(self):
-    #    return dumps(self.to_dict())
-     

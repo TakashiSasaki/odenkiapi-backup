@@ -164,13 +164,13 @@ class _DeleteUnused(JsonRpcDispatcher):
         
 if __name__ == "__main__":
     mapping = []
-    mapping.append(("/record/Data", _Recent))
-    mapping.append(("/record/Data/[0-9]+", _ByDataId))
-    mapping.append(("/record/Data/id/[0-9]+", _ByKeyId))
-    mapping.append(("/record/Data/[0-9]+/[0-9]+", _Range))
-    mapping.append(("/record/Data/duplicated", _DuplicationCheck))
-    mapping.append(("/record/Data/UnusedDataEliminator/[0-9]+/[0-9]+", _DeleteUnused))
-    mapping.append(("/record/Data/[^/]+", _ByField))
-    mapping.append(("/record/Data/[^/]+/[^/]+", _ByFieldAndString))
+    mapping.append(("/api/Data", _Recent))
+    mapping.append(("/api/Data/[0-9]+", _ByDataId))
+    mapping.append(("/api/Data/id/[0-9]+", _ByKeyId))
+    mapping.append(("/api/Data/[0-9]+/[0-9]+", _Range))
+    mapping.append(("/api/Data/duplicated", _DuplicationCheck))
+    mapping.append(("/api/Data/UnusedDataEliminator/[0-9]+/[0-9]+", _DeleteUnused))
+    mapping.append(("/api/Data/[^/]+", _ByField))
+    mapping.append(("/api/Data/[^/]+/[^/]+", _ByFieldAndString))
     from lib.gae import run_wsgi_app
     run_wsgi_app(mapping)

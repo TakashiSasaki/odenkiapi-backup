@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
 from lib.gae import JsonRpcDispatcher
 from lib.json import JsonRpcRequest, JsonRpcResponse, JsonRpcError
@@ -14,17 +15,17 @@ from google.appengine.ext.deferred import defer
 
 class _Recent(JsonRpcDispatcher):
     def GET(self, jrequest, jresponse):
-        LIMIT = 10
+        #LIMIT = 100
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
         query = MetadataNdb.queryRecent()
-        keys = query.fetch(keys_only=True, limit=LIMIT)
+        keys = query.fetch(keys_only=True, limit=100)
         for key in keys:
             metadata = key.get()
             #assert isinstance(metadata, MetadataNdb)
             jresponse.addResult(metadata)
         jresponse.setColumns(MetadataColumns())
-        jresponse.setExtraValue("limit", LIMIT)
+        #jresponse.setExtraValue("limit", LIMIT)
     
 class _Range(JsonRpcDispatcher):
     def GET(self, jrequest, jresponse):
@@ -145,6 +146,7 @@ class _OneDay(JsonRpcDispatcher):
         keys = query.fetch(limit=24 * 60 + 100, keys_only=True)
         for key in keys:
             jresponse.addResult(key.get())
+        jresponse.setColumns(MetadataColumns())
 
 class _OneHour(JsonRpcDispatcher):
     def GET(self, jrequest, jresponse):
@@ -167,6 +169,7 @@ class _OneHour(JsonRpcDispatcher):
         keys = query.fetch(limit=24 * 60 + 100, keys_only=True)
         for key in keys:
             jresponse.addResult(key.get())
+        jresponse.setColumns(MetadataColumns())
             
 class _ByMetadataId(JsonRpcDispatcher):
     def GET(self, jrequest, jresponse):
@@ -229,15 +232,15 @@ class _ByDataKey(JsonRpcDispatcher):
 
 if __name__ == "__main__":
     mapping = []
-    mapping.append(("/record/Metadata", _Recent))
-    mapping.append(("/record/Metadata/id/[0-9]+", _ByKeyId))
-    mapping.append(("/record/Metadata/[0-9]+", _ByMetadataId))
-    mapping.append(("/record/Metadata/[0-9]+/[0-9]+", _Range))
-    mapping.append(("/record/Metadata/[0-9]+/[0-9]+/[0-9]+", _OneDay))
-    mapping.append(("/record/Metadata/[0-9]+/[0-9]+/[0-9]+/[0-9]+", _OneHour))
+    mapping.append(("/api/Metadata", _Recent))
+    mapping.append(("/api/Metadata/key/[0-9]+", _ByKeyId))
+    mapping.append(("/api/Metadata/[0-9]+", _ByMetadataId))
+    mapping.append(("/api/Metadata/[0-9]+/[0-9]+", _Range))
+    mapping.append(("/api/Metadata/[0-9]+/[0-9]+/[0-9]+", _OneDay))
+    mapping.append(("/api/Metadata/[0-9]+/[0-9]+/[0-9]+/[0-9]+", _OneHour))
     #mapping.append(("/record/Metadata/CanonicalizeData/[0-9]+/[0-9]+", _CanonicalizeData))
     #mapping.append(("/record/Metadata/MakeTestData", _MakeTestData))
-    mapping.append(("/record/Metadata/dataId/[0-9]+", _ByDataId))
-    mapping.append(("/record/Metadata/dataKey/[0-9]+", _ByDataKey))
+    mapping.append(("/api/Metadata/dataId/[0-9]+", _ByDataId))
+    mapping.append(("/api/Metadata/dataKey/[0-9]+", _ByDataKey))
     from lib.gae import run_wsgi_app
     run_wsgi_app(mapping)

@@ -3,12 +3,13 @@ from __future__ import unicode_literals, print_function
 from lib.gae import JsonRpcDispatcher, run_wsgi_app
 from lib.json.JsonRpcRequest import JsonRpcRequest
 from lib.json.JsonRpcResponse import JsonRpcResponse
-from model.EmailUser import EmailRegistration, EmailUser
+from model.EmailUser import EmailUser
 from lib.json.JsonRpcError import JsonRpcError, JsonRpcException, InvalidParams, \
     UnexpectedState, EntityNotFound, PasswordMismatch
 from logging import debug
 import gaesessions
 from model.OdenkiUser import OdenkiUser
+from lib.Session import fillUser, fillEmailUser
 
 EMAIL_REGISTRATION_NONCE = str("f5464d0jVbvde1Uxtur")
 
@@ -18,31 +19,22 @@ class Email(JsonRpcDispatcher):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
-        try:
-            email_user = EmailUser.loadFromSession()
-            assert isinstance(email_user, EmailUser)
-            jresponse.setResultValue("email", email_user.email)
-            jresponse.setResultValue("emailUserId", email_user.emailUserId)
-            jresponse.setResultValue("odenkiId", email_user.odenkiId)
-        except EntityNotFound:
-            pass
-        session = gaesessions.get_current_session()
-        try:
-            nonce = session[EMAIL_REGISTRATION_NONCE]
-            jresponse.setResultValue("nonce", nonce)
-        except KeyError:
-            pass
+        email_user = EmailUser.loadFromSession()
+        jresponse.setResult(email_user)
         
-    def startOver(self, jrequest, jresponse):
-        assert isinstance(jrequest, JsonRpcRequest)
-        assert isinstance(jresponse, JsonRpcResponse)
-        jresponse.setId()
-
-        session = gaesessions.get_current_session()
-        assert isinstance(session, gaesessions.Session)
-        session.terminate()
+#    def startOver(self, jrequest, jresponse):
+#        assert isinstance(jrequest, JsonRpcRequest)
+#        assert isinstance(jresponse, JsonRpcResponse)
+#        jresponse.setId()
+#
+#        session = gaesessions.get_current_session()
+#        assert isinstance(session, gaesessions.Session)
+#        session.terminate()
 
     def setEmail(self, jrequest, jresponse):
+        """If EmailUser is loaded into the session,
+        it means the EmailUser is in some transitional state.
+        Usually EmailUser is not loaded in the session and only OdenkiUser is loaded."""
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
@@ -50,21 +42,32 @@ class Email(JsonRpcDispatcher):
             email = unicode(jrequest.getValue("email")[0])
         except Exception:
             raise JsonRpcException(None, "email is not given for setEmail method.")
-        email_registration = EmailRegistration.createNew(email)
-        assert isinstance(email_registration, EmailRegistration)
-        jresponse.setResultValue("email", email_registration.email)
-        jresponse.setResultValue("nonce", email_registration.nonce)
-        jresponse.setResultValue("beginning", email_registration.beginning)
+
+        try:
+            email_user = EmailUser.loadFromSession()
+            if email_user.email != email:
+                email_user = EmailUser.createByEmail(email)
+        except EntityNotFound:
+            try:
+                email_user = EmailUser.getByEmail(email)
+            except EntityNotFound:
+                email_user = EmailUser.createByEmail(email)
+        assert isinstance(email_user, EmailUser)
+        email_user.setNonce()
+        EmailUser.deleteFromSession()
         
         from google.appengine.api import mail
         message = mail.EmailMessage()
         message.to = email
-        message.body = "http://odenkiapi.appengine.com/api/Email/" + email_registration.nonce + " にアクセスして下さい。"
+        message.body = "「みんなでおでんき」に関心をお持ちいただきありがとうございます。\n" + \
+            ("このメールアドレス %s" % email) + " でご登録いただくには次のページを開いて下さい。 \n " + \
+            ("http://odenkiapi.appspot.com/api/Email/%s" % email_user.nonce) + "\n"+ \
+            "みんなでおでんきに登録しない場合はこのメールを無視して下さい。\n"
         message.sender = "admin@odenki.org"
         message.subject = "みんなでおでんきへの登録確認メール"
         message.send()
     
-    def invalidateEmail(self, jrequest, jresponse):
+    def invalidate(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
@@ -72,6 +75,7 @@ class Email(JsonRpcDispatcher):
         if email_user is None:
             jresponse.setError(JsonRpcError.SERVER_ERROR_RESERVED_MIN, "user is not logged in.")
         email_user.invalidate()
+        email_user.deleteFromSession()
 
     def setPassword(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
@@ -127,34 +131,18 @@ class Email(JsonRpcDispatcher):
         except Exception:
             raise EntityNotFound("EmailUser entity is not found", {"email": email})
         assert isinstance(email_user, EmailUser)
-        email_user.matchPassword(raw_password)
-        email_user.saveToSession()
+        email_user.matchPassword(raw_password) # raises PasswordMismatch if password not matches
+        email_user.saveToSession()        
+        fillUser()
         
-        if email_user.odenkiId:
-            debug("email_user.odenkiId = %s" % email_user.odenkiId)
-            try:
-                odenki_user = OdenkiUser.getByOdenkiId(email_user.odenkiId)
-                assert isinstance(odenki_user, OdenkiUser)
-                odenki_user.saveToSession()
-            except EntityNotFound:
-                debug("OdenkiUser with odenkiId %s was not found" % email_user.odenkiId)
-                odenki_user = OdenkiUser.getNew()
-                #assert isinstance(OdenkiUser.getByOdenkiId(odenki_user.odenkiId), OdenkiUser)
-                assert isinstance(odenki_user, OdenkiUser)
-                odenki_user.saveToSession()
-                email_user.odenkiId = odenki_user.odenkiId
-                email_user.put()
-
-        else:
-            debug("email_user.odenkiId is not set.")
-            odenki_user = OdenkiUser.getNew()
-            #assert isinstance(OdenkiUser.getByOdenkiId(odenki_user.odenkiId), OdenkiUser)
-            assert isinstance(odenki_user, OdenkiUser)
+        try:
+            odenki_user = OdenkiUser.loadFromSession()
+        except EntityNotFound, e:
+            odenki_user = OdenkiUser.createNew()
             odenki_user.saveToSession()
-            email_user.odenkiId = odenki_user.odenkiId
-            email_user.put()
-            
-        email_user.saveToSession()
+            fillUser()
+        assert isinstance(OdenkiUser.loadFromSession(), OdenkiUser)
+        assert isinstance(EmailUser.loadFromSession(), EmailUser)
         assert odenki_user.odenkiId == email_user.odenkiId
         jresponse.setResultValue("email", email_user.email)
         jresponse.setResultValue("emailUserId", email_user.emailUserId)
@@ -171,10 +159,11 @@ class SetNonce(JsonRpcDispatcher):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
+        EmailUser.deleteFromSession()
+        jresponse.setRedirectTarget("http://odenki.org/html/auth/Email.html")
         nonce = unicode(jrequest.getPathInfo(3))
-        session = gaesessions.get_current_session()
-        session[EMAIL_REGISTRATION_NONCE] = nonce
-        jresponse.setRedirectTarget("/html/auth/Email.html")
+        email_user = EmailUser.getByNonce(nonce)
+        email_user.saveToSession()
 
 if __name__ == "__main__":
     mapping = []

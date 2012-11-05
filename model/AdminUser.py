@@ -55,4 +55,3 @@ class AdminMode(bool):
         assert isinstance(session, Session)
         session.set(self.SESSION_KEY, admin_mode)
 
-    def getAdmin

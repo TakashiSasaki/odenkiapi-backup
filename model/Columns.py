@@ -1,7 +1,15 @@
 from __future__ import unicode_literals, print_function
-from logging import debug, info
+from logging import debug
 from lib.util import Singleton
-from _pyio import __metaclass__
+
+COLUMN_TYPE_STRING = "string"
+COLUMN_TYPE_NUMBER = "number"
+COLUMN_TYPE_DATE = "date"
+COLUMN_TYPE_DATETIME = "datetime"
+COLUMN_TYPE_BOOLEAN = "boolean"
+COLUMN_TYPE_TIMEOFDAY = "timeofday"
+COLUMN_TYPE_DATA_FIELD = "datafield"
+COLUMN_TYPE_DATA_STRING = "datastring"
 
 class Column(dict):
     """
@@ -29,38 +37,54 @@ class Column(dict):
     
     def getType(self):
         return self["type"]
+    
+    def isString(self):
+        return self.getType() == COLUMN_TYPE_STRING
+    def isNumber(self):
+        return self.getType() == COLUMN_TYPE_NUMBER
+    def isDate(self):
+        return self.getType() == COLUMN_TYPE_DATE
+    def isDateTime(self):
+        return self.getType() == COLUMN_TYPE_DATETIME
+    def isBoolean(self):
+        return self.getType() == COLUMN_TYPE_BOOLEAN
+    def isTimeOfDay(self):
+        return self.getType() == COLUMN_TYPE_TIMEOFDAY 
+    def isDataField(self):
+        return self.getType() == COLUMN_TYPE_DATA_FIELD
+    def isDataString(self):
+        return self.getType() == COLUMN_TYPE_DATA_STRING
 
 class Columns(list):
     __metaclass__ = Singleton
-    
-    _TYPE_STRING = "string"
-    _TYPE_NUMBER = "number"
-    _TYPE_DATE = "date"
-    _TYPE_DATETIME = "datetime"
-    _TYPE_BOOLEAN = "boolean"
-    _TYPE_TIMEOFDAY = "timeofday"
-    
+    __slots__ = []
 
     def addColumn(self, column_id, column_label=None, column_type=None):
         self.append(Column(column_id, column_label, column_type))
         
     def addNumber(self, column_id, column_label=None):
-        self.addColumn(column_id, column_label, self._TYPE_NUMBER)
+        self.addColumn(column_id, column_label, COLUMN_TYPE_NUMBER)
     
     def addString(self, column_id, column_label=None):
-        self.addColumn(column_id, column_label, self._TYPE_STRING)
+        self.addColumn(column_id, column_label, COLUMN_TYPE_STRING)
     
     def addDate(self, column_id, column_label=None):
-        self.addColumn(column_id, column_label, self._TYPE_DATE)
+        self.addColumn(column_id, column_label, COLUMN_TYPE_DATE)
 
     def addDateTime(self, column_id, column_label=None):
-        self.addColumn(column_id, column_label, self._TYPE_DATETIME)
+        self.addColumn(column_id, column_label, COLUMN_TYPE_DATETIME)
 
     def addBoolean(self, column_id, column_label=None):
-        self.addColumn(column_id, column_label, self._TYPE_BOOLEAN)
+        self.addColumn(column_id, column_label, COLUMN_TYPE_BOOLEAN)
 
     def addTimeOfDay(self, column_id, column_label=None):
-        self.addColumn(column_id, column_label, self._TYPE_TIMEOFDAY)
+        self.addColumn(column_id, column_label, COLUMN_TYPE_TIMEOFDAY)
+    
+    def addDataField(self, column_id, column_label=None):
+        self.addColumn(column_id, column_label, COLUMN_TYPE_DATA_FIELD)
+        
+    def addDataString(self, column_id, column_label=None):
+        self.addColumn(column_id, column_label, COLUMN_TYPE_DATA_STRING)
 
     def getColumnIds(self):
         ids = []

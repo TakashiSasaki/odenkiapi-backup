@@ -1,12 +1,14 @@
+#!-*- coding:utf-8 -*-
 from __future__ import unicode_literals, print_function
 from model.NdbModel import NdbModel
 from google.appengine.ext import ndb
 import gaesessions
-from lib.json.JsonRpcError import EntityNotFound, EntityExists, OAuthError
+from lib.json.JsonRpcError import EntityNotFound, EntityExists, OAuthError, \
+    EntityDuplicated
 from google.appengine.api import urlfetch
 import json
 from credentials import TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET
-
+from gaesessions import Session
 
 class TwitterUser(NdbModel):
     twitterId = ndb.IntegerProperty()
@@ -53,23 +55,27 @@ class TwitterUser(NdbModel):
         session = gaesessions.get_current_session()
         assert isinstance(session, gaesessions.Session)
         session[self.SESSION_KEY] = self
+        
+    @classmethod
+    def deleteFromSession(cls):
+        session = gaesessions.get_current_session()
+        if __debug__: assert isinstance(session, Session)
+        session.pop(cls.SESSION_KEY)
 
     @classmethod
     def getByTwitterId(cls, twitter_id):
-        assert isinstance(twitter_id, int)
-        key = cls.keyByTwitterId(twitter_id)
-        assert isinstance(key, ndb.Key)
-        entity = key.get()
-        assert isinstance(entity, TwitterUser)
-        return entity
+        return cls.keyByTwitterId(twitter_id).get()
     
-    def keyByTwitterId(self, twitter_id):
+    @classmethod
+    def keyByTwitterId(cls, twitter_id):
         assert isinstance(twitter_id, int)
-        query = self.queryByTwitterId(twitter_id)
-        key = query.get(keys_only=True)
-        if key is None:
-            raise EntityNotFound(self.__class__, {"twitterId":twitter_id})
-        return key
+        query = cls.queryByTwitterId(twitter_id)
+        keys = query.fetch(keys_only=True, limit=2)
+        if len(keys) == 0:
+            raise EntityNotFound(cls, {"twitterId":twitter_id})
+        if len(keys) == 2:
+            raise EntityDuplicated(cls, {"twitterId": twitter_id})
+        return keys[0]
 
     def setAccessToken(self, access_token, access_token_secret, user_id, screen_name):
         assert isinstance(access_token, str)
@@ -82,7 +88,9 @@ class TwitterUser(NdbModel):
         self.screenName = screen_name
 
     def verifyCredentials1(self):
-        """this only works with Twitter@Anywhere access token"""
+        raise DeprecationWarning(
+        """verifyCredentials1 uses Twitter API 1.0 and it works only with Twitter@Anywhere access token.
+        Use verifyCredentials11 instead.""")
         assert isinstance(self.accessToken, str)
         if self.accessToken is None:
             raise OAuthError("accessToken is not set.")
@@ -147,18 +155,17 @@ class TwitterUser(NdbModel):
 
     @classmethod
     def getByOdenkiId(cls, odenki_id):
-        key = cls.keyByOdenkiId(odenki_id)
-        twitter_user = key.get()
-        assert isinstance(twitter_user, TwitterUser)
-        return twitter_user
+        return cls.keyByOdenkiId(odenki_id).get()
     
     @classmethod
     def keyByOdenkiId(cls, odenki_id):
         query = cls.queryByOdenkiId(odenki_id)
-        key = query.get(keys_only=True)
-        if key is None:
-            raise EntityNotFound(cls, {"odenki_id": odenki_id})
-        return key
+        keys = query.fetch(keys_only=True, limit=2)
+        if len(keys) == 0:
+            raise EntityNotFound(cls, {"odenkiId": odenki_id})
+        if len(keys) == 2:
+            raise EntityDuplicated(cls, {"odenkiId": odenki_id})
+        return keys[0]
     
     @classmethod
     def queryByOdenkiId(cls, odenki_id):
@@ -168,6 +175,7 @@ class TwitterUser(NdbModel):
 
     @classmethod
     def deleteAll(cls):
+        raise DeprecationWarning
         query = ndb.Query(kind="TwitterUser")
         for key in query:
             assert isinstance(key, ndb.Key)

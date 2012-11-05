@@ -9,6 +9,7 @@ from model.Counter import Counter
 from json import loads
 from model.NdbModel import NdbModel
 from google.appengine.api.memcache import Client
+from lib.json.JsonRpcError import EntityDuplicated, EntityNotFound, EntityExists
 
 class Data(NdbModel):
     dataId = ndb.IntegerProperty()
@@ -19,6 +20,28 @@ class Data(NdbModel):
     
     def to_list(self):
         return [self.dataId, self.field, self.string]
+    
+    @classmethod
+    def prepare(cls, field, string):
+        try:
+            data = cls.getByFieldAndString(field, string)
+            return data
+        except EntityNotFound:
+            data = cls.create(field, string)
+            return data
+    
+    @classmethod
+    def create(cls, field, string):
+        try:
+            existing = cls.getByFieldAndString(field, string)
+            raise EntityExists("Data", {"field": field, "string":string})
+        except EntityNotFound:
+            data = Data()
+            data.dataId = Counter.GetNextId("dataId")
+            data.field = field
+            data.string = string
+            data.put()
+            return data
     
     @classmethod
     def queryByField(cls, field):
@@ -55,6 +78,16 @@ class Data(NdbModel):
         return data_keys
     
     @classmethod
+    def getByFieldAndString(cls, field, string):
+        query = cls.queryByFieldAndString(field, string)
+        keys = query.fetch(keys_only=True, limit=2)
+        if len(keys) == 2:
+            raise EntityDuplicated()
+        if len(keys) == 0:
+            raise EntityNotFound("Data", {"field": field, "string":string})
+        return keys[0].get()
+    
+    @classmethod
     def querySingle(cls, data_id):
         warn("querySingle is deprecatd. Use getByDataId instead.", DeprecationWarning, 2)
         query = ndb.Query(kind="Data")
@@ -72,21 +105,22 @@ class Data(NdbModel):
     def getByDataId(cls, data_id):
         assert isinstance(data_id, int)
         client = Client()
-        MEMCACHE_KEY = "jkijwxpmuqzkldruoinj" + unicode(data_id)
-        data_key = client.get(MEMCACHE_KEY)
-        if data_key: return data_key
+        MEMCACHE_KEY = "jkijwxpmuqzkldruoinjx" + unicode(data_id)
+        data = client.get(MEMCACHE_KEY)
+        if data: return data
         query = ndb.Query(kind="Data")
         query = query.filter(cls.dataId == data_id)
         #query = query.order(cls.dataId)
-        data_keys = query.fetch(keys_only=True)
+        data_keys = query.fetch(keys_only=True, limit=2)
         if data_keys is None: return
-        if len(data_keys) == 0: return
+        if len(data_keys) == 0: 
+            raise EntityNotFound("Data", {"dataId":data_id})
         if len(data_keys) > 1:
             warn("%s Data entities with dataId %s were found" % (len(data_keys), data_id), RuntimeWarning)
-        data_key = data_keys[0]
-        if data_key: client.set(MEMCACHE_KEY, data_key)
-        assert isinstance(data_key, ndb.Key)
-        return data_key
+        data = data_keys[0].get()
+        assert isinstance(data, Data)
+        client.set(MEMCACHE_KEY, data)
+        return data
     
     @classmethod
     def queryRecent(cls):

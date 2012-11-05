@@ -14,7 +14,7 @@
 		<div data-role="page">
 			<div data-role="content">
 				<div data-role="collapsible" id="odenkiUser" data-collapsed="false">
-					<h1>ログインの状態</h1>
+					<h1>おでんきユーザー情報</h1>
 					<table>
 						<tr>
 							<td><img src="/image/odenki.png" width="50px" height="50px"></img></td>
@@ -51,15 +51,13 @@
 							</input></td>
 						</tr>
 					</table>
-					<textarea value="デバッグ用"></textarea>					
-
-
+					<textarea value="デバッグ用"></textarea>															
 				</div>
 				<div data-role="collapsible" id="twitterLogin" data-collapsed="false">
 					<h1>Twitterアカウントによるログインの状態</h1>
 					<table>
 						<tr>
-							<td><img width="50px" height="50px"></img></td>
+							<td><img width="50px" height="50px" src="https://si0.twimg.com/a/1349074900/images/resources/twitter-bird-blue-on-white.png"></img></td>
 							<td>Twitterユーザ</td>
 							<td>
 							<input readonly="readonly" class="screenName">
@@ -72,7 +70,8 @@
 						<tr>
 							<td colspan="5">
 							<input type="button" value="Twitterによるログイン" onclick="window.location.href='/api/Twitter2/RedirectToAuthorizeUrl'">
-							</input> </td>
+							</input> 
+							</td>
 						</tr>
 					</table>
 					<textarea value="デバッグ用"></textarea>
@@ -89,11 +88,27 @@
 							<input readonly="readonly" class="odenkiId">
 							</input></td>
 						</tr>
-						<tr><td colspan="4"><input type="button" value="Googleアカウントによるログイン" >
-					</input></td></tr>
+						<tr>
+							<td colspan="4">
+							<input type="button" value="Googleアカウントによるログイン" >
+							</input></td>
+						</tr>
 					</table>
-					
-					<textarea value="デバッグ用"></textarea>
+					<textarea value="デバッグ用"></textarea>					
+
+
+				</div>
+				<div data-role="collapsible" data-collapsed="true">
+					<h1>デバッグ用</h1>
+					<table>
+						<tr>
+							<td >
+							<input type="button" value="デバッグ表示有効" onclick="lib.ui.showElement('textarea');">
+							</input></td><td >
+							<input type="button" value="デバッグ表示無効" onclick='lib.ui.hideElement("textarea");'>
+							</input></td>
+						</tr>
+					</table>
 				</div>
 			</div>
 		</div>
@@ -123,6 +138,8 @@
                     }
                 },
                 error : function(data) {
+					
+                    $("#odenkiUser .odenkiName").val("ログインしていません");
                     $("#odenkiUser textarea").val($.toJSON(data));
                     $("#odenkiUser .odenkiId").val(null);
                     $("#odenkiUser .nickname").val(null);
@@ -147,6 +164,7 @@
                     }
                 },
                 error : function(data) {
+                	lib.ui.collapse("#emailLogin");
                     $("#admin textarea").val($.toJSON(data));
                     $("#emailUser .email").val(data.result.email);
                     $("#emailUser .emailUserId").val(data.result.emailUserId);
@@ -173,6 +191,7 @@
                     $("#gmailLogin [type='button']").attr("onclick", "window.location.href='" + data.result.login_url + "'");
                 },
                 error : function(data) {
+                	lib.ui.collapse("#gmailLogin");
                     $("#admin textarea").val($.toJSON(data));
                     $("#emailUser .email").val(data.result.email);
                     $("#emailUser .emailUserId").val(data.result.emailUserId);
@@ -206,6 +225,8 @@
                     $("#gmailLogin [type='button']").attr("onclick", "window.location.href='" + data.result.login_url + "'");
                 },
                 error : function(data) {
+                	lib.ui.collapse("#twitterLogin");
+                    $("#twitterLogin .screenName").val("ログインしていません");
                     $("#admin textarea").val($.toJSON(data));
                     $("#emailUser .email").val(data.result.email);
                     $("#emailUser .emailUserId").val(data.result.emailUserId);
