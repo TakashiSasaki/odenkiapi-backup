@@ -139,6 +139,7 @@ class Email(JsonRpcDispatcher):
         assert email_user.odenkiId is not None
         odenki_user = OdenkiUser.getByOdenkiId(email_user.odenkiId)
         odenki_user.saveToSession()
+        EmailUser.deleteFromSession()
         
 #        fillUser()
         
@@ -160,6 +161,8 @@ class Email(JsonRpcDispatcher):
         jresponse.setId()
         session = gaesessions.get_current_session()
         session.terminate()
+        email_user = EmailUser.loadFromSession()
+        jresponse.setResultValue(email_user)
 
 class NonceCallback(JsonRpcDispatcher):
     

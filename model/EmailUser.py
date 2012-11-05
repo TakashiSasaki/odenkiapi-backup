@@ -9,6 +9,7 @@ from datetime import datetime
 from lib.json.JsonRpcError import EntityNotFound, EntityExists, PasswordMismatch, EntityDuplicated
 from logging import debug
 import gaesessions
+from model.OdenkiUser import OdenkiUser
 #from gaesessions import Session
 
 def _hashPassword(raw_password):
@@ -85,13 +86,15 @@ class EmailUser(NdbModel):
         try:
             existing_email_user = cls.getByEmail(email)
             raise EntityExists(cls, {"existing_email_user": existing_email_user})
-        except:
-            pass
+        except: pass
         email_user = EmailUser()
         assert isinstance(email_user, EmailUser)
         email_user.email = email
         email_user.registeredDateTime = datetime.now()
         email_user.emailUserId = Counter.GetNextId("emailUserId")
+        odenki_user = OdenkiUser.createNew()
+        assert isinstance(odenki_user, OdenkiUser)
+        email_user.odenkiId = odenki_user.odenkiId
         email_user.put()
         return email_user
 
