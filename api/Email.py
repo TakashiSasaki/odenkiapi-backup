@@ -19,8 +19,15 @@ class Email(JsonRpcDispatcher):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
-        email_user = EmailUser.loadFromSession()
-        jresponse.setResult(email_user)
+        try:
+            email_user = EmailUser.loadFromSession()
+        except EntityNotFound, e:
+            email_user = None
+        try:
+            odenki_user = OdenkiUser.loadFromSession()
+        except EntityNotFound, e:
+            odenki_user = None
+        jresponse.setResult({"EmailUser": email_user, "OdenkiUser":odenki_user})
         
 #    def startOver(self, jrequest, jresponse):
 #        assert isinstance(jrequest, JsonRpcRequest)
@@ -42,15 +49,21 @@ class Email(JsonRpcDispatcher):
             email = unicode(jrequest.getValue("email")[0])
         except Exception:
             raise JsonRpcException(None, "email is not given for setEmail method.")
-
+        
+        email_user = None
         try:
-            email_user = EmailUser.loadFromSession()
-                #email_user = EmailUser.createByEmail(email)
-        except EntityNotFound:
-            try:
+            odenki_user = OdenkiUser.loadFromSession()
+            email_user = EmailUser.getByOdenkiId(odenki_user.odenkiId)
+        except EntityNotFound, e: pass 
+
+        if email_user is None:
+            try: 
                 email_user = EmailUser.getByEmail(email)
-            except EntityNotFound:
-                email_user = EmailUser.createByEmail(email)
+            except EntityNotFound, e: pass
+        
+        if email_user is None:
+            email_user = EmailUser.createByEmail(email)
+
         assert isinstance(email_user, EmailUser)
         email_user.setNonce(email)
         EmailUser.deleteFromSession()
@@ -161,8 +174,15 @@ class Email(JsonRpcDispatcher):
         jresponse.setId()
         session = gaesessions.get_current_session()
         session.terminate()
-        email_user = EmailUser.loadFromSession()
-        jresponse.setResultValue(email_user)
+        email_user = None
+        try:
+            email_user = EmailUser.loadFromSession()
+        except EntityNotFound, e: pass
+        odenki_user = None
+        try:
+            odenki_user = OdenkiUser.loadFromSession()
+        except EntityNotFound, e: pass
+        jresponse.setResult({"OdenkiUser": odenki_user, "EmailUser": email_user})
 
 class NonceCallback(JsonRpcDispatcher):
     

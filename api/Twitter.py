@@ -2,98 +2,184 @@ from __future__ import unicode_literals, print_function
 from lib.gae.JsonRpcDispatcher import JsonRpcDispatcher
 from lib.json.JsonRpcRequest import JsonRpcRequest
 from lib.json.JsonRpcResponse import JsonRpcResponse
-from lib.TwitterAuth import ImplicitFlow
-from credentials import TWITTER_CONSUMER_KEY
-from urlparse import urlparse, urlunparse, ParseResult
-from logging import debug
+from credentials import TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET
 from model.TwitterUser import TwitterUser
+from lib.json.JsonRpcError import EntityNotFound, OAuthError
+import oauth2
+from urlparse import parse_qsl
+from urllib import urlencode
+from logging import error
+import gaesessions
 from model.OdenkiUser import OdenkiUser
-from lib.json.JsonRpcError import EntityNotFound, MixedAuthentication
 
-"""This module should not be used because it implements Twitter@Anywhere
-which does not fit to server side OAuth consumer."""
+"""Twitter OAuth consumer secret and consumer key for odenkiapi
+can be obtained at https://dev.twitter.com/apps/1919034/show """
 
-class Twitter(JsonRpcDispatcher):
+REQUET_TOKEN_URL = "https://api.twitter.com/oauth/request_token"
+AUTHORIZE_URL = "https://api.twitter.com/oauth/authorize"
+ACCESS_TOKEN_URL = "https://api.twitter.com/oauth/access_token"
+CALLBACK_URL = "http://odenkiapi.appspot.com/api/Twitter/Callback"
+
+class Twitter2(JsonRpcDispatcher):
+    
+    def GET(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
+        twitter_user = None
+        odenki_user = None
+        try:
+            odenki_user = OdenkiUser.loadFromSession()
+        except EntityNotFound, e: pass
+
+        if odenki_user:
+            try:
+                twitter_user = TwitterUser.getByOdenkiId(odenki_user.odenkiId)
+            except EntityNotFound, e: pass
+#        try:
+#            twitter_user2 = TwitterUser.loadFromSession()
+#        except EntityNotFound, e:
+#            twitter_user2 = None
+        #assert isinstance(twitter_user, TwitterUser)
+#        jresponse.setResultValue("twitterId", twitter_user.twitterId)
+#        jresponse.setResultValue("screenName", twitter_user.screenName)
+#        jresponse.setResultValue("odenkiId", twitter_user.odenkiId)
+#        jresponse.setResultValue("name", twitter_user.name)
+#        jresponse.setResultValue("location", twitter_user.location)
+#        jresponse.setResultValue("profile_image_url", twitter_user.profile_image_url)
+#        jresponse.setResultValue("profile_image_url_https", twitter_user.profile_image_url_https)
+#        jresponse.setResultValue("description", twitter_user.description)
+#        jresponse.setResultValue("time_zone", twitter_user.time_zone)
+#        jresponse.setResultValue("url", twitter_user.url)
+#        jresponse.setResultValue("utc_offset", twitter_user.utc_offset)
+        jresponse.setResult({"OdenkiUser": odenki_user, "TwitterUser":twitter_user})
+        
+    def logout(self, jrequest, jresponse):
+        jresponse.setId()
+        session = gaesessions.get_current_session()
+        session.terminate()
+
+    def deleteAll(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
+        TwitterUser.deleteAll()
+
+        
+REQUEST_TOKEN_SESSION_KEY = ";klsuioayggahihiaoheiajfioea"
+REQUEST_TOKEN_SECRET_SESSION_KEY = "gscfgnhbfvcfscgdfgiubH"
+
+class RedirectToAuthorizeUrl(JsonRpcDispatcher):
+    
+    def GET(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
+        consumer = oauth2.Consumer(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET)
+        client = oauth2.Client(consumer)
+        resp, content = client.request(REQUET_TOKEN_URL)
+        if resp['status'] != '200':
+            raise OAuthError({"consumer_key": TWITTER_CONSUMER_KEY, "request token url" :REQUET_TOKEN_URL})
+        request_token_dict = dict(parse_qsl(content))
+        try:
+            request_token = request_token_dict["oauth_token"]
+            request_token_secret = request_token_dict["oauth_token_secret"]
+        except KeyError:
+            raise OAuthError("RedirectToAuthorizeUrl failed to obtain request token.")
+        authorize_url_param = urlencode([("oauth_token", request_token)])
+        authorize_url = AUTHORIZE_URL + "?" + authorize_url_param
+        jresponse.setResultValue("authorize_url_param", authorize_url_param)
+        jresponse.setResultValue("authorize_url", authorize_url)
+        jresponse.setResultValue("request_token", request_token)
+        jresponse.setResultValue("request_token_secret", request_token_secret)
+        jresponse.setResultValue("request_token_dict", request_token_dict)
+        session = gaesessions.get_current_session()
+        session[REQUEST_TOKEN_SESSION_KEY] = request_token 
+        session[REQUEST_TOKEN_SECRET_SESSION_KEY] = request_token_secret
+
+        jresponse.setRedirectTarget(authorize_url)
+        
+class OAuthCallback(JsonRpcDispatcher):
     
     def GET(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
         try:
-            twitter_user = TwitterUser.loadFromSession()
-            assert isinstance(twitter_user, TwitterUser)
-            jresponse.setResultValue("twitterId", twitter_user.twitterId)
-            jresponse.setResultValue("screenName", twitter_user.screenName)
-            jresponse.setResultValue("odenkiId", twitter_user.odenkiId)
-        except EntityNotFound: pass
+            oauth_token = jrequest.getValue("oauth_token")[0]
+            oauth_verifier = jrequest.getValue("oauth_verifier")[0]
+        except:
+            raise OAuthError("OAuthCallback was called with neither oauth_token nor oauth_verifier.")
         
-        implicit_flow = ImplicitFlow()
-        callback_url = self._makeCallbackUrl(jrequest.request.url)
-        jresponse.setResultValue("callback_url", callback_url)
-        auth_url = implicit_flow.getAuthUrl(TWITTER_CONSUMER_KEY, callback_url)
-        jresponse.setResultValue("auth_url", auth_url)
-        
-    @staticmethod
-    def _makeCallbackUrl(url):
-        parsed_url = urlparse(url)
-        assert isinstance(parsed_url, ParseResult)
-        assert len(parsed_url) == 6
-        split_callback_url = (parsed_url[0], parsed_url[1], "/api/Twitter/Callback", None, None, None)
-        callback_url = urlunparse(split_callback_url)
-        return callback_url
-
-class Callback(JsonRpcDispatcher):
-    
-    def GET(self, jrequest, jresponse):
-        assert isinstance(jrequest, JsonRpcRequest)
-        assert isinstance(jresponse, JsonRpcResponse)
-        jresponse.setId()
-        jresponse.setRedirectTarget("/api/Twitter")
-        debug(jrequest.request)
-        implicit_flow = ImplicitFlow()
-        implicit_flow.setAccessToken(jrequest.request)
-        implicit_flow.saveToSession()
+        session = gaesessions.get_current_session()
         try:
-            twitter_user = TwitterUser.loadFromSession(self)
-            if twitter_user.twitterId != implicit_flow.twitterId:
-                raise MixedAuthentication({"twitter_user.twitterId": twitter_user.twitterId, "implicit_flow.twitterId": implicit_flow.twitterId})
-        except EntityNotFound:
-            try:
-                twitter_user = TwitterUser.getByTwitterId(implicit_flow.twitterId)
-            except EntityNotFound:
-                twitter_user = TwitterUser()
-                twitter_user.twitterId = implicit_flow.twitterId
-
-        assert isinstance(twitter_user, TwitterUser)
-        assert twitter_user.twitterId == implicit_flow.twitterId
-        twitter_user.screenName = implicit_flow.screenName
-        twitter_user.accessToken = implicit_flow.accessToken
+            request_token = session[REQUEST_TOKEN_SESSION_KEY]
+            request_token_secret = session[REQUEST_TOKEN_SECRET_SESSION_KEY]
+        except KeyError:
+            raise OAuthError("Request token have not been obtained.")
         
-        if twitter_user.odenkiId is None:
-            try:
-                odenki_user = OdenkiUser.loadFromSession()
-                assert isinstance(odenki_user, OdenkiUser)
-                twitter_user.odenkiId = odenki_user.odenkiId
-            except EntityNotFound:
-                odenki_user = OdenkiUser.getNew()
-                assert isinstance(odenki_user, OdenkiUser)
-                twitter_user.odenkiId = odenki_user.odenkiId
-        else:
-            try:
-                odenki_user = OdenkiUser.loadFromSession()
-                if twitter_user.odenkiId != odenki_user.odenkiId:
-                    raise MixedAuthentication({"twitter_user.odenkiId": twitter_user.odenkiId, "odenki_user.odenkiId": odenki_user.odenkiId}) 
-            except EntityNotFound:
+        if oauth_token != request_token:
+            raise OAuthError("OAuthCallback gets token which is not identical to retaining request token.")
+
+        token = oauth2.Token(request_token, request_token_secret)
+        token.set_verifier(oauth_verifier)
+        consumer = oauth2.Consumer(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET)
+        client = oauth2.Client(consumer, token)
+        resp, content = client.request(ACCESS_TOKEN_URL, "POST")
+        access_token_dict = dict(parse_qsl(content))
+        try:
+            access_token = access_token_dict["oauth_token"]
+            access_token_secret = access_token_dict["oauth_token_secret"]
+            user_id = access_token_dict["user_id"]
+            screen_name = access_token_dict["screen_name"]
+        except KeyError:
+            raise OAuthError("OAuthCallback failed to exchange verified request token to access token.")
+        #jresponse.setResultValue("access_token", access_token)
+        #jresponse.setResultValue("access_token_secret", access_token_secret)
+        #jresponse.setResultValue("uer_id", user_id)
+        #jresponse.setResultValue("screen_name", screen_name)
+        #jresponse.setResultValue("request_token", request_token)
+        #jresponse.setResultValue("request_token_secret", request_token_secret)
+        #jresponse.setResultValue("request_token_verified", oauth_token)
+        #jresponse.setResultValue("oauth_verifier", oauth_verifier)
+        
+        try: 
+            twitter_user = TwitterUser.getByTwitterId(int(user_id))
+            twitter_user.setAccessToken(access_token, access_token_secret)
+            twitter_user.screenName = unicode(screen_name)
+            twitter_user.verifyCredentials11()
+            twitter_user.put()
+            try: 
                 odenki_user = OdenkiUser.getByOdenkiId(twitter_user.odenkiId)
                 odenki_user.saveToSession()
-                
-        assert twitter_user.odenkiId == odenki_user.odenkiId
-        twitter_user.put()
-        twitter_user.saveToSession()
+                #logged in by twitter
+                jresponse.setRedirectTarget("/html/auth/index.html")
+                return
+            except:
+                twitter_user.key.delete()
+                jresponse.setRedirectTarget("/html/auth/index.html")
+                return
+        except EntityNotFound:
+            try:
+                odenki_user = OdenkiUser.loadFromSession()
+                twitter_user = TwitterUser.create(int(user_id), odenki_user)
+                twitter_user.setAccessToken(access_token, access_token_secret)
+                twitter_user.screenName = unicode(screen_name)
+                twitter_user.verifyCredentials11()
+                twitter_user.put()
+                jresponse.setRedirectTarget("/html/auth/index.html")
+                return
+            except EntityNotFound:
+                jresponse.setRedirectTarget("/html/auth/Email.html")
+                return
+        
+        error("illegal state in api.Twitter")
+        jresponse.setRedirectTarget("/html/auth/index.html")
         
 if __name__ == "__main__":
     mapping = []
-    mapping.append(("/api/Twitter/Callback", Callback))
-    mapping.append(("/api/Twitter", Twitter))
+    mapping.append(("/api/Twitter/RedirectToAuthorizeUrl", RedirectToAuthorizeUrl))
+    mapping.append(("/api/Twitter/OAuthCallback", OAuthCallback))
+    mapping.append(("/api/Twitter", Twitter2))
     from lib.gae import run_wsgi_app
     run_wsgi_app(mapping)

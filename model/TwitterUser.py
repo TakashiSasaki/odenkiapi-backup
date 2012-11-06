@@ -9,6 +9,7 @@ from google.appengine.api import urlfetch
 import json
 from credentials import TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET
 from gaesessions import Session
+from model.OdenkiUser import OdenkiUser
 
 class TwitterUser(NdbModel):
     twitterId = ndb.IntegerProperty()
@@ -34,27 +35,37 @@ class TwitterUser(NdbModel):
     time_zone = ndb.StringProperty(indexed=False)
 
     SESSION_KEY = "kpi4erdetzytUIitt#%gjgdj"
-
-    @classmethod
-    def loadFromSession(cls):
-        session = gaesessions.get_current_session()
-        assert isinstance(session, gaesessions.Session)
-        if session.has_key(cls.SESSION_KEY):
-            twitter_user = session[cls.SESSION_KEY]
-            assert isinstance(twitter_user, TwitterUser)
-            return twitter_user
-        raise EntityNotFound(cls, {"in":"the current session."})
     
-    def saveToSession(self):
-        try:
-            twitter_user = self.loadFromSession()
-            assert isinstance(twitter_user, TwitterUser)
-            if twitter_user.twitterId == self.twitterId:
-                raise EntityExists(self.__class__, {"in_session": twitter_user.twitterId, "to_be_saved": self.twitterId})
-        except EntityNotFound: pass
-        session = gaesessions.get_current_session()
-        assert isinstance(session, gaesessions.Session)
-        session[self.SESSION_KEY] = self
+    @classmethod
+    def create(cls, twitter_id, odenki_user):
+        assert isinstance(twitter_id, int)
+        assert isinstance(odenki_user, OdenkiUser)
+        twitter_user = TwitterUser()
+        twitter_user.twitterId = twitter_id
+        assert isinstance(odenki_user.odenkiId, int)
+        twitter_user.odenkiId = odenki_user.odenkiId
+        return twitter_user
+
+#    @classmethod
+#    def loadFromSession(cls):
+#        session = gaesessions.get_current_session()
+#        assert isinstance(session, gaesessions.Session)
+#        if session.has_key(cls.SESSION_KEY):
+#            twitter_user = session[cls.SESSION_KEY]
+#            assert isinstance(twitter_user, TwitterUser)
+#            return twitter_user
+#        raise EntityNotFound(cls, {"in":"the current session."})
+#    
+#    def saveToSession(self):
+#        try:
+#            twitter_user = self.loadFromSession()
+#            assert isinstance(twitter_user, TwitterUser)
+#            if twitter_user.twitterId == self.twitterId:
+#                raise EntityExists(self.__class__, {"in_session": twitter_user.twitterId, "to_be_saved": self.twitterId})
+#        except EntityNotFound: pass
+#        session = gaesessions.get_current_session()
+#        assert isinstance(session, gaesessions.Session)
+#        session[self.SESSION_KEY] = self
         
     @classmethod
     def deleteFromSession(cls):
@@ -77,15 +88,18 @@ class TwitterUser(NdbModel):
             raise EntityDuplicated(cls, {"twitterId": twitter_id})
         return keys[0]
 
-    def setAccessToken(self, access_token, access_token_secret, user_id, screen_name):
+    @classmethod
+    def queryByTwitterId(cls, twitter_id):
+        assert isinstance(twitter_id, int)
+        query = ndb.Query(kind="TwitterUser")
+        query = query.filter(cls.twitterId == twitter_id)
+        return query
+
+    def setAccessToken(self, access_token, access_token_secret):
         assert isinstance(access_token, str)
         assert isinstance(access_token_secret, str)
-        assert isinstance(user_id, int)
-        assert isinstance(screen_name, str)
         self.accessToken = access_token
         self.accessTokenSecret = access_token_secret
-        self.twitterId = user_id
-        self.screenName = screen_name
 
     def verifyCredentials1(self):
         raise DeprecationWarning(
@@ -107,7 +121,7 @@ class TwitterUser(NdbModel):
     def verifyCredentials11(self):
         import oauth2
         token = oauth2.Token(self.accessToken, self.accessTokenSecret)
-        assert isinstance(self.screenName, str)
+        assert isinstance(self.screenName, unicode)
         assert isinstance(self.twitterId, int)
         #token.set_verifier(oauth_verifier)
         consumer = oauth2.Consumer(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET)
@@ -175,8 +189,7 @@ class TwitterUser(NdbModel):
 
     @classmethod
     def deleteAll(cls):
-        raise DeprecationWarning
         query = ndb.Query(kind="TwitterUser")
         for key in query:
             assert isinstance(key, ndb.Key)
-            key.delete()
+            key.delete_async()
