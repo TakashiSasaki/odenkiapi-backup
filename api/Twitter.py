@@ -4,13 +4,15 @@ from lib.json.JsonRpcRequest import JsonRpcRequest
 from lib.json.JsonRpcResponse import JsonRpcResponse
 from credentials import TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET
 from model.TwitterUser import TwitterUser
-from lib.json.JsonRpcError import EntityNotFound, OAuthError
+from lib.json.JsonRpcError import EntityNotFound, OAuthError, EntityDuplicated
 import oauth2
 from urlparse import parse_qsl
 from urllib import urlencode
 from logging import error
 import gaesessions
 from model.OdenkiUser import OdenkiUser
+from google.appengine.ext import ndb
+#from twitter.api import Twitter
 
 """Twitter OAuth consumer secret and consumer key for odenkiapi
 can be obtained at https://dev.twitter.com/apps/1919034/show """
@@ -172,6 +174,12 @@ class OAuthCallback(JsonRpcDispatcher):
             except EntityNotFound:
                 jresponse.setRedirectTarget("/html/auth/Email.html")
                 return
+        except EntityDuplicated:
+            query = TwitterUser.queryByTwitterId(int(user_id))
+            keys = query.fetch(keys_only=True, limit=100)
+            for key in keys:
+                assert isinstance(key, ndb.Key)
+                key.delete_async()
         
         error("illegal state in api.Twitter")
         jresponse.setRedirectTarget("/html/auth/index.html")

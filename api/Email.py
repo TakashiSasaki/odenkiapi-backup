@@ -9,7 +9,6 @@ from lib.json.JsonRpcError import JsonRpcError, JsonRpcException, InvalidParams,
 from logging import debug
 import gaesessions
 from model.OdenkiUser import OdenkiUser
-from lib.Session import fillUser, fillEmailUser
 
 #EMAIL_REGISTRATION_NONCE = str("f5464d0jVbvde1Uxtur")
 
@@ -30,6 +29,7 @@ class Email(JsonRpcDispatcher):
         except EntityNotFound: email_user = None
         except AttributeError: email_user = None
         jresponse.setResult({"EmailUser": email_user, "OdenkiUser":odenki_user})
+        jresponse.setResultValue("host", jrequest.request.host)
         
 #    def startOver(self, jrequest, jresponse):
 #        assert isinstance(jrequest, JsonRpcRequest)
@@ -75,12 +75,12 @@ class Email(JsonRpcDispatcher):
         message.to = email
         message.body = "「みんなでおでんき」に関心をお持ちいただきありがとうございます。\n" + \
             ("このメールアドレス %s" % email) + " でご登録いただくには次のページを開いて下さい。 \n " + \
-            ("http://odenkiapi.appspot.com/api/Email/%s" % email_user.nonce) + "\n" + \
+            ("http://%s/api/Email/%s" % (jrequest.request.host, email_user.nonce)) + "\n" + \
             "みんなでおでんきに登録しない場合はこのメールを無視して下さい。\n"
         message.sender = "admin@odenki.org"
         message.subject = "みんなでおでんきへの登録確認メール"
         message.send()
-        jresponse.setResult(email_user)
+        jresponse.setResultValue("EmailUser",email_user)
     
     def invalidate(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
@@ -201,15 +201,17 @@ class NonceCallback(JsonRpcDispatcher):
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
         EmailUser.deleteFromSession()
-        jresponse.setRedirectTarget("http://odenki.org/html/auth/Email.html")
         nonce = unicode(jrequest.getPathInfo(3))
         email_user = EmailUser.getByNonce(nonce)
         assert isinstance(email_user, EmailUser)
+        assert email_user.nonceEmail is not None
         email_user.email = email_user.nonceEmail
         email_user.nonceEmail = None
         email_user.nonce = None
         email_user.put()
         email_user.saveToSession()
+        jresponse.setResultValue("EmailUser", email_user)
+        jresponse.setRedirectTarget("http://%s/html/auth/Email.html" % jrequest.request.host)
 
 if __name__ == "__main__":
     mapping = []

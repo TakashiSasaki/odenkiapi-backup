@@ -205,9 +205,9 @@
                 	lib.ui.collapse("#twitterLogin");
                     $("#twitterLogin .screenName").val("ログインしていません");
                     $("#admin textarea").val($.toJSON(data));
-                    $("#emailUser .email").val(data.result.email);
-                    $("#emailUser .emailUserId").val(data.result.emailUserId);
-                    $("#emailUser").val(data.result.email);
+                    $("#emailUser .email").val(data.result.EmailUser.email);
+                    $("#emailUser .emailUserId").val(data.result.EmailUser.emailUserId);
+                    $("#emailUser").val(data.result.EmailUser.email);
                 }
             });
 

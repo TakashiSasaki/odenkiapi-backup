@@ -85,7 +85,7 @@ class TwitterUser(NdbModel):
         if len(keys) == 0:
             raise EntityNotFound(cls, {"twitterId":twitter_id})
         if len(keys) == 2:
-            raise EntityDuplicated(cls, {"twitterId": twitter_id})
+            raise EntityDuplicated({"twitterId": twitter_id})
         return keys[0]
 
     @classmethod
