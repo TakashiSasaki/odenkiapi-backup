@@ -150,17 +150,11 @@
                 dataType : "json",
                 success : function(data) {
                     $("#emailLogin textarea").val($.toJSON(data));
-                    if (!data.result.EmailUser) {
-                        $("#emailLogin .email").val("ログインしていません");
-                    }
-                    if (!data.result.EmailUser.email) {
-                        $("#emailLogin .email").val("ログインしていません");
-                    }
-                    if (data.result.EmailUserodenkiId) {
+                    if (data.result.EmailUser) {
                         $("#emailLogin .odenkiId").val(data.result.EmailUser.odenkiId);
-                    }
-                    if (data.result.EmailUser.email) {
                         $("#emailLogin .email").val(data.result.EmailUser.email);
+                    } else {
+                        $("#emailLogin .email").val("ログインしていません");
                     }
                 },
                 error : function(data) {
@@ -176,17 +170,11 @@
                 dataType : "json",
                 success : function(data) {
                     $("#gmailLogin textarea").val($.toJSON(data));
-                    if (!data.result.GmailUser) {
-                        $("#gmailLogin .gmail").val("ログインしていません");
-                    }
-                    if (!data.result.GmailUser.gmail) {
-                        $("#gmailLogin .gmail").val("ログインしていません");
-                    }
-                    if (data.result.GmailUser.gmail) {
+                    if (data.result.GmailUser) {
                         $("#gmailLogin .gmail").val(data.result.GmailUser.gmail);
-                    }
-                    if (data.result.GmailUser.odenkiId) {
                         $("#gmailLogin .odenkiId").val(data.result.GmailUser.odenkiId);
+                    } else {
+                        $("#gmailLogin .gmail").val("ログインしていません");
                     }
                     $("#gmailLogin [type='button']").attr("onclick", "window.location.href='" + data.result.login_url + "'");
                 },
@@ -204,23 +192,13 @@
                 dataType : "json",
                 success : function(data) {
                     $("#twitterLogin textarea").val($.toJSON(data));
-                    if (!data.result) {
-                        $("#twitterLogin .screenName").val("ログインしていません");
-                    }
-                    if (!data.result.screenName) {
-                        $("#twitterLogin .screenName").val("ログインしていません");
-                    }
-                    if (data.result.TwitterUser.screenName) {
+                    if (data.result.TwitterUser) {
                         $("#twitterLogin .screenName").val(data.result.TwitterUser.screenName);
-                    }
-                    if (data.result.TwitterUser.odenkiId) {
                         $("#twitterLogin .odenkiId").val(data.result.TwitterUser.odenkiId);
-                    }
-                    if (data.result.TwitterUser.location) {
                         $("#twitterLogin .location").val(data.result.TwitterUser.location);
-                    }
-                    if (data.result.TwitterUser.profile_image_url) {
                         $("#twitterLogin img").attr("src", data.result.TwitterUser.profile_image_url);
+                    } else {
+                        $("#twitterLogin .screenName").val("ログインしていません");
                     }
                 },
                 error : function(data) {

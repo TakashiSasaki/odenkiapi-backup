@@ -19,7 +19,7 @@
                 また「みんなでおでんき」はTwitterやGoogleアカウントなど外部サービスのアカウントによるログインも可能なため、
                 同様の他のサービスと同じく原理的には名寄せすることも可能ですが、
                 メールアドレスおよびそれぞれの外部サービスから取得した情報を相互に通知することはありません。
-                <div data-role="collapsible" id="login">
+                <div data-role="collapsible" id="login" >
                     <h1>メールアドレスによるログイン</h1>
                     <table>
                         <tr>
@@ -102,23 +102,39 @@
         <script src="../../js/header.js"></script>
         <script>
             lib.ui.makeTab("d");
+            function setVisibility(data){
+                    $("#admin textarea").val($.toJSON(data));
+                    if (data.result.OdenkiUser){
+                        lib.ui.hideElement("#login");
+                        lib.ui.showElement("#setEmail");
+                        lib.ui.collapse("#setEmail");
+                        lib.ui.showElement("#emailUser");
+                        lib.ui.expand("#emailUser");
+                        lib.ui.showElement("#setPassword");
+                        lib.ui.collapse("#setPassword");
+                    } else {
+                        lib.ui.showElement("#login");
+                        lib.ui.expand("#login");
+                        lib.ui.showElement("#setEmail");
+                        lib.ui.expand("#setEmail");
+                        lib.ui.hideElement("#emailUser");
+                        lib.ui.hideElement("#setPassword")
+                    }
+            }
+            function fillFields(data){
+                if(data.result.EmailUser){
+                    $("#login .email").val("");
+                    $("#login .password").val("");
+                    $("#emailUser .email").val(data.result.EmailUser.email);
+                    $("#emailUser .emailUserId").val(data.result.EmailUser.emailUserId);
+                }
+            }
             $.ajax({
                 url : "/api/Email",
                 dataType : "json",
                 success : function(data) {
-                    $("#admin textarea").val($.toJSON(data));
-                    if (!data.result) {
-                        lib.ui.expand("#login");
-                        return;
-                    }
-                    if (data.result.nonce)
-                        lib.ui.expand("#setPassword");
-                    if (!data.result.nonce && !data.result.email)
-                        lib.ui.expand("#login");
-                    if (data.result.email) {
-                        lib.ui.expand("#emailUser");
-                        $("#emailUser .email").val(data.result.email);
-                    }
+                    setVisibility(data);
+                    fillFields(data);
                 },
                 error : function(data) {
                     $("#admin textarea").val($.toJSON(data));
@@ -137,7 +153,8 @@
                         password2 : $("#setPassword .password2")[0].value
                     },
                     success : function(data) {
-                        $("#admin textarea").val($.toJSON(data));
+                        setVisibility(data);
+                        fillFields(data);
                         $("#setPassword .password").val("");
                         $("#setPassword .password2").val("");
                         $("#emailUser .email").val(data.result.email);
@@ -155,7 +172,7 @@
 
             function setEmail() {
                 $.ajax({
-                    url : "/api/Email?method=setEmail",
+                    url : "/api/Email?method=setNonce",
                     data : {
                         email : $("#setEmail .email")[0].value,
                     },
@@ -166,7 +183,7 @@
                     },
                     error : function(data) {
                         $("#admin textarea").val($.toJSON(data));
-                        $("#setEmail .email").val("指定されたメールアドレスでは登録できません。");
+                        $("#setEmail .email").val("指定されたメールアドレスへの送信に失敗しました。");
                     }
                 });
             }
@@ -181,17 +198,13 @@
                     },
                     dataType : "json",
                     success : function(data) {
-                        $("#admin textarea").val($.toJSON(data));
-                        $("#login .email").val("");
-                        $("#login .password").val("");
-                        $("#emailUser .email").val(data.result.email);
-                        lib.ui.collapse("#login");
-                        lib.ui.expand("#emailUser");
+                        setVisibility(data);
+                        fillFields(data);
                     },
                     error : function(data) {
                         $("#admin textarea").val($.toJSON(data));
-                        $("#emailUser .email").val("ログインできませんでした");
-                        lib.ui.expand("#emailUser");
+                        $("#login .email").val("ログインできませんでした");
+                        $("#login .password").val("");
                     }
                 });
             }
@@ -204,10 +217,8 @@
                     },
                     dataType : "json",
                     success : function(data) {
-                        $("#emailUser .email").val("");
-                        lib.ui.collapse("#emailUser");
-                        lib.ui.expand("#login");
-                        $("#admin textarea").val($.toJSON(data));
+                        setVisibility(data);
+                        fillFields(data);
                     },
                     error : function(data) {
                         lib.ui.expand("#emailUser");

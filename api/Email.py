@@ -104,11 +104,16 @@ class Email(JsonRpcDispatcher):
 #            raise UnexpectedState("Nonce is not stored in session data.")
 #        assert isinstance(nonce, unicode)
 #        email_user = EmailUser.getByNonce(nonce)
-        email_user = EmailUser.loadFromSession()
+        try:
+            odenki_user = OdenkiUser.loadFromSession()
+        except EntityNotFound:
+            odenki_user = None
+        email_user = EmailUser.getByOdenkiId(odenki_user.odenkiId)
         assert isinstance(email_user, EmailUser)
         try:
             raw_password = jrequest.getValue("password")[0].decode()
             raw_password2 = jrequest.getValue("password2")[0].decode()
+            assert len(raw_password) < 8
         except Exception, e:
             raise InvalidParams("setPassword method requires password and password2. %s" % e)
         if raw_password != raw_password2:
@@ -170,7 +175,8 @@ class Email(JsonRpcDispatcher):
 #        jresponse.setResultValue("email", email_user.email)
 #        jresponse.setResultValue("emailUserId", email_user.emailUserId)
 #        jresponse.setResultValue("odenkiId", email_user.odenkiId)
-        jresponse.setResult([email_user, odenki_user])
+        jresponse.setResultValue("EmailUser", email_user)
+        jresponse.setResultValue("OdenkiUser", odenki_user)
         
     def logout(self, jrequest, jresponse):
         jresponse.setId()
