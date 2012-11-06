@@ -53,9 +53,10 @@ class GmailUser(NdbModel):
         assert isinstance(gmail_id, str) #user_id() returns str, not unicode
         query = cls.queryByGmailId(gmail_id)
         keys = query.fetch(keys_only=True, limit=2)
-        if len(keys == 0):
+        assert isinstance(keys, list)
+        if len(keys) == 0:
             raise EntityNotFound(cls, {"gmailId":gmail_id})
-        if len(keys == 2):
+        if len(keys) == 2:
             raise EntityDuplicated(cls, {"gmailId": gmail_id})
         return keys[0]
     

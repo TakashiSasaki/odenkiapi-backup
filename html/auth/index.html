@@ -150,17 +150,17 @@
                 dataType : "json",
                 success : function(data) {
                     $("#emailLogin textarea").val($.toJSON(data));
-                    if (!data.result) {
+                    if (!data.result.EmailUser) {
                         $("#emailLogin .email").val("ログインしていません");
                     }
-                    if (!data.result.email) {
+                    if (!data.result.EmailUser.email) {
                         $("#emailLogin .email").val("ログインしていません");
                     }
-                    if (data.result.odenkiId) {
-                        $("#emailLogin .odenkiId").val(data.result.odenkiId);
+                    if (data.result.EmailUserodenkiId) {
+                        $("#emailLogin .odenkiId").val(data.result.EmailUser.odenkiId);
                     }
-                    if (data.result.email) {
-                        $("#emailLogin .email").val(data.result.email);
+                    if (data.result.EmailUser.email) {
+                        $("#emailLogin .email").val(data.result.EmailUser.email);
                     }
                 },
                 error : function(data) {
@@ -176,17 +176,17 @@
                 dataType : "json",
                 success : function(data) {
                     $("#gmailLogin textarea").val($.toJSON(data));
-                    if (!data.result) {
+                    if (!data.result.GmailUser) {
                         $("#gmailLogin .gmail").val("ログインしていません");
                     }
-                    if (!data.result.gmail) {
+                    if (!data.result.GmailUser.gmail) {
                         $("#gmailLogin .gmail").val("ログインしていません");
                     }
-                    if (data.result.gmail) {
-                        $("#gmailLogin .gmail").val(data.result.gmail);
+                    if (data.result.GmailUser.gmail) {
+                        $("#gmailLogin .gmail").val(data.result.GmailUser.gmail);
                     }
-                    if (data.result.odenkiId) {
-                        $("#gmailLogin .odenkiId").val(data.result.odenkiId);
+                    if (data.result.GmailUser.odenkiId) {
+                        $("#gmailLogin .odenkiId").val(data.result.GmailUser.odenkiId);
                     }
                     $("#gmailLogin [type='button']").attr("onclick", "window.location.href='" + data.result.login_url + "'");
                 },

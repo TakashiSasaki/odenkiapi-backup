@@ -16,16 +16,24 @@ class Gmail(JsonRpcDispatcher):
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
         try:
-            gmail_user = GmailUser.loadFromSession()
-            assert isinstance(gmail_user, GmailUser)
-            jresponse.setResultValue("gmailId", gmail_user.gmailId)
-            jresponse.setResultValue("gmail", gmail_user.gmail)
-            jresponse.setResultValue("nickname", gmail_user.nickname)
-            jresponse.setResultValue("odenkiId", gmail_user.odenkiId)
-        except EntityNotFound: pass
-        create_url = users.create_login_url("/api/Gmail/RedirectedFromGoogle")
-        assert isinstance(create_url, str)
-        jresponse.setResultValue("login_url", create_url)
+            odenki_user = OdenkiUser.loadFromSession()
+        except EntityNotFound:
+            odenki_user = None
+
+        try:
+            gmail_user = GmailUser.getByOdenkiId(odenki_user.odenkiId)
+#            assert isinstance(gmail_user, GmailUser)
+#            jresponse.setResultValue("gmailId", gmail_user.gmailId)
+#            jresponse.setResultValue("gmail", gmail_user.gmail)
+#            jresponse.setResultValue("nickname", gmail_user.nickname)
+#            jresponse.setResultValue("odenkiId", gmail_user.odenkiId)
+        except EntityNotFound: 
+            gmail_user = None
+        login_url = users.create_login_url("/api/Gmail/RedirectedFromGoogle")
+        assert isinstance(login_url, str)
+        jresponse.setResultValue("OdenkiUser", odenki_user)
+        jresponse.setResultValue("GmailUser", gmail_user)
+        jresponse.setResultValue("login_url", login_url)
 
 class RedirectedFromGoogle(JsonRpcDispatcher):
     """This is the first handler to catch the result of authentication by Google.
@@ -36,28 +44,43 @@ class RedirectedFromGoogle(JsonRpcDispatcher):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
-        jresponse.setRedirectTarget("/html/auth/index.html")
+        #jresponse.setRedirectTarget("/html/auth/index.html")
         current_user = users.get_current_user()
         if current_user is None:
+            jresponse.setRedirectTarget("/html/auth/index.html")
             return
-        debug("type of current_user.user_id() is %s " % type(current_user.user_id()))
+        #debug("type of current_user.user_id() is %s " % type(current_user.user_id()))
+
         try:
             gmail_user = GmailUser.getByGmailId(current_user.user_id())
-            gmail_user.saveToSession()
-        except EntityNotFound:
-            gmail_user = GmailUser()
-            gmail_user.gmailId = current_user.user_id()
-            gmail_user.gmail = current_user.email()
             gmail_user.nickname = current_user.nickname()
+            gmail_user.gmail = current_user.email()
             gmail_user.put()
-            gmail_user.saveToSession()
-        fillUser()
+            try:
+                odenki_user = OdenkiUser.getByOdenkiId(gmail_user.odenkiId)
+                odenki_user.saveToSession()
+                jresponse.setRedirectTarget("/html/auth/index.html")
+                return
+            except:
+                gmail_user.key.delete()
+                jresponse.setRedirectTarget("/html/auth/index.html")
+                return
+        except EntityNotFound:
+            try:
+                odenki_user = OdenkiUser.loadFromSession()                
+                gmail_user = GmailUser()
+                gmail_user.gmailId = current_user.user_id()
+                gmail_user.gmail = current_user.email()
+                gmail_user.nickname = current_user.nickname()
+                gmail_user.put()
+                jresponse.setRedirectTarget("/html/auth/index.html")
+                return
+            except EntityNotFound:
+                jresponse.setRedirectTarget("/html/auth/Email.html")
+                return
         
-        try:
-            odenki_user = OdenkiUser.loadFromSession()
-        except EntityNotFound, e:
-            odenki_user = OdenkiUser.createNew()
-        fillUser()
+        jresponse.setResultValue("OdenkiUser", odenki_user)
+        jresponse.setResultValue("GmailUser", gmail_user)
 
 if __name__ == "__main__":
     mapping = []
