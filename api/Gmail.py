@@ -29,6 +29,8 @@ class Gmail(JsonRpcDispatcher):
 #            jresponse.setResultValue("odenkiId", gmail_user.odenkiId)
         except EntityNotFound: 
             gmail_user = None
+        except AttributeError:
+            gmail_user = None
         login_url = users.create_login_url("/api/Gmail/RedirectedFromGoogle")
         assert isinstance(login_url, str)
         jresponse.setResultValue("OdenkiUser", odenki_user)

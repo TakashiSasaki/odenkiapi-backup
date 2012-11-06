@@ -20,13 +20,15 @@ class Email(JsonRpcDispatcher):
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
         try:
-            email_user = EmailUser.loadFromSession()
-        except EntityNotFound, e:
-            email_user = None
-        try:
             odenki_user = OdenkiUser.loadFromSession()
-        except EntityNotFound, e:
-            odenki_user = None
+            assert isinstance(odenki_user, OdenkiUser)
+        except EntityNotFound: odenki_user = None
+
+        try: 
+            email_user = EmailUser.getByOdenkiId(odenki_user.odenkiId)
+            assert isinstance(email_user, EmailUser)
+        except EntityNotFound: email_user = None
+        except AttributeError: email_user = None
         jresponse.setResult({"EmailUser": email_user, "OdenkiUser":odenki_user})
         
 #    def startOver(self, jrequest, jresponse):
