@@ -26,7 +26,7 @@ lib.ui.c = '<li>\
             </li>';
             
 lib.ui.d = '<li>\
-    <a href="/html/auth/index.html"   data-ajax="false"   data-icon="grid" >\
+    <a href="/html/Equipments.html"   data-ajax="false"   data-icon="grid" >\
         <div class="ui-bar-d">\
             機器登録\
         </div>\
