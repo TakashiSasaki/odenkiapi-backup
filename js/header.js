@@ -2,7 +2,7 @@ var lib = lib || {}
 lib.ui = lib.ui || {}
 
 lib.ui.a = '<li>\
-                <a href="main.html"   data-ajax="false"   data-icon="home" >\
+                <a href="/html/main.html"   data-ajax="false"   data-icon="home" >\
                     <div class="ui-bar-a">\
                         みんなのおでんき\
                     </div>\
@@ -10,7 +10,7 @@ lib.ui.a = '<li>\
         </li>';
     
 lib.ui.b = '<li >\
-                <a href="community.html"   data-ajax="false"   data-icon="star" >\
+                <a href="/html/community.html"   data-ajax="false"   data-icon="star" >\
                     <div class="ui-bar-b">\
                         なかまのおでんき\
                     </div>\
@@ -18,7 +18,7 @@ lib.ui.b = '<li >\
             </li>';
     
 lib.ui.c = '<li>\
-                <a href="myself.html"   data-ajax="false"   data-icon="info">\
+                <a href="/html/myself.html"   data-ajax="false"   data-icon="info">\
                     <div class="ui-bar-c">\
                         マイおでんき\
                     </div>\
@@ -26,12 +26,20 @@ lib.ui.c = '<li>\
             </li>';
             
 lib.ui.d = '<li>\
-                <a href="/html/auth/index.html"   data-ajax="false"   data-icon="gear" >\
-                    <div class="ui-bar-d">\
-                        ユーザー登録\
-                    </div>\
-                </a>\
-            </li>';
+    <a href="/html/auth/index.html"   data-ajax="false"   data-icon="grid" >\
+        <div class="ui-bar-d">\
+            機器登録\
+        </div>\
+    </a>\
+</li>';
+
+lib.ui.e = '<li>\
+    <a href="/html/auth/index.html"   data-ajax="false"   data-icon="gear" >\
+        <div class="ui-bar-e">\
+            ユーザー登録\
+        </div>\
+    </a>\
+</li>';
 
 lib.ui.makeHeader = function(){
     $('div[data-role="header"]').remove();
@@ -48,7 +56,7 @@ lib.ui.makeHeader = function(){
 
 lib.ui.makeNavbar = function(active){
     $('div[data-role="navbar"]').remove();
-    $('div[data-role="page"]').prepend('<div data-role="navbar"><ul>'+lib.ui.a+lib.ui.b+lib.ui.c+lib.ui.d+'</ul></div>');
+    $('div[data-role="page"]').prepend('<div data-role="navbar"><ul>'+lib.ui.a+lib.ui.b+lib.ui.c+lib.ui.d+lib.ui.e+'</ul></div>');
     $(".ui-bar-"+active).closest("a").addClass("ui-btn-active");
 }//makeNavbar
 
