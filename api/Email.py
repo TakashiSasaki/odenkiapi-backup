@@ -18,27 +18,23 @@ class Email(JsonRpcDispatcher):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
+        
+        odenki_user, email_user = None, None
         try:
             odenki_user = OdenkiUser.loadFromSession()
             assert isinstance(odenki_user, OdenkiUser)
-        except EntityNotFound: odenki_user = None
-
-        try: 
             email_user = EmailUser.getByOdenkiId(odenki_user.odenkiId)
             assert isinstance(email_user, EmailUser)
-        except EntityNotFound: email_user = None
-        except AttributeError: email_user = None
+        except EntityNotFound: pass
+        except AttributeError: pass
+
+        if email_user is None:
+            try:
+                email_user = EmailUser.loadFromSession()
+            except EntityNotFound: pass
+
         jresponse.setResult({"EmailUser": email_user, "OdenkiUser":odenki_user})
         jresponse.setResultValue("host", jrequest.request.host)
-        
-#    def startOver(self, jrequest, jresponse):
-#        assert isinstance(jrequest, JsonRpcRequest)
-#        assert isinstance(jresponse, JsonRpcResponse)
-#        jresponse.setId()
-#
-#        session = gaesessions.get_current_session()
-#        assert isinstance(session, gaesessions.Session)
-#        session.terminate()
 
     def setNonce(self, jrequest, jresponse):
         """If EmailUser is loaded into the session,
@@ -210,7 +206,18 @@ class NonceCallback(JsonRpcDispatcher):
         email_user.nonce = None
         email_user.put()
         email_user.saveToSession()
-        jresponse.setResultValue("EmailUser", email_user)
+        
+        try:
+            odenki_user = OdenkiUser.getByOdenkiId(email_user.odenkiId)
+            odenki_user.saveToSession()
+        except EntityNotFound:
+            odenki_user = OdenkiUser.createNew()
+            assert isinstance(odenki_user, OdenkiUser)
+            email_user.odenkiId = odenki_user.odenkiId
+            email_user.put()
+            odenki_user.saveToSession()
+        
+        #jresponse.setResultValue("EmailUser", email_user)
         jresponse.setRedirectTarget("http://%s/html/auth/Email.html" % jrequest.request.host)
 
 if __name__ == "__main__":
