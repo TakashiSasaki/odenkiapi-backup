@@ -69,7 +69,7 @@
 						</tr>
 						<tr>
 							<td colspan="5">
-							<input type="button" value="Twitterによるログイン" onclick="window.location.href='/api/Twitter2/RedirectToAuthorizeUrl'">
+							<input type="button" value="Twitterによるログイン" onclick="window.location.href='/api/Twitter/RedirectToAuthorizeUrl'">
 							</input> 
 							</td>
 						</tr>
@@ -200,7 +200,7 @@
             });
 
             $.ajax({
-                url : "/api/Twitter2",
+                url : "/api/Twitter",
                 dataType : "json",
                 success : function(data) {
                     $("#twitterLogin textarea").val($.toJSON(data));
@@ -210,19 +210,18 @@
                     if (!data.result.screenName) {
                         $("#twitterLogin .screenName").val("ログインしていません");
                     }
-                    if (data.result.screenName) {
-                        $("#twitterLogin .screenName").val(data.result.screenName);
+                    if (data.result.TwitterUser.screenName) {
+                        $("#twitterLogin .screenName").val(data.result.TwitterUser.screenName);
                     }
-                    if (data.result.odenkiId) {
-                        $("#twitterLogin .odenkiId").val(data.result.odenkiId);
+                    if (data.result.TwitterUser.odenkiId) {
+                        $("#twitterLogin .odenkiId").val(data.result.TwitterUser.odenkiId);
                     }
-                    if (data.result.location) {
-                        $("#twitterLogin .location").val(data.result.location);
+                    if (data.result.TwitterUser.location) {
+                        $("#twitterLogin .location").val(data.result.TwitterUser.location);
                     }
-                    if (data.result.profile_image_url) {
-                        $("#twitterLogin img").attr("src", data.result.profile_image_url);
+                    if (data.result.TwitterUser.profile_image_url) {
+                        $("#twitterLogin img").attr("src", data.result.TwitterUser.profile_image_url);
                     }
-                    $("#gmailLogin [type='button']").attr("onclick", "window.location.href='" + data.result.login_url + "'");
                 },
                 error : function(data) {
                 	lib.ui.collapse("#twitterLogin");
