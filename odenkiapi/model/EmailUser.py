@@ -12,7 +12,7 @@ import gaesessions
 from model.OdenkiUser import OdenkiUser
 #from gaesessions import Session
 
-def _hashPassword(raw_password):
+def hashPassword(raw_password):
     assert isinstance(raw_password, unicode)
     PASSWORD_SALT = "llj5fpioifht0;iu"
     password_with_salt = PASSWORD_SALT + raw_password
@@ -28,6 +28,7 @@ class EmailUser(NdbModel):
     email = ndb.StringProperty()
     nonceEmail = ndb.StringProperty(indexed=False)
     hashedPassword = ndb.StringProperty(indexed=False)
+    nonceHashedPassword = ndb.StringProperty(indexed=False)
     registeredDateTime = ndb.DateTimeProperty(indexed=False)
     invalidatedDateTime = ndb.DateTimeProperty()
     odenkiId = ndb.IntegerProperty()
@@ -38,20 +39,19 @@ class EmailUser(NdbModel):
     
     def matchPassword(self, raw_password):
         assert isinstance(raw_password, unicode)
-        hashed_password = _hashPassword(raw_password)
+        hashed_password = hashPassword(raw_password)
         debug("given password = %s, given hashed password = %s, stored hashed password = %s" % (raw_password, hashed_password, self.hashedPassword))
         if hashed_password != self.hashedPassword:
             raise PasswordMismatch(hashed_password)
 
-    @ndb.toplevel
-    def setPassword(self, raw_password):
-        assert isinstance(raw_password, unicode)
-        hashed_password = _hashPassword(raw_password)
-        assert len(hashed_password) == 40
-        debug("hashed_password=%s" % hashed_password)
-        self.hashedPassword = hashed_password
-        self.put()
-        
+#    @ndb.toplevel
+#    def setPassword(self, raw_password):
+#        assert isinstance(raw_password, unicode)
+#        hashed_password = hashPassword(raw_password)
+#        assert len(hashed_password) == 40
+#        debug("hashed_password=%s" % hashed_password)
+#        self.hashedPassword = hashed_password
+#        self.put()
 
     @classmethod
     def getByEmail(cls, email):
@@ -152,7 +152,8 @@ class EmailUser(NdbModel):
             raise EntityNotFound(cls, {"nonce": nonce})
         return keys[0].get()
     
-    def setNonce(self, nonce_email):
+    @ndb.toplevel
+    def setNonce(self, nonce_email, raw_password):
         uuid = uuid4()
         assert isinstance(uuid, UUID)
         nonce = uuid.get_hex().decode()
@@ -160,6 +161,12 @@ class EmailUser(NdbModel):
         self.nonce = nonce
         self.nonceDateTime = datetime.utcnow()
         self.nonceEmail = nonce_email
+
+        assert isinstance(raw_password, unicode)
+        hashed_password = hashPassword(raw_password)
+        assert len(hashed_password) == 40
+        debug("hashed_password=%s" % hashed_password)
+        self.nonceHashedPassword = hashed_password
         self.put()
 
     @classmethod

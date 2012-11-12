@@ -58,7 +58,8 @@ class EntityNotFound(JsonRpcException):
         elif isinstance(model, ndb.Model):
             kind = model.kind()
         elif isinstance(model, ndb.MetaModel):
-            kind = unicode(model)
+            assert isinstance(model, ndb.MetaModel)
+            kind = unicode(model.__name__)
         else:
             kind = unicode(model)
         JsonRpcException.__init__(self, self.errorCode, "Entity of %s is not found" % kind, {"kind":kind, "condition":condition})
