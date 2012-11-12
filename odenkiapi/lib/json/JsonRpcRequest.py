@@ -4,6 +4,13 @@ from logging import error, debug
 from JsonRpcError import JsonRpcError
 from encodings.base64_codec import base64_decode
 from json import loads
+import re
+
+try:
+    import DebugCredentials
+    DEBUG_IP_ADDRESS_REGEX = DebugCredentials.DEBUG_IP_ADDRESS_REGEX
+except:
+    DEBUG_IP_ADDRESS_REGEX = ""
 
 class JsonRpcRequest(object):
     """JSON-RPC 2.0 over HTTP GET method should have method,id and params in URL parameter part.
@@ -12,7 +19,7 @@ class JsonRpcRequest(object):
     'param' key in JSON-RPC request object.
     See http://www.simple-is-better.org/json-rpc/jsonrpc20-over-http.html
     """
-    __slots__ = ["jsonrpc", "method", "id", "params", "extra", "error", "pathInfo", "request", "url", "remoteAddr"]
+    __slots__ = ["jsonrpc", "method", "id", "params", "extra", "error", "pathInfo", "request", "url", "remoteAddr", "fromAdminHost"]
 
     def __init__(self, request):
         assert isinstance(request, Request)
@@ -26,6 +33,7 @@ class JsonRpcRequest(object):
         self.url = request.url
         self.remoteAddr = request.remote_addr
         self.request = request
+        self.fromAdminHost = False if re.match(DEBUG_IP_ADDRESS_REGEX, request.remote_addr) is None else True
 
         # methods are listed in http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
         # default JSON-RPC method is identical to HTTP method and it should be overridden
