@@ -114,3 +114,29 @@ class EntityInvalidated(JsonRpcException):
     errorCode = -32089
     def __init__(self, data):
         JsonRpcException.__init__(self, self.errorCode, "Entity was found but invalidated.", data)
+
+class InconistentAuthentiation(JsonRpcException):
+    errorCode = -32088
+    def __init__(self, existing_user_id, data=None):
+        JsonRpcException.__init__(self, self.errorCode)
+
+class _Dummy(JsonRpcException):
+    errorCode = -32089
+
+if __name__ == "__main__":
+    import sys
+    print (sys.version)
+    print (dir())
+    print (globals())
+    g = dict(globals())
+    json_rpc_exceptions = {}
+    for json_rpc_exception_name, json_rpc_exception_class in g.iteritems():
+        if not isinstance(json_rpc_exception_class, type): continue
+        if issubclass(json_rpc_exception_class, JsonRpcException):
+            print (json_rpc_exception_name, json_rpc_exception_class)
+            error_code = json_rpc_exception_class.errorCode
+            assert isinstance(error_code, int) and error_code < 0
+            if json_rpc_exceptions.has_key(error_code):
+                raise UserWarning("duplicated errocodes %s were defined in %s and %s",
+                                  (error_code, json_rpc_exceptions[error_code].__class__.__name__, json_rpc_exception_name))
+            json_rpc_exceptions[error_code] = json_rpc_exception_class
