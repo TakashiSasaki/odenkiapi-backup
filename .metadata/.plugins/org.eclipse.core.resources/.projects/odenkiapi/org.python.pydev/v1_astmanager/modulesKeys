@@ -22,21 +22,21 @@ antlr3.tokens|C:\Program Files (x86)\Google\google_appengine\lib\antlr3\antlr3\t
 antlr3.tree|C:\Program Files (x86)\Google\google_appengine\lib\antlr3\antlr3\tree.py
 antlr3.treewizard|C:\Program Files (x86)\Google\google_appengine\lib\antlr3\antlr3\treewizard.py
 api.Data|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\Data.py
-api.Email|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\Email.py
-api.Gmail|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\Gmail.py
 api.Metadata|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\Metadata.py
 api.Odenki|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\Odenki.py
 api.OdenkiUser|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\OdenkiUser.py
 api.RawData|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\RawData.py
 api.Sender|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\Sender.py
 api.Sensor|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\Sensor.py
-api.Twitter|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\Twitter.py
-api.TwitterOld|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\TwitterOld.py
 api.__init__|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\__init__.py
-api.admin|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\admin.py
-api.echo|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\echo.py
+api.auth.Email|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\auth\Email.py
+api.auth.Gmail|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\auth\Gmail.py
+api.auth.Twitter|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\auth\Twitter.py
+api.auth.TwitterOld|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\auth\TwitterOld.py
+api.auth.__init__|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\auth\__init__.py
+api.debug.__init__|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\debug\__init__.py
+api.debug.echo|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\debug\echo.py
 api.gdrive|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\gdrive.py
-api.session|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\session.py
 api.version|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\version.py
 api_server|C:\Program Files (x86)\Google\google_appengine\api_server.py
 apiclient.__init__|C:\Program Files (x86)\Google\google_appengine\lib\google-api-python-client\apiclient\__init__.py
@@ -1896,6 +1896,7 @@ lib.TwitterAuth|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi
 lib.__init__|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\lib\__init__.py
 lib.gae.JsonRpcDispatcher|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\lib\gae\JsonRpcDispatcher.py
 lib.gae.__init__|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\lib\gae\__init__.py
+lib.json.DebugCredentials|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\lib\json\DebugCredentials.py
 lib.json.JsonEncoder|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\lib\json\JsonEncoder.py
 lib.json.JsonRpcError|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\lib\json\JsonRpcError.py
 lib.json.JsonRpcRequest|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\lib\json\JsonRpcRequest.py
@@ -1907,7 +1908,6 @@ markupsafe.__init__|C:\Program Files (x86)\Google\google_appengine\lib\markupsaf
 markupsafe._constants|C:\Program Files (x86)\Google\google_appengine\lib\markupsafe\markupsafe\_constants.py
 markupsafe._native|C:\Program Files (x86)\Google\google_appengine\lib\markupsafe\markupsafe\_native.py
 markupsafe.tests|C:\Program Files (x86)\Google\google_appengine\lib\markupsafe\markupsafe\tests.py
-model.AdminUser|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\model\AdminUser.py
 model.Columns|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\model\Columns.py
 model.Command|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\model\Command.py
 model.Counter|C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\model\Counter.py
