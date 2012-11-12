@@ -1,0 +1,133 @@
+application: odenkiapi
+version: python-0017
+#runtime: python
+runtime: python27
+api_version: 1
+#default_expiration: "7d 1h"
+
+threadsafe: no
+inbound_services:
+- warmup
+builtins:  
+- remote_api: on  
+- appstats: off
+libraries:
+- name: django
+  version: "1.2"
+#- name: webapp2
+#  version: "2.5.1"
+handlers:
+- url: /_ah/queue/deferred
+  #script: $PYTHON_LIB/google/appengine/ext/deferred/deferred.py
+  script: $PYTHON_LIB/google/appengine/ext/deferred/handler.py
+  login: admin
+
+- url: /stylesheets
+  static_dir: stylesheets
+
+- url: /js
+  static_dir: js
+
+- url: /html
+  static_dir: html
+
+- url: /css
+  static_dir: css
+  
+- url: /image
+  static_dir: image
+
+- url: /favicon.ico
+  static_files: image/odenki.png
+  upload: image/odenki.png
+
+- url: /api/([A-Za-z_]+).*
+  script: api/\1.py
+
+- url: /record/([A-Za-z_]+).*
+  script: record/\1.py
+  
+- url: /post
+  script: post.py
+
+- url: /admin
+  script: index.py
+
+- url: /Sender
+  script: SenderRequestHandler.py
+
+##############################################
+
+- url: /record
+  static_files: html/record.html
+  upload: html/record.html
+
+###############################################
+- url: /RawData
+  script: RawDataRequestHandler.py
+
+- url: /RawDataNonCached
+  script: RawDataRequestHandler.py
+  
+- url: /RawData2
+  script: RawDataRequestHandler.py
+
+- url: /Metadata
+  script: MetadataRequestHandler.py
+  
+- url: /Data
+  script: DataRequestHandler.py
+
+- url: /Last
+  script: LastRequestHandler.py
+
+- url: /sandbox/hello
+  script: sandbox/hello.py
+
+- url: /Equipment
+  script: Equipment.py
+  
+- url: /GoogleDocs
+  script: GoogleDocs.py
+
+- url: /google686f6b490a533df7.html
+  script: google686f6b490a533df7.py 
+
+- url: /OdenkiUser
+  script: OdenkiUser.py
+  
+- url: /Twitter
+  script: Twitter.py
+  
+- url: /Facebook
+  script: Facebook.py
+  
+- url: /Foursquare
+  script: Foursquare.py
+
+- url: /Spreadsheet
+  script: Spreadsheet.py
+
+- url: /Command
+  script: Command.py
+  
+- url: /GoogleAuth*
+  script: GoogleAuth.py
+  
+- url: /MyRequestHandler*
+  script: MyRequestHandler.py
+
+- url: /
+  static_files: html/main.html
+  upload: html/main.html
+
+- url: /RawData
+  script: RawDataRequestHandler.py
+
+- url: /RawData2Cached
+  script: RawDataRequestHandler.py
+
+- url: /OdenkiSession*
+  script: OdenkiSession.py
+- url: /RawDataNdb
+  script: RawDataNdb.py

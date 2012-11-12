@@ -1,0 +1,9 @@
+INSTUPapi.auth.TwitterOld
+C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\auth\TwitterOld.py
+INFOS:&&1|1|2|0&&2|3|2|1&&2|4|2|1&&1|5|2|0&&2|3|2|5&&3|6|2|5
+GET=3
+Callback=5
+mapping=6
+_makeCallbackUrl=4
+api.auth.TwitterOld=2
+Twitter=1
