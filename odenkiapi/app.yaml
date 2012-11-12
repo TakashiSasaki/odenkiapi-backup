@@ -41,6 +41,9 @@ handlers:
   static_files: image/odenki.png
   upload: image/odenki.png
 
+- url: /api/auth/([A-Za-z_]+).*
+  script: api/auth/\1.py
+
 - url: /api/([A-Za-z_]+).*
   script: api/\1.py
 
