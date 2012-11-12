@@ -186,8 +186,8 @@ class OAuthCallback(JsonRpcDispatcher):
         
 if __name__ == "__main__":
     mapping = []
-    mapping.append(("/api/Twitter/RedirectToAuthorizeUrl", RedirectToAuthorizeUrl))
-    mapping.append(("/api/Twitter/OAuthCallback", OAuthCallback))
-    mapping.append(("/api/Twitter", Twitter2))
+    mapping.append(("/api/auth/Twitter/RedirectToAuthorizeUrl", RedirectToAuthorizeUrl))
+    mapping.append(("/api/auth/Twitter/OAuthCallback", OAuthCallback))
+    mapping.append(("/api/auth/Twitter", Twitter2))
     from lib.gae import run_wsgi_app
     run_wsgi_app(mapping)
