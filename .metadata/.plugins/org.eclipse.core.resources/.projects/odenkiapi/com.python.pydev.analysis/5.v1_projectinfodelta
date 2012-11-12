@@ -1,14 +1,1 @@
-INSTUPapi.auth.Email
-C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\auth\Email.py
-INFOS:&&1|1|2|0&&2|3|2|1&&2|4|2|1&&2|5|2|1&&2|6|2|1&&2|7|2|1&&2|8|2|1&&2|9|2|1&&1|10|2|0&&2|3|2|10&&3|11|2|10
-deleteEmail=7
-api.auth.Email=2
-logout=9
-GET=3
-NonceCallback=10
-Email=1
-setNonce=4
-mapping=11
-login=8
-setPassword=6
-invalidate=5
+DELSTRlib.json.JsonRpcRequest

@@ -1,8 +1,5 @@
-INSTUPapi.auth.Gmail
-C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\auth\Gmail.py
-INFOS:&&1|1|2|0&&2|3|2|1&&1|4|2|0&&2|3|2|4&&3|5|2|4
-GET=3
-api.auth.Gmail=2
-Gmail=1
-mapping=5
-RedirectedFromGoogle=4
+INSTUPlib.json.DebugCredentials
+C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\lib\json\DebugCredentials.py
+INFOS:&&3|1|2|0
+DEBUG_IP_ADDRESS_REGEX=1
+lib.json.DebugCredentials=2

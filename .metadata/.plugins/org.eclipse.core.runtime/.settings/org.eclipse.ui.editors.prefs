@@ -4,6 +4,7 @@ htmlTagPairOccurrenceIndication=true
 htmlTagPairOccurrenceIndicationColor=94,94,94
 htmlTagPairOccurrenceIndicationHighlighting=false
 htmlTagPairOccurrenceIndicationTextStyle=BOX
+lineNumberRuler=true
 overviewRuler_migration=migrated_3.1
 pydevOccurrenceHighlighting=false
 pydevOccurrenceIndication=true
