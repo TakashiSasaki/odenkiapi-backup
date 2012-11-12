@@ -1,27 +1,18 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
 from google.appengine.ext import ndb
-#from google.appengine import runtime
-#from model.NdbModel import NdbModel
 from model.Columns import Columns
-#from model.Columns import Columns
-#from model.Command import getCommandById
-#__all__ = ["JsonRpcError", "JsonRpcRequest", "JsonRpcResponse", "JsonRpcDispatcher"]
 import logging as _logging
 from lib.json.JsonRpcError import JsonRpcException
-import gaesessions
 from model.CsvMixin import CsvMixin
 from lib.DataTableMixin import DataTableMixin
 _logging.getLogger().setLevel(_logging.DEBUG)
-#from exceptions import Exception
-#from lib.JsonEncoder import dumps
 from google.appengine.ext.webapp import RequestHandler, Response
 from StringIO import StringIO
 import csv
 from logging import debug, error, info
 from warnings import warn
 from lib.json import JsonRpcRequest, JsonRpcResponse, JsonRpcError, dumps
-#from lib.json import dumps
 
 class JsonRpcDispatcher(RequestHandler):
     """JsonRpcDispatcher invokes corresponding methods according to given method parameter"""
@@ -177,13 +168,6 @@ class JsonRpcDispatcher(RequestHandler):
         self.response.out.write(dumps(json_rpc_response))
         return
 
-#    def _writeJsonP(self, json_rpc_response):
-#        result = json_rpc_response.getResult()
-#        if not isinstance(result, dict) or not isinstance(result, list):
-#            raise RuntimeError("result is neither dict or list")
-#        self.response.out.write(dumps(result))
-#        self.response.content_type = "application/javascript"
-    
     def _writeCsv(self, json_rpc_response, dialect=csv.excel, content_type="text/plain"):
         assert isinstance(json_rpc_response, JsonRpcResponse)
         output = StringIO()
