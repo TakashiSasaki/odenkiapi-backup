@@ -72,7 +72,7 @@ class JsonRpcDispatcher(RequestHandler):
             json_rpc_response.setError(e.code, e.message, e.data)
 
         # cancel redirection for debug purpose
-        if json_rpc_request.getValue("debug") or json_rpc_request.getValue("ignore_redirection"):
+        if json_rpc_request.getValue("debug") or json_rpc_request.getValue("ignore_redirection") or json_rpc_request.fromAdminHost:
             if json_rpc_response.getRedirectTarget():
                 if not json_rpc_response.hasError():
                     json_rpc_response.setResultValue("cancelled_redirect_target_for_debug", json_rpc_response.getRedirectTarget())
