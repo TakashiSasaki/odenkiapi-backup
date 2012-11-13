@@ -207,3 +207,8 @@ class JsonRpcResponse(dict):
     def getRedirectTarget(self):
         if hasattr(self, "_redirectTarget"): return self._redirectTarget
 
+    def hasRedirectTarget(self):
+        return True if hasattr(self, "_redirectTarget") else False
+
+    def delRedirectTarget(self):
+        del(self._redirectTarget)
