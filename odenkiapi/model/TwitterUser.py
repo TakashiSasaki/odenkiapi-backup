@@ -201,3 +201,17 @@ class TwitterUser(NdbModel):
         for key in query:
             assert isinstance(key, ndb.Key)
             key.delete_async()
+            
+    def setOdenkiId(self, odenki_id):
+        assert odenki_id is not None
+        assert self.odenkiId is None
+
+        try:
+            existing_twitter_user = TwitterUser.getByOdenkiId(odenki_id)
+            raise EntityExists({"ExistingTwitterUser" : existing_twitter_user,
+                                "self": self,
+                                "odenkiId": odenki_id})
+        except EntityNotFound: pass
+
+        self.odenkiId = odenki_id
+        self.put_async()

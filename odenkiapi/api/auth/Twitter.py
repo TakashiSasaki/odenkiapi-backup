@@ -170,22 +170,24 @@ class OAuthCallback(JsonRpcDispatcher):
                 odenki_user = OdenkiUser.createNew()
                 assert isinstance(odenki_user, OdenkiUser)
                 odenki_user.saveToSession()
-                twitter_user.odenkiId = odenki_user.odenkiId
-                twitter_user.put_async()
+                twitter_user.setOdenkiId(odenki_user.odenkiId)
+                twitter_user.put()
             else:
                 odenki_user = OdenkiUser.getByOdenkiId(twitter_user.odenkiId)
                 odenki_user.saveToSession()
         else:
             if twitter_user.odenkiId is None:
                 odenki_user.saveToSession()
-                twitter_user.odenkiId = odenki_user.odenkiId
+                twitter_user.setOdenkiId(odenki_user.odenkiId)
                 twitter_user.put_async()
             else:
                 if twitter_user.odenkiId != odenki_user.odenkiId:
                     raise InconsistentAuthentiation({twitter_user.__class__.__name__: twitter_user,
                                                      odenki_user.__class__.__name__:odenki_user})
                 odenki_user.saveToSession()
-    
+        
+        jresponse.setResultValue("OdenkiUser", odenki_user)
+        jresponse.setResultValue("TwitterUser", twitter_user)
         jresponse.setRedirectTarget("/html/auth/succeeded.html")
         
 if __name__ == "__main__":
