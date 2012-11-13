@@ -52,21 +52,9 @@ class InternalError(JsonRpcException):
 
 class EntityNotFound(JsonRpcException):
     code = -32097
-    def __init__(self, model, condition):
-        from google.appengine.ext import db
-        from google.appengine.ext import ndb
-        if isinstance(model, db.Model):
-            kind = model.kind()
-        elif isinstance(model, ndb.Model):
-            kind = model.kind()
-        elif isinstance(model, ndb.MetaModel):
-            assert isinstance(model, ndb.MetaModel)
-            kind = unicode(model.__name__)
-        else:
-            kind = unicode(model)
-
-        self.message = "Entity of %s is not found" % kind
-        self.data = {"kind":kind, "condition":condition}
+    def __init__(self, data={}, message=None):
+        self.message = message
+        self.data = data
 
 class EntityExists(JsonRpcException):
     code = -32096
