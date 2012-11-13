@@ -32,6 +32,16 @@ class Gmail(JsonRpcDispatcher):
         jresponse.setResultValue("OdenkiUser", odenki_user)
         jresponse.setResultValue("GmailUser", gmail_user)
         jresponse.setResultValue("login_url", login_url)
+        
+    def deleteGmailUser(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
+        odenki_user = OdenkiUser.loadFromSession()
+        gmail_user = GmailUser.getByOdenkiId(odenki_user.odenkiId)
+        gmail_user.key.delete_async()
+        jresponse.setResultValue("OdenkiUser", odenki_user)
+        jresponse.setResultValue("GmailUser", gmail_user)
 
 class RedirectedFromGoogle(JsonRpcDispatcher):
     """This is the first handler to catch the result of authentication by Google.
