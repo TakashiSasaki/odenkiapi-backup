@@ -11,6 +11,7 @@ from urlparse import parse_qsl
 from urllib import urlencode
 import gaesessions
 from model.OdenkiUser import OdenkiUser
+from google.appengine.ext import ndb
 
 """Twitter OAuth consumer secret and consumer key for odenkiapi
 can be obtained at https://dev.twitter.com/apps/1919034/show """
@@ -18,7 +19,7 @@ can be obtained at https://dev.twitter.com/apps/1919034/show """
 REQUET_TOKEN_URL = "https://api.twitter.com/oauth/request_token"
 AUTHORIZE_URL = "https://api.twitter.com/oauth/authorize"
 ACCESS_TOKEN_URL = "https://api.twitter.com/oauth/access_token"
-CALLBACK_URL = "http://odenkiapi.appspot.com/api/Twitter/Callback"
+#CALLBACK_URL = "http://www.odenki.org/api/Twitter/Callback"
 
 class Twitter2(JsonRpcDispatcher):
     
@@ -52,12 +53,23 @@ class Twitter2(JsonRpcDispatcher):
     def showAllTwitterUsers(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
+        assert jrequest.fromAdminHost
         jresponse.setId()
         query = TwitterUser.query()
         twitter_users=[]
         for twitter_user in query:
             twitter_users.append(twitter_user)
         jresponse.setResult(twitter_users)
+        
+    def deleteAllTwitterUsers(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        assert jrequest.fromAdminHost
+        jresponse.setId()
+        query = TwitterUser.query()
+        for twitter_user_key in query.fetch(keys_only=True):
+            assert isinstance(twitter_user_key, ndb.Key)
+            twitter_user_key.delete_async()
         
 REQUEST_TOKEN_SESSION_KEY = ";klsuioayggahihiaoheiajfioea"
 REQUEST_TOKEN_SECRET_SESSION_KEY = "gscfgnhbfvcfscgdfgiubH"

@@ -91,9 +91,9 @@ class TwitterUser(NdbModel):
             assert isinstance(twitter_user_2, TwitterUser)
             if twitter_user_1.odenkiId == twitter_user_2.odenkiId:
                 twitter_user_2.key.delete()
-                return twitter_user_1
-            raise EntityDuplicated(cls, {"twitter_user_1": twitter_user_1,
-                                         "twitter_suer_2": twitter_user_2})
+                return twitter_user_1.key
+            raise EntityDuplicated({"twitter_user_1": twitter_user_1,
+                                    "twitter_user_2": twitter_user_2})
         return keys[0]
 
     @classmethod
@@ -209,8 +209,9 @@ class TwitterUser(NdbModel):
         try:
             existing_twitter_user = TwitterUser.getByOdenkiId(odenki_id)
             raise EntityExists({"ExistingTwitterUser" : existing_twitter_user,
-                                "self": self,
-                                "odenkiId": odenki_id})
+                                "IncomingTwitterUser": self,
+                                "odenkiId": odenki_id}, 
+                                "TwitterUser.setOdenkiId failed")
         except EntityNotFound: pass
 
         self.odenkiId = odenki_id
