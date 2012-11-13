@@ -137,7 +137,7 @@ class JsonRpcDispatcher(RequestHandler):
 
         if json_rpc_response.has_key("error"):
             debug("JSON RPC response with error.")
-            assert  json_rpc_response.getResult() is None
+            #assert  json_rpc_response.getResult() is None
             self.response.content_type = "application/json"
             self.response.status = JsonRpcDispatcher._getHttpStatusFromJsonRpcError(json_rpc_response.getErrorCode()) 
             self.response.out.write(dumps(json_rpc_response))

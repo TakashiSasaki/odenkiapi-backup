@@ -84,16 +84,16 @@ class EmailUser(NdbModel):
         assert isinstance(email, unicode)
         try:
             existing_email_user = cls.getByEmail(email)
-            raise EntityExists(cls, {"existing_email_user": existing_email_user})
+            raise EntityExists({"EmailUser": existing_email_user}, "EmailUser %s already exists" % email)
         except: pass
         email_user = EmailUser()
         assert isinstance(email_user, EmailUser)
         email_user.email = email
         email_user.registeredDateTime = datetime.now()
         email_user.emailUserId = Counter.GetNextId("emailUserId")
-        odenki_user = OdenkiUser.createNew()
-        assert isinstance(odenki_user, OdenkiUser)
-        email_user.odenkiId = odenki_user.odenkiId
+        #odenki_user = OdenkiUser.createNew()
+        #assert isinstance(odenki_user, OdenkiUser)
+        #email_user.odenkiId = odenki_user.odenkiId
         email_user.put()
         return email_user
 
@@ -104,31 +104,31 @@ class EmailUser(NdbModel):
         
     SESSION_KEY = "nasfuafhasjlafapsiofhap"
 
-    @classmethod    
-    def loadFromSession(cls):
-        """get EmailUser instance in the session"""
-        from gaesessions import get_current_session
-        session = get_current_session()
-        try:
-            email_user = session[cls.SESSION_KEY]
-        except KeyError:
-            raise EntityNotFound(cls, "loadFromSession")
-        if email_user is None:
-            raise EntityNotFound(cls, "loadFromSession")
-        assert isinstance(email_user, EmailUser)
-        return email_user
-        
-    def saveToSession(self):
-        assert isinstance(self.key, ndb.Key)
-        session = gaesessions.get_current_session()
-        assert isinstance(session, gaesessions.Session)
-        try:
-            existing = self.loadFromSession()
-            assert isinstance(existing, EmailUser)
-            if existing.emailUserId != self.emailUserId:
-                raise EntityExists(self.__class__, {"existing.emailUserId": existing.emailUserId, "self.emailUserId": self.emailUserId})
-        except EntityNotFound: pass
-        session[self.SESSION_KEY] = self
+#    @classmethod    
+#    def loadFromSession(cls):
+#        """get EmailUser instance in the session"""
+#        from gaesessions import get_current_session
+#        session = get_current_session()
+#        try:
+#            email_user = session[cls.SESSION_KEY]
+#        except KeyError:
+#            raise EntityNotFound(cls, "loadFromSession")
+#        if email_user is None:
+#            raise EntityNotFound(cls, "loadFromSession")
+#        assert isinstance(email_user, EmailUser)
+#        return email_user
+#        
+#    def saveToSession(self):
+#        assert isinstance(self.key, ndb.Key)
+#        session = gaesessions.get_current_session()
+#        assert isinstance(session, gaesessions.Session)
+#        try:
+#            existing = self.loadFromSession()
+#            assert isinstance(existing, EmailUser)
+#            if existing.emailUserId != self.emailUserId:
+#                raise EntityExists(self.__class__, {"existing.emailUserId": existing.emailUserId, "self.emailUserId": self.emailUserId})
+#        except EntityNotFound: pass
+#        session[self.SESSION_KEY] = self
         
     @classmethod
     def deleteFromSession(cls):
@@ -188,3 +188,17 @@ class EmailUser(NdbModel):
         query = query.filter(cls.invalidatedDateTime == None)
         query = query.filter(cls.odenkiId == odenki_id)
         return query
+
+    def setOdenkiId(self, odenki_id):
+        assert isinstance(odenki_id, int)
+        assert self.odenkiId is None
+        
+        try:
+            existing_email_user = EmailUser.getByOdenkiId(odenki_id)
+            raise EntityExists({"ExistingEmailUser": existing_email_user,
+                                "IncomingEmailUser": self,
+                                "odenkiId": odenki_id},
+                               message="EmailUser with odenkiId %s already exists." % odenki_id)
+        except EntityNotFound: pass
+        self.odenkiId = odenki_id
+        self.put_async()
