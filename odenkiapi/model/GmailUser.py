@@ -5,7 +5,7 @@ from google.appengine.ext import ndb
 from lib.json.JsonRpcError import EntityNotFound, EntityExists, EntityDuplicated
 import gaesessions
 from gaesessions import Session
-from model.OdenkiUser import OdenkiUser
+#from model.OdenkiUser import OdenkiUser
 
 class GmailUser(NdbModel):
     gmail = ndb.StringProperty(indexed=False)
@@ -56,14 +56,17 @@ class GmailUser(NdbModel):
         keys = query.fetch(keys_only=True, limit=2)
         assert isinstance(keys, list)
         if len(keys) == 0:
-            raise EntityNotFound(cls, {"gmailId":gmail_id})
+            raise EntityNotFound({"kind": cls.__name__ , "gmailId":gmail_id})
         if len(keys) == 2:
             gmail_user_1 = keys[0].get()
+            assert isinstance(gmail_user_1, GmailUser)
             gmail_user_2 = keys[1].get()
+            assert isinstance(gmail_user_2, GmailUser)
             if gmail_user_1.odenkiId == gmail_user_2.odenkiId:
-                gmail_user_2.key.delete()
+                gmail_user_2.key.delete_async()
                 return gmail_user_1.key
-            raise EntityDuplicated(cls, {"gmail_user_1": gmail_user_1, "gmail_user_2": gmail_user_2})
+            raise EntityDuplicated({"gmail_user_1": gmail_user_1, "gmail_user_2": gmail_user_2,
+                                    "gmailId":gmail_id})
         return keys[0]
     
     @classmethod
@@ -84,13 +87,15 @@ class GmailUser(NdbModel):
                                   "odenkiId": odenki_id})
         if len(keys) == 2:
             gmail_user_1 = keys[0].get()
+            assert isinstance(gmail_user_1, GmailUser)
             gmail_user_2 = keys[1].get()
+            assert isinstance(gmail_user_2, GmailUser)
             if gmail_user_1.gmailId == gmail_user_2.gmailId:
-                gmail_user_2.key.delete()
+                gmail_user_2.key.delete_async()
                 return gmail_user_1.key
             raise EntityDuplicated({"odenkiId": odenki_id,
-                                    "gmail_user_1": keys[0].get(),
-                                    "gmail_user_2": keys[1].get()})
+                                    "gmail_user_1": gmail_user_1,
+                                    "gmail_user_2": gmail_user_2})
         return keys[0]
 
     @classmethod
@@ -108,7 +113,7 @@ class GmailUser(NdbModel):
         try:
             existing_gmail_user = GmailUser.getByOdenkiId(odenki_id)
             raise EntityExists({"ExistingGmailUser" : existing_gmail_user,
-                                "self": self,
+                                "IncomingGmailUser": self,
                                 "odenkiId": odenki_id})
         except EntityNotFound: pass
 
