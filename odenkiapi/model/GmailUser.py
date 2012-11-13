@@ -86,3 +86,14 @@ class GmailUser(NdbModel):
         query = query.filter(cls.odenkiId == odenki_id)
         assert isinstance(query, ndb.Query)
         return query
+
+    def setOdenkiId(self, odenki_id):
+        assert odenki_id is not None
+        if self.odenkiId is None:
+            self.odenkiId = odenki_id
+            self.put_async()
+            return
+        if self.odenkiId != odenki_id:
+            self.odenkiId = odenki_id
+            self.put_async()
+            return
