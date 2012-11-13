@@ -1,3 +1,4 @@
+#!-*- coding:utf-8 -*-
 from __future__ import unicode_literals, print_function
 from lib.gae.JsonRpcDispatcher import JsonRpcDispatcher
 from lib.json.JsonRpcRequest import JsonRpcRequest
@@ -10,7 +11,6 @@ from urlparse import parse_qsl
 from urllib import urlencode
 import gaesessions
 from model.OdenkiUser import OdenkiUser
-#from twitter.api import Twitter
 
 """Twitter OAuth consumer secret and consumer key for odenkiapi
 can be obtained at https://dev.twitter.com/apps/1919034/show """
@@ -36,29 +36,8 @@ class Twitter2(JsonRpcDispatcher):
             try:
                 twitter_user = TwitterUser.getByOdenkiId(odenki_user.odenkiId)
             except EntityNotFound: pass
-#        try:
-#            twitter_user2 = TwitterUser.loadFromSession()
-#        except EntityNotFound, e:
-#            twitter_user2 = None
-        #assert isinstance(twitter_user, TwitterUser)
-#        jresponse.setResultValue("twitterId", twitter_user.twitterId)
-#        jresponse.setResultValue("screenName", twitter_user.screenName)
-#        jresponse.setResultValue("odenkiId", twitter_user.odenkiId)
-#        jresponse.setResultValue("name", twitter_user.name)
-#        jresponse.setResultValue("location", twitter_user.location)
-#        jresponse.setResultValue("profile_image_url", twitter_user.profile_image_url)
-#        jresponse.setResultValue("profile_image_url_https", twitter_user.profile_image_url_https)
-#        jresponse.setResultValue("description", twitter_user.description)
-#        jresponse.setResultValue("time_zone", twitter_user.time_zone)
-#        jresponse.setResultValue("url", twitter_user.url)
-#        jresponse.setResultValue("utc_offset", twitter_user.utc_offset)
         jresponse.setResult({"OdenkiUser": odenki_user, "TwitterUser":twitter_user})
         
-    def logout(self, jrequest, jresponse):
-        jresponse.setId()
-        session = gaesessions.get_current_session()
-        session.terminate()
-
     def deleteTwitterUser(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
@@ -69,6 +48,16 @@ class Twitter2(JsonRpcDispatcher):
         assert isinstance(twitter_user, TwitterUser)
         twitter_user.key.delete()
         jresponse.setResultValue("OdenkiUser", odenki_user)
+        
+    def showAllTwitterUsers(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
+        query = TwitterUser.query()
+        twitter_users=[]
+        for twitter_user in query:
+            twitter_users.append(twitter_user)
+        jresponse.setResult(twitter_users)
         
 REQUEST_TOKEN_SESSION_KEY = ";klsuioayggahihiaoheiajfioea"
 REQUEST_TOKEN_SECRET_SESSION_KEY = "gscfgnhbfvcfscgdfgiubH"
@@ -155,7 +144,7 @@ class OAuthCallback(JsonRpcDispatcher):
             twitter_user.setAccessToken(access_token, access_token_secret)
             twitter_user.screenName = unicode(screen_name)
             twitter_user.verifyCredentials11()
-            twitter_user.put_async()
+            twitter_user.put()
         assert isinstance(twitter_user, TwitterUser)
         
         # prepare OdenkiUser
@@ -171,7 +160,7 @@ class OAuthCallback(JsonRpcDispatcher):
                 assert isinstance(odenki_user, OdenkiUser)
                 odenki_user.saveToSession()
                 twitter_user.setOdenkiId(odenki_user.odenkiId)
-                twitter_user.put()
+                twitter_user.put_async()
             else:
                 odenki_user = OdenkiUser.getByOdenkiId(twitter_user.odenkiId)
                 odenki_user.saveToSession()
