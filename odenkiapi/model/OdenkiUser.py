@@ -23,7 +23,7 @@ class OdenkiUser(NdbModel):
             existing = self.loadFromSession()
             assert isinstance(existing, OdenkiUser)
             if existing.odenkiId != self.odenkiId:
-                raise EntityExists(self.__class__, {"existing": existing.odenkiId, "odenkiId": self.odenkiId})
+                raise EntityExists(self.__class__, {"ExistingInSession": existing, "TriedToSave": self})
         except EntityNotFound: pass
         session[self.SESSION_KEY] = self
     
