@@ -4,14 +4,12 @@ from lib.json.JsonRpcRequest import JsonRpcRequest
 from lib.json.JsonRpcResponse import JsonRpcResponse
 from credentials import TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET
 from model.TwitterUser import TwitterUser
-from lib.json.JsonRpcError import EntityNotFound, OAuthError, EntityDuplicated
+from lib.json.JsonRpcError import EntityNotFound, OAuthError, InconsistentAuthentiation
 import oauth2
 from urlparse import parse_qsl
 from urllib import urlencode
-from logging import error
 import gaesessions
 from model.OdenkiUser import OdenkiUser
-from google.appengine.ext import ndb
 #from twitter.api import Twitter
 
 """Twitter OAuth consumer secret and consumer key for odenkiapi
@@ -32,12 +30,12 @@ class Twitter2(JsonRpcDispatcher):
         odenki_user = None
         try:
             odenki_user = OdenkiUser.loadFromSession()
-        except EntityNotFound, e: pass
+        except EntityNotFound: pass
 
         if odenki_user:
             try:
                 twitter_user = TwitterUser.getByOdenkiId(odenki_user.odenkiId)
-            except EntityNotFound, e: pass
+            except EntityNotFound: pass
 #        try:
 #            twitter_user2 = TwitterUser.loadFromSession()
 #        except EntityNotFound, e:
@@ -61,12 +59,16 @@ class Twitter2(JsonRpcDispatcher):
         session = gaesessions.get_current_session()
         session.terminate()
 
-    def deleteAll(self, jrequest, jresponse):
+    def deleteTwitterUser(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
-        TwitterUser.deleteAll()
-
+        odenki_user = OdenkiUser.loadFromSession()
+        assert isinstance(odenki_user, OdenkiUser)
+        twitter_user = TwitterUser.getByOdenkiId(odenki_user.odenkiId)
+        assert isinstance(twitter_user, TwitterUser)
+        twitter_user.key.delete()
+        jresponse.setResultValue("OdenkiUser", odenki_user)
         
 REQUEST_TOKEN_SESSION_KEY = ";klsuioayggahihiaoheiajfioea"
 REQUEST_TOKEN_SECRET_SESSION_KEY = "gscfgnhbfvcfscgdfgiubH"
@@ -107,6 +109,7 @@ class OAuthCallback(JsonRpcDispatcher):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
+        jresponse.setRedirectTarget("/html/auth/failed.html")
         try:
             oauth_token = jrequest.getValue("oauth_token")[0]
             oauth_verifier = jrequest.getValue("oauth_verifier")[0]
@@ -135,54 +138,55 @@ class OAuthCallback(JsonRpcDispatcher):
             user_id = access_token_dict["user_id"]
             screen_name = access_token_dict["screen_name"]
         except KeyError:
-            raise OAuthError("OAuthCallback failed to exchange verified request token to access token.")
-        #jresponse.setResultValue("access_token", access_token)
-        #jresponse.setResultValue("access_token_secret", access_token_secret)
-        #jresponse.setResultValue("uer_id", user_id)
-        #jresponse.setResultValue("screen_name", screen_name)
-        #jresponse.setResultValue("request_token", request_token)
-        #jresponse.setResultValue("request_token_secret", request_token_secret)
-        #jresponse.setResultValue("request_token_verified", oauth_token)
-        #jresponse.setResultValue("oauth_verifier", oauth_verifier)
-        
+            raise OAuthError({"request_token": request_token,
+                              "ACCESS_TOKEN_URL": ACCESS_TOKEN_URL
+                              },
+                             message="OAuthCallback failed to exchange verified request token to access token.")
+    
+        # prepare TwittrUser
         try: 
             twitter_user = TwitterUser.getByTwitterId(int(user_id))
             twitter_user.setAccessToken(access_token, access_token_secret)
             twitter_user.screenName = unicode(screen_name)
             twitter_user.verifyCredentials11()
-            twitter_user.put()
-            try: 
+            twitter_user.put_async()
+        except EntityNotFound:
+            twitter_user = TwitterUser.create(int(user_id))
+            twitter_user.setAccessToken(access_token, access_token_secret)
+            twitter_user.screenName = unicode(screen_name)
+            twitter_user.verifyCredentials11()
+            twitter_user.put_async()
+        assert isinstance(twitter_user, TwitterUser)
+        
+        # prepare OdenkiUser
+        try:
+            odenki_user = OdenkiUser.loadFromSession()
+        except EntityNotFound: 
+            odenki_user = None
+        
+        # reconcile TwitterUser and OdenkiUser
+        if odenki_user is None:
+            if twitter_user.odenkiId is None:
+                odenki_user = OdenkiUser.createNew()
+                assert isinstance(odenki_user, OdenkiUser)
+                odenki_user.saveToSession()
+                twitter_user.odenkiId = odenki_user.odenkiId
+                twitter_user.put_async()
+            else:
                 odenki_user = OdenkiUser.getByOdenkiId(twitter_user.odenkiId)
                 odenki_user.saveToSession()
-                #logged in by twitter
-                jresponse.setRedirectTarget("/html/auth/index.html")
-                return
-            except:
-                twitter_user.key.delete()
-                jresponse.setRedirectTarget("/html/auth/index.html")
-                return
-        except EntityNotFound:
-            try:
-                odenki_user = OdenkiUser.loadFromSession()
-                twitter_user = TwitterUser.create(int(user_id), odenki_user)
-                twitter_user.setAccessToken(access_token, access_token_secret)
-                twitter_user.screenName = unicode(screen_name)
-                twitter_user.verifyCredentials11()
-                twitter_user.put()
-                jresponse.setRedirectTarget("/html/auth/index.html")
-                return
-            except EntityNotFound:
-                jresponse.setRedirectTarget("/html/auth/Email.html")
-                return
-        except EntityDuplicated:
-            query = TwitterUser.queryByTwitterId(int(user_id))
-            keys = query.fetch(keys_only=True, limit=100)
-            for key in keys:
-                assert isinstance(key, ndb.Key)
-                key.delete_async()
-        
-        error("illegal state in api.Twitter")
-        jresponse.setRedirectTarget("/html/auth/index.html")
+        else:
+            if twitter_user.odenkiId is None:
+                odenki_user.saveToSession()
+                twitter_user.odenkiId = odenki_user.odenkiId
+                twitter_user.put_async()
+            else:
+                if twitter_user.odenkiId != odenki_user.odenkiId:
+                    raise InconsistentAuthentiation({twitter_user.__class__.__name__: twitter_user,
+                                                     odenki_user.__class__.__name__:odenki_user})
+                odenki_user.saveToSession()
+    
+        jresponse.setRedirectTarget("/html/auth/succeeded.html")
         
 if __name__ == "__main__":
     mapping = []
