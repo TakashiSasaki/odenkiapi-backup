@@ -42,7 +42,7 @@ class JsonRpcResponse(dict):
             error_message = e
         self.setError(JsonRpcError.INVALID_PARAMS, error_message)
     
-    def setError(self, error_code, error_message=None, error_data=None):
+    def setError(self, error_code, error_message=None, error_data=None, error_name=None):
         if error_code is None:
             error_code = JsonRpcError.SERVER_ERROR_RESERVED_MIN
         assert isinstance(error_code, int)
@@ -52,8 +52,9 @@ class JsonRpcResponse(dict):
         #assert not hasattr(self, "error")
         self["error"] = {
                       "code": error_code,
+                      "name" : error_name, # this is non standard field
                       "message": error_message,
-                      "data":error_data
+                      "data":error_data,
                       }
         if self.getResult():  
             self["canceled_result"] = self.getResult()

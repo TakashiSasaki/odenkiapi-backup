@@ -69,7 +69,7 @@ class JsonRpcDispatcher(RequestHandler):
             (etype, value, tb) = exc_info()
             from traceback import print_exception
             print_exception(etype, value, tb)
-            json_rpc_response.setError(e.code, e.message, e.data)
+            json_rpc_response.setError(e.code, e.message, e.data, e.__class__.__name__)
 
         # cancel redirection for debug purpose
         if json_rpc_request.getValue("debug") or json_rpc_request.getValue("ignore_redirection") or json_rpc_request.fromAdminHost:

@@ -1,5 +1,7 @@
 from __future__ import unicode_literals, print_function
 from logging import debug
+from model.NdbModel import NdbModel
+from yaml.parser import ParserError
 
 class JsonRpcError(object):
     PARSE_ERROR = -32700
@@ -12,53 +14,44 @@ class JsonRpcError(object):
     
 
 class JsonRpcException(RuntimeError):
-    errorCode = -32000
-    __slots__ = ["code", "message", "data"]
-
-    def __init__(self, code, message, data={}, exception_class=None):
-        RuntimeError.__init__(self)
-        assert isinstance(data, dict)
-        self.code = code
-        self.message = message
-        self.data = data
-        self.setExceptionClassName(exception_class)
+    code = -32000
+    __slots__ = ["message", "data"]
     
-    def setExceptionClassName(self, exception_class):
-        if exception_class is None:return
-        assert issubclass(exception_class, JsonRpcException)
-        assert isinstance(self.data, dict)
-        self.data["exceptionClass"] = exception_class.__name__
-
     def __str__(self):
         return unicode(self.message) + unicode(self.data)
 
 class ParseError(JsonRpcException):
-    errorCode = JsonRpcError.PARSE_ERROR
-    def __init__(self, message, data=None):
-        JsonRpcException.__init__(self, self.errorCode, message, data, self.__class__)
+    code = JsonRpcError.PARSE_ERROR
+    def __init__(self, data={}, message=None):
+        self.data = data
+        self.message = message
 
 class InvalidRequest(JsonRpcException):
-    errorCode = JsonRpcError.INVALID_REQUEST
-    def __init__(self, message, data=None):
-        JsonRpcException.__init__(self, self.errorCode, message, data, self.__class__)
+    code = JsonRpcError.INVALID_REQUEST
+    def __init__(self, data={}, message=None):
+        self.data = data
+        self.message = message
 
 class MethodNotFound(JsonRpcException):
-    errorCode = JsonRpcError.METHOD_NOT_FOUND
-    def __init__(self, message, data=None):
-        JsonRpcException.__init__(self, self.errorCode, message, data, self.__class__)
+    code = JsonRpcError.METHOD_NOT_FOUND
+    def __init__(self, data={}, message=None):
+        self.data = data
+        self.message = message
 
 class InvalidParams(JsonRpcException):
-    errorCode = JsonRpcError.INVALID_PARAMS
-    def __init__(self, message, data=None):
-        JsonRpcException.__init__(self, self.errorCode, message, data, self.__class__)
+    code = JsonRpcError.INVALID_PARAMS
+    def __init__(self, data={}, message=None):
+        self.data = data
+        self.message = message
 
 class InternalError(JsonRpcException):
-    errorCode = JsonRpcError.INTERNAL_ERROR
-    def __init__(self, message, data=None):
-        JsonRpcException.__init__(self, self.errorCode, message, data, self.__class__)
+    code = JsonRpcError.INTERNAL_ERROR
+    def __init__(self, data={}, message=None):
+        self.data = data
+        self.message = message
 
 class EntityNotFound(JsonRpcException):
-    errorCode = -32097
+    code = -32097
     def __init__(self, model, condition):
         from google.appengine.ext import db
         from google.appengine.ext import ndb
@@ -71,13 +64,12 @@ class EntityNotFound(JsonRpcException):
             kind = unicode(model.__name__)
         else:
             kind = unicode(model)
-        JsonRpcException.__init__(self, self.errorCode,
-                                  "Entity of %s is not found" % kind,
-                                  {"kind":kind, "condition":condition},
-                                  exception_class=self.__class__)
+
+        self.message = "Entity of %s is not found" % kind
+        self.data = {"kind":kind, "condition":condition}
 
 class EntityExists(JsonRpcException):
-    errorCode = -32096
+    code = -32096
     def __init__(self, model, condition):
         from google.appengine.ext import db
         from google.appengine.ext import ndb
@@ -90,36 +82,37 @@ class EntityExists(JsonRpcException):
             kind = unicode(model.__name__)
         else:
             kind = unicode(model)
-        JsonRpcException.__init__(self, self.errorCode,
-                                  "Entity of %s already exists" % kind,
-                                  {"kind":kind, "condition":condition},
-                                  exception_class=self.__class__)
-        
+        self.data = {"kind":kind, "condition":condition}
+        self.message = "Entity of %s already exists" % kind
 
 class UnexpectedState(JsonRpcException):
-    errorCode = -32095
-    def __init__(self, message, data=None):
-        JsonRpcException.__init__(self, self.errorCode, message, data, self.__class__)
+    code = -32095
+    def __init__(self, data={}, message=None):
+        self.data = data
+        self.message = message
 
 class PasswordMismatch(JsonRpcException):
-    errorCode = -32094
-    def __init__(self, hashed_password):
-        JsonRpcException.__init__(self, self.errorCode,
-                                  "Passwords and do not match.",
-                                  {"hashed_password": hashed_password},
-                                  self.__class__)
+    code = -32094
+    def __init__(self, hashed_password, message=None):
+        self.message = message
+        self.data = {"hashed_password": hashed_password}
 
-class MixedAuthentication(JsonRpcException):
-    errorCode = -32093
-    def __init__(self, data):
-        JsonRpcException.__init__(self, self.errorCode,
-                                  "Authentication with different odenkiId was detected.",
-                                  data, self.__class__)
+#class MixedAuthentication(JsonRpcException):
+#    code = -32093
+#    def __init__(self, data={}, message = None):
+#        self.message = message
+#        self.data  = data
+#        JsonRpcException.__init__(self, self.errorCode,
+#                                  "Authentication with different odenkiId was detected.",
+#                                  data, self.__class__)
 
 class OAuthError(JsonRpcException):
-    errorCode = -32092
-    def __init__(self, message):
-        JsonRpcException.__init__(self, self.errorCode, message, exception_class=self.__class__)
+    code = -32092
+    def __init__(self, data={}, message=None):
+        assert isinstance(data, dict)
+        assert isinstance(message, unicode)
+        self.message = message
+        self.data = data
 
 #class InvalidatedUser(JsonRpcException):
 #    errorCode = -32091
@@ -127,24 +120,28 @@ class OAuthError(JsonRpcException):
 #        JsonRpcException.__init__(self, self.errorCode, "Invalidated user.", data)
 
 class EntityDuplicated(JsonRpcException):
-    errorCode = -32090
-    def __init__(self, data):
-        JsonRpcException.__init__(self, self.errorCode, "Duplicated entity found.",
-                                  data, self.__class__)
+    code = -32090
+    def __init__(self, model_class, condition_dict, message=None):
+        self.data = {}
+        self.data.update(condition_dict)
+        assert issubclass(model_class, NdbModel)
+        self.data["kind"] = model_class.__name__
+        self.message = message
 
 class EntityInvalidated(JsonRpcException):
-    errorCode = -32089
-    def __init__(self, data):
-        JsonRpcException.__init__(self, self.errorCode, "Entity was found but invalidated.",
-                                  data, self.__class__)
+    code = -32089
+    def __init__(self, data={}, message=None):
+        self.data = data
+        self.message = message
 
-class InconistentAuthentiation(JsonRpcException):
-    errorCode = -32088
-    def __init__(self, existing_user_id, data={}):
-        JsonRpcException.__init__(self, self.errorCode, exception_class=self.__class__)
+class InconsistentAuthentiation(JsonRpcException):
+    code = -32088
+    def __init__(self, data={}, message=None):
+        self.data = data
+        self.message = message
 
 class _Dummy(JsonRpcException):
-    errorCode = -32089
+    code = -32087
 
 if __name__ == "__main__":
     import sys
@@ -157,7 +154,7 @@ if __name__ == "__main__":
         if not isinstance(json_rpc_exception_class, type): continue
         if issubclass(json_rpc_exception_class, JsonRpcException):
             print (json_rpc_exception_name, json_rpc_exception_class)
-            error_code = json_rpc_exception_class.errorCode
+            error_code = json_rpc_exception_class.code
             assert isinstance(error_code, int) and error_code < 0
             if json_rpc_exceptions.has_key(error_code):
                 raise UserWarning("duplicated errocodes %s were defined in %s and %s",
