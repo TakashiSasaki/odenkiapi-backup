@@ -23,11 +23,6 @@ class Gmail(JsonRpcDispatcher):
 
         try:
             gmail_user = GmailUser.getByOdenkiId(odenki_user.odenkiId)
-#            assert isinstance(gmail_user, GmailUser)
-#            jresponse.setResultValue("gmailId", gmail_user.gmailId)
-#            jresponse.setResultValue("gmail", gmail_user.gmail)
-#            jresponse.setResultValue("nickname", gmail_user.nickname)
-#            jresponse.setResultValue("odenkiId", gmail_user.odenkiId)
         except EntityNotFound: 
             gmail_user = None
         except AttributeError:
