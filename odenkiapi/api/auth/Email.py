@@ -4,10 +4,11 @@ from lib.gae import JsonRpcDispatcher, run_wsgi_app
 from lib.json.JsonRpcRequest import JsonRpcRequest
 from lib.json.JsonRpcResponse import JsonRpcResponse
 from model.EmailUser import EmailUser, hashPassword
-from lib.json.JsonRpcError import JsonRpcException, InvalidParams, EntityNotFound, PasswordMismatch, \
+from lib.json.JsonRpcError import InvalidParams, EntityNotFound, PasswordMismatch, \
     InconsistentAuthentiation
 from model.OdenkiUser import OdenkiUser
 import re
+from google.appengine.ext import ndb
 
 class Email(JsonRpcDispatcher):
     
@@ -58,7 +59,7 @@ class Email(JsonRpcDispatcher):
             raise InvalidParams(message="password should be eight characters or more")
         if raw_password != raw_password2:
             raise PasswordMismatch()
-        match = re.search(r'^[\w.-]+@[\w.-]+$', email)
+        match = re.search(r'^[\w.-\\\\+]+@[\w.-]+$', email)
         if not match:
             raise InvalidParams({"email": email}, "Malformed email '%s' address was given." % email)
         
@@ -173,7 +174,32 @@ class Email(JsonRpcDispatcher):
         
         jresponse.setResultValue("EmailUser", email_user)
         jresponse.setResultValue("OdenkiUser", odenki_user)
-        
+    
+    def deleteNullOdenkiId(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        assert jrequest.fromAdminHost
+        jresponse.setId()
+        email_user_query = EmailUser.query()
+        assert (email_user_query, ndb.Query)
+        #email_user_query = email_user_query.filter(EmailUser.odenkiId==None)
+        email_user_query = email_user_query.filter()
+        count1 = 0
+        for email_user_key in email_user_query.fetch(keys_only=True):
+            assert isinstance(email_user_key, ndb.Key)
+            if email_user_key.get().odenkiId is None:
+                email_user_key.delete_async()
+                count1 += 1
+        jresponse.setResultValue("count1", count1)
+
+        count2 = 0
+        for email_user_key in email_user_query.fetch(keys_only=True):
+            assert isinstance(email_user_key, ndb.Key)
+            if email_user_key.get().odenkiId is None:
+                email_user_key.delete_async()
+                count2 += 1
+        jresponse.setResultValue("count2", count2)
+
 #    def logout(self, jrequest, jresponse):
 #        jresponse.setId()
 #        session = gaesessions.get_current_session()
@@ -229,7 +255,7 @@ class NonceCallback(JsonRpcDispatcher):
         else:
             if email_user.odenkiId is None:
                 odenki_user.saveToSession()
-                email_user.setOdenkiUser(odenki_user.odenkiId)
+                email_user.setOdenkiId(odenki_user.odenkiId)
                 email_user.put_async()
             else:
                 if email_user.odenkiId != odenki_user.odenkiId:
