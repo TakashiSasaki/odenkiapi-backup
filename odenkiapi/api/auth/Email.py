@@ -4,9 +4,10 @@ from lib.gae import JsonRpcDispatcher, run_wsgi_app
 from lib.json.JsonRpcRequest import JsonRpcRequest
 from lib.json.JsonRpcResponse import JsonRpcResponse
 from model.EmailUser import EmailUser, hashPassword
-from lib.json.JsonRpcError import JsonRpcError, JsonRpcException, InvalidParams, EntityNotFound, PasswordMismatch
-import gaesessions
+from lib.json.JsonRpcError import JsonRpcException, InvalidParams, EntityNotFound, PasswordMismatch, \
+    InconsistentAuthentiation
 from model.OdenkiUser import OdenkiUser
+import re
 
 class Email(JsonRpcDispatcher):
     
@@ -24,58 +25,59 @@ class Email(JsonRpcDispatcher):
         except EntityNotFound: pass
         except AttributeError: pass
 
-        if email_user is None:
-            try:
-                email_user = EmailUser.loadFromSession()
-            except EntityNotFound: pass
-
-        jresponse.setResult({"EmailUser": email_user, "OdenkiUser":odenki_user})
+        jresponse.setResultValue("EmailUser", email_user)
+        jresponse.setResultValue("OdenkiUser", odenki_user)
         jresponse.setResultValue("host", jrequest.request.host)
+        
+    def showAllEmailUsers(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        assert jrequest.fromAdminHost
+        jresponse.setId()
+        query = EmailUser.query()
+        email_users = []
+        for email_user in query:
+            email_users.append(email_user)
+        jresponse.setResult(email_users)
 
     def setNonce(self, jrequest, jresponse):
-        """If EmailUser is loaded into the session,
-        it means the EmailUser is in some transitional state.
-        Usually EmailUser is not loaded in the session and only OdenkiUser is loaded."""
+        """generate a nonce with given password and send the corresponding URL to the user.
+        This round trip is intended to associate a password to an email address.
+        """
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
         try:
-            email = None
             email = unicode(jrequest.getValue("email")[0])
-            raw_password = None
             raw_password = jrequest.getValue("password")[0].decode()
-            raw_password2 = None
             raw_password2 = jrequest.getValue("password2")[0].decode()
-            if len(raw_password) < 8:
-                raise InvalidParams("password should be eight characters or more", None)
-            if raw_password != raw_password2:
-                raise PasswordMismatch(raw_password, raw_password2)
-        except Exception, e:
-            raise JsonRpcException(None, "email, password and password2 are should be given.",
-                                   {"email": email,
-                                    "raw_password": raw_password,
-                                    "raw_password2": raw_password2,
-                                    "message":e.message})
+        except TypeError:
+            raise InvalidParams(message="email, password and password2 were mandatory.")
         
-        email_user = None
+        if len(raw_password) < 8:
+            raise InvalidParams(message="password should be eight characters or more")
+        if raw_password != raw_password2:
+            raise PasswordMismatch()
+        match = re.search(r'^[\w.-]+@[\w.-]+$', email)
+        if not match:
+            raise InvalidParams({"email": email}, "Malformed email '%s' address was given." % email)
+        
+        #email_user = None
         # check if OdenkiUser is loaded 
-        try: 
-            odenki_user = OdenkiUser.loadFromSession()
-            email_user = EmailUser.getByOdenkiId(odenki_user.odenkiId)
-        except EntityNotFound: pass 
+#        try: 
+#            odenki_user = OdenkiUser.loadFromSession()
+#            email_user = EmailUser.getByOdenkiId(odenki_user.odenkiId)
+#        except EntityNotFound: pass 
 
         # check if EmailUser already exists.
-        if email_user is None:
-            try: 
-                email_user = EmailUser.getByEmail(email)
-            except EntityNotFound: pass
-        
-        if email_user is None:
-            email_user = EmailUser.createByEmail(email)
 
+        try: 
+            email_user = EmailUser.getByEmail(email)
+        except EntityNotFound:
+            email_user = EmailUser.createByEmail(email)
         assert isinstance(email_user, EmailUser)
         email_user.setNonce(email, raw_password)
-        EmailUser.deleteFromSession()
+        #EmailUser.deleteFromSession()
         
         from google.appengine.api import mail
         message = mail.EmailMessage()
@@ -88,16 +90,17 @@ class Email(JsonRpcDispatcher):
         message.subject = "みんなでおでんきへの登録確認メール"
         message.send()
         jresponse.setResultValue("EmailUser", email_user)
+        jresponse.setResultValue("email", email)
     
     def invalidate(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
-        email_user = EmailUser.loadFromSession()
-        if email_user is None:
-            jresponse.setError(JsonRpcError.SERVER_ERROR_RESERVED_MIN, "user is not logged in.")
+        odenki_user = OdenkiUser.loadFromSession()
+        assert isinstance(odenki_user, OdenkiUser)
+        email_user = EmailUser.getByOdenkiId(odenki_user.odenkiId)
+        assert isinstance(email_user, EmailUser)
         email_user.invalidate()
-        email_user.deleteFromSession()
 
     def setPassword(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
@@ -129,22 +132,22 @@ class Email(JsonRpcDispatcher):
         email_user.put()
         email_user.saveToSession()
         assert isinstance(email_user.hashedPassword, unicode)
-        #jresponse.setResultValue("hashed_password", email_user.hashedPassword)
-#        jresponse.setResultValue("email", email_user.email)
-#        jresponse.setResultValue("emailUserId", email_user.emailUserId)
-#        jresponse.setResultValue("odenkiId", email_user.odenkiId)
         jresponse.setResult(email_user)
     
-    def deleteEmail(self, jrequest, jresponse):
+    def deleteEmailUser(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
-        email_user = EmailUser.loadFromSession()
-        assert isinstance(email_user, EmailUser)
-        key = email_user.key
-        from google.appengine.ext import ndb
-        assert isinstance(key, ndb.Key)
-        key.delete()
+        odenki_user = OdenkiUser.loadFromSession()
+        assert isinstance(odenki_user, OdenkiUser)
+        email_user = EmailUser.getByOdenkiId(odenki_user.odenkiId)
+        email_user.key.delete_async()
+#        email_user = EmailUser.loadFromSession()
+#        assert isinstance(email_user, EmailUser)
+#        key = email_user.key
+#        from google.appengine.ext import ndb
+#        assert isinstance(key, ndb.Key)
+#        key.delete()
     
     def login(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
@@ -168,36 +171,22 @@ class Email(JsonRpcDispatcher):
         odenki_user.saveToSession()
         EmailUser.deleteFromSession()
         
-#        fillUser()
-        
-#        try:
-#            odenki_user = OdenkiUser.loadFromSession()
-#        except EntityNotFound, e:
-#            odenki_user = OdenkiUser.createNew()
-#            odenki_user.saveToSession()
-#            fillUser()
-#        assert isinstance(OdenkiUser.loadFromSession(), OdenkiUser)
-#        assert isinstance(EmailUser.loadFromSession(), EmailUser)
-#        assert odenki_user.odenkiId == email_user.odenkiId
-#        jresponse.setResultValue("email", email_user.email)
-#        jresponse.setResultValue("emailUserId", email_user.emailUserId)
-#        jresponse.setResultValue("odenkiId", email_user.odenkiId)
         jresponse.setResultValue("EmailUser", email_user)
         jresponse.setResultValue("OdenkiUser", odenki_user)
         
-    def logout(self, jrequest, jresponse):
-        jresponse.setId()
-        session = gaesessions.get_current_session()
-        session.terminate()
-        email_user = None
-        try:
-            email_user = EmailUser.loadFromSession()
-        except EntityNotFound: pass
-        odenki_user = None
-        try:
-            odenki_user = OdenkiUser.loadFromSession()
-        except EntityNotFound: pass
-        jresponse.setResult({"OdenkiUser": odenki_user, "EmailUser": email_user})
+#    def logout(self, jrequest, jresponse):
+#        jresponse.setId()
+#        session = gaesessions.get_current_session()
+#        session.terminate()
+#        email_user = None
+#        try:
+#            email_user = EmailUser.loadFromSession()
+#        except EntityNotFound: pass
+#        odenki_user = None
+#        try:
+#            odenki_user = OdenkiUser.loadFromSession()
+#        except EntityNotFound: pass
+#        jresponse.setResult({"OdenkiUser": odenki_user, "EmailUser": email_user})
 
 class NonceCallback(JsonRpcDispatcher):
     
@@ -207,7 +196,7 @@ class NonceCallback(JsonRpcDispatcher):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
-        EmailUser.deleteFromSession()
+        #EmailUser.deleteFromSession()
         nonce = unicode(jrequest.getPathInfo(4))
         email_user = EmailUser.getByNonce(nonce)
         assert isinstance(email_user, EmailUser)
@@ -217,20 +206,40 @@ class NonceCallback(JsonRpcDispatcher):
         email_user.hashedPassword = email_user.nonceHashedPassword
         email_user.nonceHashedPassword = None
         email_user.nonce = None
-        email_user.put()
-        email_user.saveToSession()
+        email_user.put_async()
+        #email_user.saveToSession()
         
+        # prepare OdenkiUser
         try:
-            odenki_user = OdenkiUser.getByOdenkiId(email_user.odenkiId)
-            odenki_user.saveToSession()
+            odenki_user = OdenkiUser.loadFromSession()
         except EntityNotFound:
-            odenki_user = OdenkiUser.createNew()
-            assert isinstance(odenki_user, OdenkiUser)
-            email_user.odenkiId = odenki_user.odenkiId
-            email_user.put()
-            odenki_user.saveToSession()
+            odenki_user = None
+            
+        # reconcile EmailUser and OdenkiUser
+        if odenki_user is None:
+            if email_user.odenkiId is None:
+                odenki_user = OdenkiUser.createNew()
+                assert isinstance(odenki_user, OdenkiUser)
+                odenki_user.saveToSession()
+                email_user.setOdenkiId(odenki_user.odenkiId)
+                email_user.put_async()
+            else:
+                odenki_user = OdenkiUser.getByOdenkiId(email_user.odenkiId)
+                odenki_user.saveToSession()
+        else:
+            if email_user.odenkiId is None:
+                odenki_user.saveToSession()
+                email_user.setOdenkiUser(odenki_user.odenkiId)
+                email_user.put_async()
+            else:
+                if email_user.odenkiId != odenki_user.odenkiId:
+                    raise InconsistentAuthentiation({email_user.__class__.__name__: email_user,
+                                                     odenki_user.__class__.__name__:odenki_user})
+                odenki_user.saveToSession()
         
-        #jresponse.setResultValue("EmailUser", email_user)
+        jresponse.setResultValue(odenki_user.__class__.__name__, odenki_user)
+        jresponse.setResultValue(email_user.__class__.__name__, email_user)
+        #jresponse.setResultValue("nonce", nonce)
         jresponse.setRedirectTarget("http://%s/html/auth/Email.html" % jrequest.request.host)
 
 if __name__ == "__main__":

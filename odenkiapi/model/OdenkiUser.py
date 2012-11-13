@@ -23,7 +23,7 @@ class OdenkiUser(NdbModel):
             existing = self.loadFromSession()
             assert isinstance(existing, OdenkiUser)
             if existing.odenkiId != self.odenkiId:
-                raise EntityExists(self.__class__, {"ExistingInSession": existing, "TriedToSave": self})
+                raise EntityExists({"OdenkiUserInSession": existing, "IncomingOdenkiUser": self})
         except EntityNotFound: pass
         session[self.SESSION_KEY] = self
     
@@ -32,7 +32,7 @@ class OdenkiUser(NdbModel):
         session = gaesessions.get_current_session()
         assert isinstance(session, gaesessions.Session)
         if not session.has_key(cls.SESSION_KEY):
-            raise EntityNotFound(cls, {"in": "session"})
+            raise EntityNotFound(message="OdenkiUser is not in the session.")
         odenki_user = session[cls.SESSION_KEY]
         assert isinstance(odenki_user, OdenkiUser)
         return odenki_user
@@ -75,9 +75,9 @@ class OdenkiUser(NdbModel):
         query = cls.queryByOdenkiId(odenki_id)
         keys = query.fetch(keys_only=True, limit=2)
         if len(keys) == 0:
-            raise EntityNotFound(cls, {"odenkiId": odenki_id})
+            raise EntityNotFound({"odenkiId": odenki_id}, "OdenkiUser.keyByOdenkiId")
         if len(keys) == 2:
-            raise EntityDuplicated(cls, {"odenkiId":odenki_id})
+            raise EntityDuplicated({"odenkiId":odenki_id}, "OdenkiUser.keyByOdenkiId")
         return keys[0]
     
     @classmethod

@@ -10,7 +10,6 @@ from lib.json.JsonRpcError import EntityNotFound, EntityExists, PasswordMismatch
 from logging import debug
 import gaesessions
 from model.OdenkiUser import OdenkiUser
-#from gaesessions import Session
 
 def hashPassword(raw_password):
     assert isinstance(raw_password, unicode)
@@ -101,7 +100,7 @@ class EmailUser(NdbModel):
     def invalidate(self):
         """TODO: It should not be deleted but invalidated."""
         self.invalidatedDateTime = datetime.now()
-        self.put()
+        self.put_async()
         
     SESSION_KEY = "nasfuafhasjlafapsiofhap"
 
@@ -147,9 +146,9 @@ class EmailUser(NdbModel):
         query = query.filter(cls.invalidatedDateTime == None)
         keys = query.fetch(limit=2, keys_only=True)
         if len(keys) == 2:
-            raise EntityDuplicated(cls, {"nonce" : nonce})
+            raise EntityDuplicated({"nonce" : nonce}, "EmailUser.getByNonce failed")
         if len(keys) == 0:
-            raise EntityNotFound(cls, {"nonce": nonce})
+            raise EntityNotFound({"nonce": nonce}, "EmailUser.getByNonce failed")
         return keys[0].get()
     
     @ndb.toplevel
@@ -178,9 +177,9 @@ class EmailUser(NdbModel):
         query = cls.queryByOdenkiId(odenki_id)
         keys = query.fetch(keys_only=True, limit=2)
         if len(keys) == 0:
-            raise EntityNotFound(cls, {"odenkiId": odenki_id})
+            raise EntityNotFound({"odenkiId": odenki_id}, "EmailUser.keyByOdenkiId failed")
         if len(keys) == 2:
-            raise EntityDuplicated(cls, {"odenkiId:": odenki_id})
+            raise EntityDuplicated({"odenkiId:": odenki_id}, "EmailUser.keyByOdenkiId failed")
         return keys[0]
     
     @classmethod
