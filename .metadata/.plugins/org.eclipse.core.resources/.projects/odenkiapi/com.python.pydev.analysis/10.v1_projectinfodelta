@@ -1,7 +1,0 @@
-INSTUPapi.auth.logout
-C:\Users\Takashi\Documents\Eclipse Workspace\odenkiapi\odenkiapi\api\auth\logout.py
-INFOS:&&1|1|2|0&&2|3|2|1&&3|4|2|0
-GET=3
-LogoutHandler=1
-mapping=4
-api.auth.logout=2
