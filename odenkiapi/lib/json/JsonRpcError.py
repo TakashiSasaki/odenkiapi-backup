@@ -70,20 +70,9 @@ class EntityNotFound(JsonRpcException):
 
 class EntityExists(JsonRpcException):
     code = -32096
-    def __init__(self, model, condition):
-        from google.appengine.ext import db
-        from google.appengine.ext import ndb
-        if isinstance(model, db.Model):
-            kind = model.kind()
-        elif isinstance(model, ndb.Model):
-            kind = model.kind()
-        elif isinstance(model, ndb.MetaModel):
-            assert isinstance(model, ndb.MetaModel)
-            kind = unicode(model.__name__)
-        else:
-            kind = unicode(model)
-        self.data = {"kind":kind, "condition":condition}
-        self.message = "Entity of %s already exists" % kind
+    def __init__(self, data={}, message=""):
+        self.data = data
+        self.message = message
 
 class UnexpectedState(JsonRpcException):
     code = -32095
@@ -121,11 +110,8 @@ class OAuthError(JsonRpcException):
 
 class EntityDuplicated(JsonRpcException):
     code = -32090
-    def __init__(self, model_class, condition_dict, message=None):
-        self.data = {}
-        self.data.update(condition_dict)
-        assert issubclass(model_class, NdbModel)
-        self.data["kind"] = model_class.__name__
+    def __init__(self, data={}, message=None):
+        self.data = data
         self.message = message
 
 class EntityInvalidated(JsonRpcException):

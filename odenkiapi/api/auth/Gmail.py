@@ -5,7 +5,7 @@ from lib.json.JsonRpcRequest import JsonRpcRequest
 from lib.json.JsonRpcResponse import JsonRpcResponse
 from model.GmailUser import GmailUser
 from google.appengine.api import users
-from lib.json.JsonRpcError import EntityNotFound
+from lib.json.JsonRpcError import EntityNotFound, InconsistentAuthentiation
 from model.OdenkiUser import OdenkiUser
 #from logging import debug
 #from lib.Session import fillUser
@@ -42,6 +42,23 @@ class Gmail(JsonRpcDispatcher):
         gmail_user.key.delete_async()
         jresponse.setResultValue("OdenkiUser", odenki_user)
         jresponse.setResultValue("GmailUser", gmail_user)
+    
+    def deleteAllGmailUsers(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
+        assert jrequest.fromAdminHost
+        GmailUser.deleteAll()
+    
+    def showAllGmailUsers(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
+        query = GmailUser.query()
+        gmail_users = []
+        for gmail_user in query:
+            gmail_users.append(gmail_user)
+        jresponse.setResult(gmail_users)
 
 class RedirectedFromGoogle(JsonRpcDispatcher):
     """This is the first handler to catch the result of authentication by Google.
@@ -52,7 +69,7 @@ class RedirectedFromGoogle(JsonRpcDispatcher):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
-        jresponse.setRedirectTarget("/html/auth/index.html")
+        jresponse.setRedirectTarget("/html/auth/failed.html")
         #jresponse.setRedirectTarget("/html/auth/index.html")
         current_user = users.get_current_user()
         if current_user is None:
@@ -60,29 +77,49 @@ class RedirectedFromGoogle(JsonRpcDispatcher):
             return
         #debug("type of current_user.user_id() is %s " % type(current_user.user_id()))
 
+        # prepare GmailUser
         try:
             gmail_user = GmailUser.getByGmailId(current_user.user_id())
             gmail_user.nickname = current_user.nickname()
             gmail_user.gmail = current_user.email()
+            gmail_user.put_async()
         except EntityNotFound:
             gmail_user = GmailUser()
             gmail_user.gmailId = current_user.user_id()
             gmail_user.gmail = current_user.email()
             gmail_user.nickname = current_user.nickname()
-            gmail_user.put_async()
+            gmail_user.put()
         assert isinstance(gmail_user, GmailUser)
         
-        if gmail_user.odenkiId is None:
-            odenki_user = OdenkiUser.createNew()
-            assert isinstance(odenki_user, OdenkiUser)
-            gmail_user.setOdenkiId(odenki_user.odenkiId)
+        # prepare OdenkiUser
+        try:
+            odenki_user = OdenkiUser.loadFromSession()
+        except EntityNotFound:
+            odenki_user = None
+        
+        if odenki_user is None:
+            if gmail_user.odenkiId is None:
+                odenki_user = OdenkiUser.createNew()
+                odenki_user.saveToSession()
+                gmail_user.setOdenkiId(odenki_user.odenkiId)
+                gmail_user.put_async()
+            else:
+                odenki_user = OdenkiUser.getByOdenkiId(gmail_user.odenkiId)
+                odenki_user.saveToSession()
         else:
-            odenki_user = OdenkiUser.getByOdenkiId(gmail_user.odenkiId)
-            odenki_user.saveToSession()
-            gmail_user.setOdenkiId(odenki_user.odenkiId)
+            if gmail_user.odenkiId is None:
+                gmail_user.setOdenkiId(odenki_user.odenkiId)
+                gmail_user.put_async()
+                odenki_user.saveToSession()
+            else:
+                if gmail_user.odenkiId != odenki_user.odenkiId:
+                    raise InconsistentAuthentiation({gmail_user.__class__.__name__: gmail_user,
+                                                     odenki_user.__class__.__name__:odenki_user})
+                odenki_user.saveToSession()
         
         jresponse.setResultValue("OdenkiUser", odenki_user)
         jresponse.setResultValue("GmailUser", gmail_user)
+        jresponse.setRedirectTarget("/html/auth/succeeded.html")
 
 if __name__ == "__main__":
     mapping = []
