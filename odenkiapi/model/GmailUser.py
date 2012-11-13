@@ -80,7 +80,8 @@ class GmailUser(NdbModel):
         query = cls.queryByOdenkiId(odenki_id)
         keys = query.fetch(keys_only=True, limit=2)
         if len(keys) == 0:
-            raise EntityNotFound(cls, {"odenkiId": odenki_id})
+            raise EntityNotFound({"kind": cls.__name__,
+                                  "odenkiId": odenki_id})
         if len(keys) == 2:
             gmail_user_1 = keys[0].get()
             gmail_user_2 = keys[1].get()
