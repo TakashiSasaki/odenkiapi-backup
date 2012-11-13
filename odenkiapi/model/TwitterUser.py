@@ -37,13 +37,13 @@ class TwitterUser(NdbModel):
     SESSION_KEY = "kpi4erdetzytUIitt#%gjgdj"
     
     @classmethod
-    def create(cls, twitter_id, odenki_user):
+    def create(cls, twitter_id):
         assert isinstance(twitter_id, int)
-        assert isinstance(odenki_user, OdenkiUser)
+        #assert isinstance(odenki_user, OdenkiUser)
         twitter_user = TwitterUser()
         twitter_user.twitterId = twitter_id
-        assert isinstance(odenki_user.odenkiId, int)
-        twitter_user.odenkiId = odenki_user.odenkiId
+        #assert isinstance(odenki_user.odenkiId, int)
+        #twitter_user.odenkiId = odenki_user.odenkiId
         return twitter_user
 
 #    @classmethod
@@ -85,7 +85,15 @@ class TwitterUser(NdbModel):
         if len(keys) == 0:
             raise EntityNotFound(cls, {"twitterId":twitter_id})
         if len(keys) == 2:
-            raise EntityDuplicated({"twitterId": twitter_id})
+            twitter_user_1 = keys[0].get()
+            assert isinstance(twitter_user_1, TwitterUser)
+            twitter_user_2 = keys[1].get()
+            assert isinstance(twitter_user_2, TwitterUser)
+            if twitter_user_1.odenkiId == twitter_user_2.odenkiId:
+                twitter_user_2.key.delete()
+                return twitter_user_1
+            raise EntityDuplicated(cls, {"twitter_user_1": twitter_user_1,
+                                         "twitter_suer_2": twitter_user_2})
         return keys[0]
 
     @classmethod
