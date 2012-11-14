@@ -26,17 +26,17 @@ lib.ui.c = '<li>\
             </li>';
             
 lib.ui.d = '<li>\
-    <a href="/html/Equipments.html"   data-ajax="false"   data-icon="grid" >\
+    <a href="/html/equipments.html"   data-ajax="false"   data-icon="grid" >\
         <div class="ui-bar-d">\
-            機器登録\
+            記録作成\
         </div>\
     </a>\
 </li>';
 
 lib.ui.e = '<li>\
-    <a href="/html/auth/index.html"   data-ajax="false"   data-icon="gear" >\
+    <a href="/html/settings.html"   data-ajax="false"   data-icon="gear" >\
         <div class="ui-bar-e">\
-            ユーザー登録\
+            ユーザー設定\
         </div>\
     </a>\
 </li>';
