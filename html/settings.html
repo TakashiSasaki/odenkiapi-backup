@@ -75,28 +75,28 @@
 				<form>
 					<input type="email" name="email" placeholder="odenki@example.com"></input><input
 						type="password" name="password" placeholder="パスワード（8文字以上）"></input>
+					<a href="#" data-role="button" data-inline="true" data-rel="back"
+						data-theme="c" data-corners="true" data-shadow="true"
+						data-iconshadow="true" data-wrapperels="span"
+						class="ui-btn ui-shadow ui-btn-corner-all ui-btn-inline ui-btn-up-c"><span
+						class="ui-btn-inner ui-btn-corner-all"><span
+							class="ui-btn-text">もどる</span></span></a> <a href="#" data-inline="true"
+						data-rel="back" data-role="button"
+						onclick='$.get("/api/auth/Email/Login", $("#EmailUser form").serialize(), function(data){alert("ログインしました");});'>ログイン</a>
+					<!-- TODO: it should be posted via https link in release version -->
+					<p>メールアドレスを新規にご登録いただくには、確認のためパスワードをもう一度入力してください。
+						に登録を完了するためのURLを含んだメールが送信されます。 安全のためパスワードは他のサービスのものとは異なるものにしてください。
+						登録されたメールアドレスにはみんなでおでんきプロジェクトからのお知らせが届くことがあります。
+						登録いただいたメールアドレスは「みんなでおでんき」へのログイン、通知、パスワード忘れや変更時の確認などのためにのみ用いられ、
+						「みんなでおでんき」以外には通知されません。
+						「みんなでおでんき」はTwitterやGoogleアカウントなど外部サービスのアカウントによるログインも可能なため、
+						同様の他のサービスと同じく原理的には名寄せすることも可能ですが、
+						メールアドレスおよびそれぞれの外部サービスから取得した情報を相互に通知することはありません。</p>
+					<input type="password" name="password2" placeholder="上と同じパスワード"></input>
+					<a href="#" data-inline="true" data-rel="back" data-role="button"
+						onclick='$.get("/api/auth/Email/SetNonce", $("#EmailUser form").serialize(), function(){alert("確認のためにメールを送信しました");});'>メールアドレスの新規登録</a>
+					<!-- TODO: it should be posted via https link in release version -->
 				</form>
-				<a href="#" data-role="button" data-inline="true" data-rel="back"
-					data-theme="c" data-corners="true" data-shadow="true"
-					data-iconshadow="true" data-wrapperels="span"
-					class="ui-btn ui-shadow ui-btn-corner-all ui-btn-inline ui-btn-up-c"><span
-					class="ui-btn-inner ui-btn-corner-all"><span
-						class="ui-btn-text">もどる</span></span></a> <a href="#" data-inline="true"
-					data-rel="back" data-role="button"
-					onclick='$.post("/api/auth/Email/Login", $("#EmailUser form").serialize(), update());'>ログイン</a>
-				<!-- TODO: it should be posted via https link in release version -->
-				<p>メールアドレスを新規にご登録いただくには、確認のためパスワードをもう一度入力してください。
-					に登録を完了するためのURLを含んだメールが送信されます。 安全のためパスワードは他のサービスのものとは異なるものにしてください。
-					登録されたメールアドレスにはみんなでおでんきプロジェクトからのお知らせが届くことがあります。
-					登録いただいたメールアドレスは「みんなでおでんき」へのログイン、通知、パスワード忘れや変更時の確認などのためにのみ用いられ、
-					「みんなでおでんき」以外には通知されません。
-					「みんなでおでんき」はTwitterやGoogleアカウントなど外部サービスのアカウントによるログインも可能なため、
-					同様の他のサービスと同じく原理的には名寄せすることも可能ですが、
-					メールアドレスおよびそれぞれの外部サービスから取得した情報を相互に通知することはありません。</p>
-				<input type="password" name="password2" placeholder="上と同じパスワード"></input>
-				<a href="#" data-inline="true" data-rel="back" data-role="button"
-					onclick='$.post("/api/auth/Email/SetNonce", $("#EmailUser form").serialize(), update());'>メールアドレスの新規登録</a>
-				<!-- TODO: it should be posted via https link in release version -->
 			</div>
 		</div>
 
