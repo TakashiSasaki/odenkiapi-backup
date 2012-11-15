@@ -119,7 +119,7 @@ class RedirectedFromGoogle(JsonRpcDispatcher):
         
         jresponse.setResultValue("OdenkiUser", odenki_user)
         jresponse.setResultValue("GmailUser", gmail_user)
-        jresponse.setRedirectTarget("/html/auth/succeeded.html")
+        jresponse.setRedirectTarget("/html/settings.html")
 
 if __name__ == "__main__":
     mapping = []
