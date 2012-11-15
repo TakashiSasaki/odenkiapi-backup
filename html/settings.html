@@ -19,8 +19,8 @@
 			<div data-role="collapsible" data-collapsed="false">
 				<h3>おでんきユーザー情報</h3>
 				<img src="/image/odenki.png" width="50px" height="50px"></img>
-				ニックネーム：<span class="OdenkiUser"><span></span></span><a
-					href="#changeNickname" data-rel="popup" data-role="button"><span>ニックネームを変える</span></a>
+				おでんきネーム：<span class="OdenkiUser"><span></span></span><a
+					href="#changeOdenkiName" data-rel="popup" data-role="button"><span>おでんきネームを変える</span></a>
 			</div>
 			<div data-role="collapsible">
 				<h1>ログイン</h1>
@@ -162,13 +162,15 @@
 			</div>
 		</div>
 
-		<div data-role="popup" id="changeNickname">
-			<div data-role="header">ニックネームの変更</div>
+		<div data-role="popup" id="changeOdenkiName">
+			<div data-role="header">おでんきネームの変更</div>
 			<div data-role="content">
 				<form>
-					新しいニックネーム <input type="text" name="nickname"></input> <a href="#"
+					新しいおでんきネーム <input type="text" name="odenkiName"></input> <a href="#"
 						data-rel="back"><button data-inline="true">もどる</button></a>
-					<button type="submit" data-inline="true">変更</button>
+				
+				<a href="#" data-inline="true" data-rel="back" data-role="button"
+						onclick='$.get("/api/OdenkiUser/SetOdenkiName", $("#changeOdenkiName form").serialize(), update);'>変更する</a>
 				</form>
 			</div>
 		</div>
@@ -183,7 +185,8 @@
 				dataType : "json",
 				success : function(data) {
 					if (data.result.OdenkiUser) {
-						$(".OdenkiUser span").text(data.result.OdenkiUser);
+						$(".OdenkiUser span").text(
+								data.result.OdenkiUser.odenkiName);
 					} else {
 						$(".OdenkiUser span").text("おでんきユーザーとしてログインしていません。");
 					}

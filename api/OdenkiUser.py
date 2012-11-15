@@ -10,18 +10,24 @@ from logging import debug
 from lib.json import JsonRpcError
 from lib.json.JsonRpcError import InvalidParams, EntityNotFound
 
+
 class OdenkiUserApi(JsonRpcDispatcher):
     
     def GET(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
-        
-        query = ndb.Query(kind="OdenkiUser")
-        query = query.order(-OdenkiUser.odenkiId)
-        keys = query.fetch(limit=100, keys_only=True)
-        for key in keys:
-            jresponse.addResult(key.get())
         jresponse.setId()
+
+        #query = ndb.Query(kind="OdenkiUser")
+        #query = query.order(-OdenkiUser.odenkiId)
+        #keys = query.fetch(limit=100, keys_only=True)
+        #for key in keys:
+        #    jresponse.addResult(key.get())
+        
+        odenki_user = OdenkiUser.loadFromSession()
+        if odenki_user is not None:
+            assert isinstance(odenki_user, OdenkiUser)
+            jresponse.setResultObject(odenki_user)
 
     def create(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
@@ -67,8 +73,27 @@ class OdenkiUserApi(JsonRpcDispatcher):
         jresponse.addResult(odenki_user)
         OdenkiUser.deleteFromSession()
 
+
+class SetOdenkiName(JsonRpcDispatcher):
+    
+    def GET(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
+        odenki_user = OdenkiUser.loadFromSession()
+        try:
+            new_odenki_name = jrequest.getValue("odenkiName")[0]
+            assert isinstance(new_odenki_name, unicode)
+        except:
+            raise InvalidParams("SetOdenkiName requires odenkiName")
+        odenki_user.setOdenkiName(new_odenki_name)
+        odenki_user.saveToSession()    
+        
+        jresponse.setResult(odenki_user)
+
 if __name__ == "__main__":
     #print ("\u30e6\u30fc\u30b6\u30fc\uff11")
     mapping = []
+    mapping.append(("/api/OdenkiUser/SetOdenkiName", SetOdenkiName))
     mapping.append(("/api/OdenkiUser", OdenkiUserApi))
     run_wsgi_app(mapping)
