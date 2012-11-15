@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+	google.load("visualization", "1.0", {
+		packages : [ "corechart", 'table' ]
+	});
+</script>
+</head>
+<body>
+	<div id="chart"></div>
+	<script>
+		// div : elemment
+		// data : json object
+		function draw(data) {
+			var div = $("#chart")[0];
+			var table = new google.visualization.Table(div);
+			//var data_table = new google.visualization.DataTable(data);
+			var data_table = new google.visualization.DataTable(data);
+			//data_table.addColumn('string', '都道府県');
+			//data_table.addColumn('number', '人口');
+			//data_table.addRows([ [ 'Hokkaido', 554 ], [ 'Aomori', 139 ],
+			//		[ 'Iwate', 135 ], [ 'Miyagi', 234 ], [ 'Akita', 111 ] ]);
+
+			table.draw(data_table, {
+				allowHtml : true,
+			//'width' : 400,
+			//'height' : 300
+			});
+		}
+		function draw2() {
+			$.getJSON("/api/RawData?format=DataTable", {}, draw);
+		}
+		google.setOnLoadCallback(draw2);
+	</script>
+</body>
+</html>
