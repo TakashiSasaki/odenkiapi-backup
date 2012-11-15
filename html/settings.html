@@ -194,15 +194,15 @@
 						$(".EmailUser span").text("未登録");
 					}
 					if (data.result.GmailUser) {
-						$(".GmailUser span").text("ログイン済み");
+						$(".GmailUser span").text("登録済");
 					} else {
-						$(".GmailUser span").text("未ログイン");
+						$(".GmailUser span").text("未登録");
 					}
 					if (data.result.TwitterUser) {
-						$(".TwitterUser span").text("ログイン済み");
+						$(".TwitterUser span").text("登録済");
 						$("#twitter_icon").attr("src", data.result.TwitterUser.profile_image_url_https);
 					} else {
-						$(".TwitterUser span").text("未ログイン");
+						$(".TwitterUser span").text("未登録");
 						$("#twitter_icon").attr("src", "https://si0.twimg.com/a/1349074900/images/resources/twitter-bird-blue-on-white.png");
 					}
 					$("#login_url").attr("href", data.result.login_url);

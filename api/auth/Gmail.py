@@ -5,7 +5,8 @@ from lib.json.JsonRpcRequest import JsonRpcRequest
 from lib.json.JsonRpcResponse import JsonRpcResponse
 from model.GmailUser import GmailUser
 from google.appengine.api import users
-from lib.json.JsonRpcError import EntityNotFound, InconsistentAuthentiation
+from lib.json.JsonRpcError import EntityNotFound, InconsistentAuthentiation,\
+    InvalidParams
 from model.OdenkiUser import OdenkiUser
 #from logging import debug
 #from lib.Session import fillUser

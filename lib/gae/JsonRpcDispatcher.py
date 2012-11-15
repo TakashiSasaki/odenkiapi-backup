@@ -6,6 +6,7 @@ import logging as _logging
 from lib.json.JsonRpcError import JsonRpcException
 from model.CsvMixin import CsvMixin
 from lib.DataTableMixin import DataTableMixin
+from gaesessions import get_current_session
 _logging.getLogger().setLevel(_logging.DEBUG)
 from google.appengine.ext.webapp import RequestHandler, Response
 from StringIO import StringIO
@@ -71,8 +72,7 @@ class JsonRpcDispatcher(RequestHandler):
             print_exception(etype, value, tb)
             json_rpc_response.setError(e.code, e.message, e.data, e.__class__.__name__)
 
-        # cancel redirection for debug purpose
-        if json_rpc_request.getValue("debug") or json_rpc_request.getValue("ignore_redirection") or json_rpc_request.fromAdminHost:
+        if self._inAdminMode():
             if json_rpc_response.hasRedirectTarget():
                 json_rpc_response["redirect"] = json_rpc_response.getRedirectTarget()
                 json_rpc_response.delRedirectTarget()
@@ -245,3 +245,15 @@ class JsonRpcDispatcher(RequestHandler):
         assert isinstance(jresponse, JsonRpcResponse)
         error_message = "user agent does not accept text/html response"
         jresponse.setError(JsonRpcError.INVALID_REQUEST, error_message)
+
+
+    def _setAdminMode(self, true_or_false):
+        assert isinstance(true_or_false, bool)
+        current_session = get_current_session()
+        current_session["inAdminMode"] = true_or_false
+    
+    def _inAdminMode(self):
+        current_session = get_current_session()
+        return current_session.get("inAdminMode")
+
+         

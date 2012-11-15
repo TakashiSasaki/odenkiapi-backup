@@ -9,6 +9,8 @@ from model.TwitterUser import TwitterUser
 from model.GmailUser import GmailUser
 from lib.gae import run_wsgi_app
 from google.appengine.api import users
+from gaesessions import get_current_session
+import json
 
 class Settings(JsonRpcDispatcher):
     
@@ -43,6 +45,26 @@ class Settings(JsonRpcDispatcher):
         jresponse.setResultObject(gmail_user)
         login_url = users.create_login_url("/api/auth/Gmail/RedirectedFromGoogle")
         jresponse.setResultValue("login_url", login_url)
+
+    def setAdmin(self, jrequest, jresponse):
+        assert isinstance(jresponse, JsonRpcResponse)
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert jrequest.fromAdminHost
+        jresponse.setId()
+        session = get_current_session()
+        self._setAdminMode(True)
+        for x in session:
+            jresponse.setResultValue(x, session[x])
+        
+    def unsetAdmin(self, jrequest, jresponse):
+        assert isinstance(jresponse, JsonRpcResponse)
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert jrequest.fromAdminHost
+        jresponse.setId()
+        session = get_current_session()
+        self._setAdminMode(False)
+        for x in session:
+            jresponse.setResultValue(x, session[x])
 
 if __name__ == "__main__":
     mapping = []
