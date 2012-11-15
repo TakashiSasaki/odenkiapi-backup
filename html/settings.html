@@ -39,7 +39,7 @@
 						<td><a href="#TwitterUser" data-rel="popup"
 							data-position-to="window" data-role="button" data-inline="true"
 							data-transition="pop" data-corners="true" data-shadow="true"
-							data-iconshadow="true"><img width="50px" height="50px"
+							data-iconshadow="true"><img id="twitter_icon" width="50px" height="50px"
 								src="https://si0.twimg.com/a/1349074900/images/resources/twitter-bird-blue-on-white.png"></img></a></td>
 						<td><a href="#GmailUser" data-rel="popup"
 							data-position-to="window" data-role="button" data-inline="true"
@@ -127,7 +127,7 @@
 					data-shadow="true" data-iconshadow="true" data-wrapperels="span"
 					class="ui-btn ui-shadow ui-btn-corner-all ui-btn-inline ui-btn-up-b"><span
 					class="ui-btn-inner ui-btn-corner-all"><span
-						class="ui-btn-text">ログイン</span></span></a>
+						class="ui-btn-text">Googleアカウントによるログイン</span></span></a>
 			</div>
 		</div>
 
@@ -200,8 +200,10 @@
 					}
 					if (data.result.TwitterUser) {
 						$(".TwitterUser span").text("ログイン済み");
+						$("#twitter_icon").attr("src", data.result.TwitterUser.profile_image_url_https);
 					} else {
 						$(".TwitterUser span").text("未ログイン");
+						$("#twitter_icon").attr("src", "https://si0.twimg.com/a/1349074900/images/resources/twitter-bird-blue-on-white.png");
 					}
 					$("#login_url").attr("href", data.result.login_url);
 
