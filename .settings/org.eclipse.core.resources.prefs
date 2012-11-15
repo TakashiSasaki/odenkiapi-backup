@@ -9,6 +9,7 @@ encoding//api/auth/Twitter.py=utf-8
 encoding//api/auth/logout.py=utf-8
 encoding//api/settings.py=utf-8
 encoding//html/sandbox/Spreadsheet.html=UTF-8
+encoding//html/sandbox/Table.html=UTF-8
 encoding//lib/gae/JsonRpcDispatcher.py=utf-8
 encoding//lib/json/JsonEncoder.py=utf-8
 encoding//lib/json/JsonRpcResponse.py=utf-8
