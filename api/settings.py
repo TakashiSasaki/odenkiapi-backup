@@ -8,6 +8,7 @@ from model.EmailUser import EmailUser
 from model.TwitterUser import TwitterUser
 from model.GmailUser import GmailUser
 from lib.gae import run_wsgi_app
+from google.appengine.api import users
 
 class Settings(JsonRpcDispatcher):
     
@@ -40,6 +41,8 @@ class Settings(JsonRpcDispatcher):
         jresponse.setResultObject(email_user)
         jresponse.setResultObject(twitter_user)
         jresponse.setResultObject(gmail_user)
+        login_url = users.create_login_url("/api/auth/Gmail/RedirectedFromGoogle")
+        jresponse.setResultValue("login_url", login_url)
 
 if __name__ == "__main__":
     mapping = []
