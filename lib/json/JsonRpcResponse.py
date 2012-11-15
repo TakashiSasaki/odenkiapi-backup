@@ -1,3 +1,4 @@
+#!-*- coding:utf-8 -*-
 from __future__ import unicode_literals, print_function
 from warnings import warn
 from JsonRpcError import JsonRpcError
@@ -90,6 +91,9 @@ class JsonRpcResponse(dict):
             raise RuntimeError("Existing JSON-RPC result already has key %s" % key)
         self["result"][key] = value
         return self["result"]
+    
+    def setResultObject(self, o):
+        self.setResultValue(o.__class__.__name__, o)
     
     def getResult(self):
         return self.get("result")

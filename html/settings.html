@@ -7,17 +7,214 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
 <script src="/js/jquery.json-2.3.min.js"></script>
 <script
-	src="//ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+	src="//ajax.aspnetcdn.com/ajax/jquery.mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
 <link rel="stylesheet" href="/css/odenki-theme.min.css" />
 <link rel="stylesheet"
-	href="http://ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css" />
+	href="http://ajax.aspnetcdn.com/ajax/jquery.mobile/1.2.0/jquery.mobile.structure-1.2.0.min.css" />
 <script src="/js/header.js"></script>
 </head>
 <body>
-	<div data-role="page"></div>
+	<div data-role="page">
+		<div data-role="collapsible-set">
+			<div data-role="collapsible" data-collapsed="false">
+				<h3>おでんきユーザー情報</h3>
+				<img src="/image/odenki.png" width="50px" height="50px"></img>
+				ニックネーム：<span class="OdenkiUser"><span></span></span><a
+					href="#changeNickname" data-rel="popup" data-role="button"><span>ニックネームを変える</span></a>
+			</div>
+			<div data-role="collapsible">
+				<h1>ログイン</h1>
+				<p>メールアドレスを登録することによるログイン、Twitterアカウントによるログイン、
+					Googleアカウントによるログインに対応しています。
+					アイコンの設定、フォロー、フォロワー関係を反映した集計にはTwitterアカウントによるログインが必要です。
+					メールアドレスを登録するとみんなでおでんきシステムからの通知を受け取る事ができます。</p>
+				<table>
+					<tr align="center">
+						<td><a href="#EmailUser" data-rel="popup"
+							data-position-to="window" data-role="button" data-inline="true"
+							data-transition="pop" data-corners="true" data-shadow="true"
+							data-iconshadow="true"><img
+								src="http://code.google.com/p/outlook-unread-notifier/logo"
+								width="50px" height="50px"></a></td>
+						<td><a href="#TwitterUser" data-rel="popup"
+							data-position-to="window" data-role="button" data-inline="true"
+							data-transition="pop" data-corners="true" data-shadow="true"
+							data-iconshadow="true"><img width="50px" height="50px"
+								src="https://si0.twimg.com/a/1349074900/images/resources/twitter-bird-blue-on-white.png"></img></a></td>
+						<td><a href="#GmailUser" data-rel="popup"
+							data-position-to="window" data-role="button" data-inline="true"
+							data-transition="pop" data-corners="true" data-shadow="true"
+							data-iconshadow="true"><img
+								src="http://code.google.com/p/google-api-dotnet-client/logo"
+								width="50px" height="50px"></img></a></td>
+					</tr>
+					<tr>
+						<td class="EmailUser" align="center"><span></span></td>
+						<td class="TwitterUser" align="center"><span></span></td>
+						<td class="GmailUser" align="center"><span></span></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+
+		<!--  popups  -->
+		<div data-role="popup" id="EmailUser" data-overlay-theme="a"
+			data-theme="c" style="max-width: 400px;"
+			class="ui-corner-all ui-popup ui-body-c ui-overlay-shadow"
+			aria-disabled="false" data-disabled="false" data-shadow="true"
+			data-corners="true" data-transition="none" data-position-to="origin">
+			<div data-role="header" data-theme="a"
+				class="ui-corner-top ui-header ui-bar-a" role="banner">
+				<h1 class="ui-title" role="heading" aria-level="1">メールアドレスとパスワードの登録</h1>
+			</div>
+			<div data-role="content" data-theme="d"
+				class="ui-corner-bottom ui-content ui-body-d" role="main">
+				<h3 class="ui-title">メールアドレスとパスワードの登録</h3>
+				<p>メールアドレスによるログインのためにパスワードを設定します。
+					入力されたメールアドレスに登録を完了するためのURLを含んだメールが送信されます。
+					安全のためパスワードは他のサービスとは異なるものにしてください。
+					また、登録されたメールアドレスにはみんなでおでんきプロジェクトからのお知らせが届くことがあります。</p>
+				<a href="#" data-role="button" data-inline="true" data-rel="back"
+					data-theme="c" data-corners="true" data-shadow="true"
+					data-iconshadow="true" data-wrapperels="span"
+					class="ui-btn ui-shadow ui-btn-corner-all ui-btn-inline ui-btn-up-c"><span
+					class="ui-btn-inner ui-btn-corner-all"><span
+						class="ui-btn-text">もどる</span></span></a> <a href="#" data-role="button"
+					data-inline="true" data-rel="back" data-transition="flow"
+					data-theme="b" data-corners="true" data-shadow="true"
+					data-iconshadow="true" data-wrapperels="span"
+					class="ui-btn ui-shadow ui-btn-corner-all ui-btn-inline ui-btn-up-b"><span
+					class="ui-btn-inner ui-btn-corner-all"><span
+						class="ui-btn-text">入力</span></span></a>
+			</div>
+		</div>
+
+		<div data-role="popup" id="GmailUser" data-overlay-theme="a"
+			data-theme="c" style="max-width: 400px;"
+			class="ui-corner-all ui-popup ui-body-c ui-overlay-shadow"
+			aria-disabled="false" data-disabled="false" data-shadow="true"
+			data-corners="true" data-transition="none" data-position-to="origin">
+			<div data-role="header" data-theme="a"
+				class="ui-corner-top ui-header ui-bar-a" role="banner">
+				<h1 class="ui-title" role="heading" aria-level="1">
+					Googleアカウントによるログイン</h1>
+			</div>
+			<div data-role="content" data-theme="d"
+				class="ui-corner-bottom ui-content ui-body-d" role="main">
+				<h3 class="ui-title">Googleアカウントによるログイン</h3>
+				<p>Googleアカウントをお持ちの方はGoogleアカウントを使ってログインすることができます。
+					ログインに使われるメールアドレスはみんなでおでんきシステムに登録されます。
+					登録されたメールアドレスにはみんなでおでんきプロジェクトからのお知らせが届くことがあります。</p>
+				<a href="#" data-role="button" data-inline="true" data-rel="back"
+					data-theme="c" data-corners="true" data-shadow="true"
+					data-iconshadow="true" data-wrapperels="span"
+					class="ui-btn ui-shadow ui-btn-corner-all ui-btn-inline ui-btn-up-c"><span
+					class="ui-btn-inner ui-btn-corner-all"><span
+						class="ui-btn-text">もどる</span></span></a> <a href="#" data-role="button"
+					data-inline="true" data-rel="back" data-transition="flow"
+					data-theme="b" data-corners="true" data-shadow="true"
+					data-iconshadow="true" data-wrapperels="span"
+					class="ui-btn ui-shadow ui-btn-corner-all ui-btn-inline ui-btn-up-b"><span
+					class="ui-btn-inner ui-btn-corner-all"><span
+						class="ui-btn-text">ログイン</span></span></a>
+			</div>
+		</div>
+
+		<div data-role="popup" id="TwitterUser" data-overlay-theme="a"
+			data-theme="c" style="max-width: 400px;"
+			class="ui-corner-all ui-popup ui-body-c ui-overlay-shadow"
+			aria-disabled="false" data-disabled="false" data-shadow="true"
+			data-corners="true" data-transition="none" data-position-to="origin">
+			<div data-role="header" data-theme="a"
+				class="ui-corner-top ui-header ui-bar-a" role="banner">
+				<h1 class="ui-title" role="heading" aria-level="1">Twitterアカウントによるログイン</h1>
+			</div>
+			<div data-role="content" data-theme="d"
+				class="ui-corner-bottom ui-content ui-body-d" role="main">
+				<h3 class="ui-title">Twitterアカウントによるログイン</h3>
+				<p>Twitterアカウントをお持ちの方はTwitterアカウントを使ったログインすることができます。 Twitter
+					ID、Twitter表示名、アイコン画像のURL、フォロー、被フォロー関係がみんなでおでんきシステムに取得されます。
+					取得されたTwitterID、Twitter表示名、アイコン画像のURLランキング表示などで、
+					フォロー、被フォロー関係はコミュニティでにおける発電量などの集計処理に使われます。</p>
+				<a href="#" data-role="button" data-inline="true" data-rel="back"
+					data-theme="c" data-corners="true" data-shadow="true"
+					data-iconshadow="true" data-wrapperels="span"
+					class="ui-btn ui-shadow ui-btn-corner-all ui-btn-inline ui-btn-up-c"><span
+					class="ui-btn-inner ui-btn-corner-all"><span
+						class="ui-btn-text">もどる</span></span></a> <a href="#" data-role="button"
+					data-inline="true" data-rel="back" data-transition="flow"
+					data-theme="b" data-corners="true" data-shadow="true"
+					data-iconshadow="true" data-wrapperels="span"
+					class="ui-btn ui-shadow ui-btn-corner-all ui-btn-inline ui-btn-up-b"><span
+					class="ui-btn-inner ui-btn-corner-all"><span
+						class="ui-btn-text">ログイン</span></span></a>
+			</div>
+		</div>
+
+		<div data-role="popup" id="changeNickname">
+			<div data-role="header">ニックネームの変更</div>
+			<div data-role="content">
+				<form>
+					新しいニックネーム <input type="text" name="nickname"></input> <a href="#"><button>もどる</button></a>
+					<button type="submit">変更</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	</div>
 	<script>
-		lib.ui.makeNavbar("d");
-		lib.ui.makeTab("d");
+		lib.ui.makeNavbar("e");
+		lib.ui.makeTab("e");
+		$
+				.ajax({
+					url : "/api/settings",
+					dataType : "json",
+					success : function(data) {
+						if (data.result.OdenkiUser) {
+							$(".OdenkiUser span").text(data.result.OdenkiUser);
+						} else {
+							$(".OdenkiUser span")
+									.text("おでんきユーザーとしてログインしていません。");
+						}
+						if (data.result.EmailUser) {
+							$(".EmailUser span").text("登録済");
+						} else {
+							$(".EmailUser span").text("未登録");
+						}
+						if (data.result.GmailUser) {
+							$(".GmailUser span").text("ログイン済み");
+						} else {
+							$(".GmailUser span").text("未ログイン");
+						}
+						if (data.result.TwitterUser) {
+							$(".TwitterUser span").text("ログイン済み");
+						} else {
+							$(".TwitterUser span").text("未ログイン");
+						}
+
+						$("#gmailLogin textarea").val($.toJSON(data));
+						if (data.result.GmailUser) {
+							$("#gmailLogin .gmail").val(
+									data.result.GmailUser.gmail);
+							$("#gmailLogin .odenkiId").val(
+									data.result.GmailUser.odenkiId);
+						} else {
+							$("#gmailLogin .gmail").val("ログインしていません");
+						}
+						$("#gmailLogin [type='button']").attr(
+								"onclick",
+								"window.location.href='"
+										+ data.result.login_url + "'");
+					},
+					error : function(data) {
+						lib.ui.collapse("#gmailLogin");
+						$("#admin textarea").val($.toJSON(data));
+						$("#emailUser .email").val(data.result.email);
+						$("#emailUser .emailUserId").val(
+								data.result.emailUserId);
+						$("#emailUser").val(data.result.email);
+					}
+				});
 	</script>
 </body>
 </html>
