@@ -48,7 +48,9 @@ class JsonRpcRequest(object):
             self._getFromArguments(request)
             return
         if request.method == "POST":
+            # TODO: it should be switched according to Content-Type
             self._getFromBody(request)
+            self._getFromArguments(request)
             return
         if request.method == "PUT":
             self._getFromBody(request)

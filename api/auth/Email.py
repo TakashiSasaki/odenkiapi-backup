@@ -41,58 +41,6 @@ class Email(JsonRpcDispatcher):
             email_users.append(email_user)
         jresponse.setResult(email_users)
 
-    def setNonce(self, jrequest, jresponse):
-        """generate a nonce with given password and send the corresponding URL to the user.
-        This round trip is intended to associate a password to an email address.
-        """
-        assert isinstance(jrequest, JsonRpcRequest)
-        assert isinstance(jresponse, JsonRpcResponse)
-        jresponse.setId()
-        try:
-            email = unicode(jrequest.getValue("email")[0])
-            raw_password = jrequest.getValue("password")[0].decode()
-            raw_password2 = jrequest.getValue("password2")[0].decode()
-        except TypeError:
-            raise InvalidParams(message="email, password and password2 were mandatory.")
-        
-        if len(raw_password) < 8:
-            raise InvalidParams(message="password should be eight characters or more")
-        if raw_password != raw_password2:
-            raise PasswordMismatch()
-        match = re.search(r'^[\w.-\\\\+]+@[\w.-]+$', email)
-        if not match:
-            raise InvalidParams({"email": email}, "Malformed email '%s' address was given." % email)
-        
-        #email_user = None
-        # check if OdenkiUser is loaded 
-#        try: 
-#            odenki_user = OdenkiUser.loadFromSession()
-#            email_user = EmailUser.getByOdenkiId(odenki_user.odenkiId)
-#        except EntityNotFound: pass 
-
-        # check if EmailUser already exists.
-
-        try: 
-            email_user = EmailUser.getByEmail(email)
-        except EntityNotFound:
-            email_user = EmailUser.createByEmail(email)
-        assert isinstance(email_user, EmailUser)
-        email_user.setNonce(email, raw_password)
-        #EmailUser.deleteFromSession()
-        
-        from google.appengine.api import mail
-        message = mail.EmailMessage()
-        message.to = email
-        message.body = "「みんなでおでんき」に関心をお持ちいただきありがとうございます。\n" + \
-            ("このメールアドレス %s" % email) + " でご登録いただくには次のページを開いて下さい。 \n " + \
-            ("http://%s/api/Email/%s" % (jrequest.request.host, email_user.nonce)) + "\n" + \
-            "みんなでおでんきに登録しない場合はこのメールを無視して下さい。\n"
-        message.sender = "admin@odenki.org"
-        message.subject = "みんなでおでんきへの登録確認メール"
-        message.send()
-        jresponse.setResultValue("EmailUser", email_user)
-        jresponse.setResultValue("email", email)
-    
     def invalidate(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
@@ -214,6 +162,61 @@ class Email(JsonRpcDispatcher):
 #        except EntityNotFound: pass
 #        jresponse.setResult({"OdenkiUser": odenki_user, "EmailUser": email_user})
 
+class SetNonce(JsonRpcDispatcher):
+
+    def POST(self, jrequest, jresponse):
+        """generate a nonce with given password and send the corresponding URL to the user.
+        This round trip is intended to associate a password to an email address.
+        """
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
+        try:
+            email = unicode(jrequest.getValue("email")[0])
+            raw_password = jrequest.getValue("password")[0].decode()
+            raw_password2 = jrequest.getValue("password2")[0].decode()
+        except TypeError:
+            raise InvalidParams(message="email, password and password2 were mandatory.")
+        
+        if len(raw_password) < 8:
+            raise InvalidParams(message="password should be eight characters or more")
+        if raw_password != raw_password2:
+            raise PasswordMismatch()
+        match = re.search(r'^[\w.-\\\\+]+@[\w.-]+$', email)
+        if not match:
+            raise InvalidParams({"email": email}, "Malformed email '%s' address was given." % email)
+        
+        #email_user = None
+        # check if OdenkiUser is loaded 
+#        try: 
+#            odenki_user = OdenkiUser.loadFromSession()
+#            email_user = EmailUser.getByOdenkiId(odenki_user.odenkiId)
+#        except EntityNotFound: pass 
+
+        # check if EmailUser already exists.
+
+        try: 
+            email_user = EmailUser.getByEmail(email)
+        except EntityNotFound:
+            email_user = EmailUser.createByEmail(email)
+        assert isinstance(email_user, EmailUser)
+        email_user.setNonce(email, raw_password)
+        #EmailUser.deleteFromSession()
+        
+        from google.appengine.api import mail
+        message = mail.EmailMessage()
+        message.to = email
+        message.body = "「みんなでおでんき」に関心をお持ちいただきありがとうございます。\n" + \
+            ("このメールアドレス %s" % email) + " でご登録いただくには次のページを開いて下さい。 \n " + \
+            ("http://%s/api/Email/%s" % (jrequest.request.host, email_user.nonce)) + "\n" + \
+            "みんなでおでんきに登録しない場合はこのメールを無視して下さい。\n"
+        message.sender = "admin@odenki.org"
+        message.subject = "みんなでおでんきへの登録確認メール"
+        message.send()
+        jresponse.setResultValue("EmailUser", email_user)
+        jresponse.setResultValue("email", email)
+    
+
 class NonceCallback(JsonRpcDispatcher):
     
     def GET(self, jrequest, jresponse):
@@ -270,6 +273,7 @@ class NonceCallback(JsonRpcDispatcher):
 
 if __name__ == "__main__":
     mapping = []
+    mapping.append(("/api/auth/Email/setNonce", SetNonce))
     mapping.append(("/api/auth/Email/[a-zA-Z0-9-]+", NonceCallback))
     mapping.append(("/api/auth/Email", Email))
     run_wsgi_app(mapping)
