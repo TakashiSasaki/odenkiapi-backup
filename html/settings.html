@@ -18,9 +18,21 @@
 		<div data-role="collapsible-set">
 			<div data-role="collapsible" data-collapsed="false">
 				<h3>おでんきユーザー情報</h3>
-				<img src="/image/odenki.png" width="50px" height="50px"></img>
-				おでんきネーム：<span class="OdenkiUser"><span></span></span><a
-					href="#changeOdenkiName" data-rel="popup" data-role="button"><span>おでんきネームを変える</span></a>
+				<table>
+					<tr>
+						<td><img src="/image/odenki.png" width="50px" height="50px"></img></td>
+						<td>おでんきネーム</td>
+						<td><span id="odenkiName"></span></td>
+						<td><a href="#changeOdenkiName" data-rel="popup"
+							data-role="button"><span>変更</span></a></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>おでんきID</td>
+						<td id="odenkiId"></td>
+						<td></td>
+					</tr>
+				</table>
 			</div>
 			<div data-role="collapsible">
 				<h1>ログイン</h1>
@@ -39,7 +51,8 @@
 						<td><a href="#TwitterUser" data-rel="popup"
 							data-position-to="window" data-role="button" data-inline="true"
 							data-transition="pop" data-corners="true" data-shadow="true"
-							data-iconshadow="true"><img id="twitter_icon" width="50px" height="50px"
+							data-iconshadow="true"><img id="twitter_icon" width="50px"
+								height="50px"
 								src="https://si0.twimg.com/a/1349074900/images/resources/twitter-bird-blue-on-white.png"></img></a></td>
 						<td><a href="#GmailUser" data-rel="popup"
 							data-position-to="window" data-role="button" data-inline="true"
@@ -178,57 +191,69 @@
 		lib.ui.makeNavbar("e");
 		lib.ui.makeTab("e");
 		function update() {
-			$.ajax({
-				url : "/api/settings",
-				dataType : "json",
-				success : function(data) {
-					if (data.result.OdenkiUser) {
-						$(".OdenkiUser span").text(
-								data.result.OdenkiUser.odenkiName);
-					} else {
-						$(".OdenkiUser span").text("おでんきユーザーとしてログインしていません。");
-					}
-					if (data.result.EmailUser) {
-						$(".EmailUser span").text("登録済");
-					} else {
-						$(".EmailUser span").text("未登録");
-					}
-					if (data.result.GmailUser) {
-						$(".GmailUser span").text("登録済");
-					} else {
-						$(".GmailUser span").text("未登録");
-					}
-					if (data.result.TwitterUser) {
-						$(".TwitterUser span").text("登録済");
-						$("#twitter_icon").attr("src", data.result.TwitterUser.profile_image_url_https);
-					} else {
-						$(".TwitterUser span").text("未登録");
-						$("#twitter_icon").attr("src", "https://si0.twimg.com/a/1349074900/images/resources/twitter-bird-blue-on-white.png");
-					}
-					$("#login_url").attr("href", data.result.login_url);
+			$
+					.ajax({
+						url : "/api/settings",
+						dataType : "json",
+						success : function(data) {
+							if (data.result.OdenkiUser) {
+								$("#odenkiName").text(
+										data.result.OdenkiUser.odenkiName);
+								$("#odenkiId").text(
+										data.result.OdenkiUser.odenkiId);
+							} else {
+								$("#odenkiName span").text(
+										"おでんきユーザーとしてログインしていません。");
+								$("#odenkiId").text("");
+							}
+							if (data.result.EmailUser) {
+								$(".EmailUser span").text("登録済");
+							} else {
+								$(".EmailUser span").text("未登録");
+							}
+							if (data.result.GmailUser) {
+								$(".GmailUser span").text("登録済");
+							} else {
+								$(".GmailUser span").text("未登録");
+							}
+							if (data.result.TwitterUser) {
+								$(".TwitterUser span").text("登録済");
+								$("#twitter_icon")
+										.attr(
+												"src",
+												data.result.TwitterUser.profile_image_url_https);
+							} else {
+								$(".TwitterUser span").text("未登録");
+								$("#twitter_icon")
+										.attr(
+												"src",
+												"https://si0.twimg.com/a/1349074900/images/resources/twitter-bird-blue-on-white.png");
+							}
+							$("#login_url").attr("href", data.result.login_url);
 
-					$("#gmailLogin textarea").val($.toJSON(data));
-					if (data.result.GmailUser) {
-						$("#gmailLogin .gmail")
-								.val(data.result.GmailUser.gmail);
-						$("#gmailLogin .odenkiId").val(
-								data.result.GmailUser.odenkiId);
-					} else {
-						$("#gmailLogin .gmail").val("ログインしていません");
-					}
-					$("#gmailLogin [type='button']").attr(
-							"onclick",
-							"window.location.href='" + data.result.login_url
-									+ "'");
-				},
-				error : function(data) {
-					lib.ui.collapse("#gmailLogin");
-					$("#admin textarea").val($.toJSON(data));
-					$("#emailUser .email").val(data.result.email);
-					$("#emailUser .emailUserId").val(data.result.emailUserId);
-					$("#emailUser").val(data.result.email);
-				}
-			});
+							$("#gmailLogin textarea").val($.toJSON(data));
+							if (data.result.GmailUser) {
+								$("#gmailLogin .gmail").val(
+										data.result.GmailUser.gmail);
+								$("#gmailLogin .odenkiId").val(
+										data.result.GmailUser.odenkiId);
+							} else {
+								$("#gmailLogin .gmail").val("ログインしていません");
+							}
+							$("#gmailLogin [type='button']").attr(
+									"onclick",
+									"window.location.href='"
+											+ data.result.login_url + "'");
+						},
+						error : function(data) {
+							lib.ui.collapse("#gmailLogin");
+							$("#admin textarea").val($.toJSON(data));
+							$("#emailUser .email").val(data.result.email);
+							$("#emailUser .emailUserId").val(
+									data.result.emailUserId);
+							$("#emailUser").val(data.result.email);
+						}
+					});
 		}
 		update();
 	</script>
