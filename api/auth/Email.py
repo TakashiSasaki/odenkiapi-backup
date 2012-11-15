@@ -208,7 +208,7 @@ class SetNonce(JsonRpcDispatcher):
         message.to = email
         message.body = "「みんなでおでんき」に関心をお持ちいただきありがとうございます。\n" + \
             ("このメールアドレス %s" % email) + " でご登録いただくには次のページを開いて下さい。 \n " + \
-            ("http://%s/api/Email/%s" % (jrequest.request.host, email_user.nonce)) + "\n" + \
+            ("http://%s/api/auth/Email/%s" % (jrequest.request.host, email_user.nonce)) + "\n" + \
             "みんなでおでんきに登録しない場合はこのメールを無視して下さい。\n"
         message.sender = "admin@odenki.org"
         message.subject = "みんなでおでんきへの登録確認メール"
