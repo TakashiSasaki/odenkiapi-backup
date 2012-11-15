@@ -68,6 +68,23 @@
 					</tr>
 				</table>
 			</div>
+			<div data-role="collapsible">
+				<h1>ホームゲートウェイの登録</h1>
+				みんなでおでんきに対応したホームゲートウェイを登録すると、 発電量を自動的にモニターすることができます。
+				今のところユーザー１人あたり１つのホームゲートウェイを登録することができます。
+				<table>
+					<tr>
+						<td>製品名</td>
+						<td id="productName"></td>
+					</tr>
+					<tr>
+						<td>シリアル番号</td>
+						<td id="serialNumber"></td>
+					</tr>
+				</table>
+				<a href="#homeGateway" data-rel="popup" data-role="button"
+					data-transition="pop"> みんなでおでんき対応ホームゲートウェイの登録 </a>
+			</div>
 		</div>
 
 		<!--  popups  -->
@@ -185,7 +202,26 @@
 				</form>
 			</div>
 		</div>
-	</div>
+
+		<div data-role="popup" id="homeGateway">
+			<div data-role="content">
+				<form>
+					<table>
+						<tr>
+							<td>製品名</td>
+							<td><input type="text"></input></td>
+						</tr>
+						<tr>
+							<td>シリアル番号</td>
+							<td><input type="text"></input</td>
+						</tr>
+					</table>
+					<a href="#" data-rel="back" data-role="button">もどる</a> <a href="#"
+						data-rel="back" data-role="button"
+						onclick='$.get("/api/Equipment/register", $("#homeGateway form").serialize(), update);'>変更する</a>
+				</form>
+			</div>
+		</div>
 	</div>
 	<script>
 		lib.ui.makeNavbar("e");
