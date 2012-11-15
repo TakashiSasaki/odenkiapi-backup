@@ -10,7 +10,6 @@
 
 			// Set a callback to run when the Google Visualization API is loaded.
 			google.setOnLoadCallback(drawChart);
-			google.setOnLoadCallback(drawTable);
 
 			// Callback that creates and populates a data table,
 			// instantiates the pie chart, passes in the data and
@@ -35,6 +34,14 @@
 				chart.draw(data, options);
 			}
 
+		</script>
+	</head>
+
+	<body>
+		<!--Div that will hold the pie chart-->
+		<div id="chart_div"></div>
+		<div id="table_div"></div>
+		<script>
 			function drawTable() {
 				var data_table = new google.visualization.DataTable();
 				data_table.addColumn('string', '都道府県');
@@ -43,13 +50,7 @@
 				var chart = new google.visualization.Table(document.getElementById('table_div'));
 				chart.draw(data_table, {});
 			}
-
+			google.setOnLoadCallback(drawTable);
 		</script>
-	</head>
-
-	<body>
-		<!--Div that will hold the pie chart-->
-		<div id="chart_div"></div>
-		<div id="table_div"></div>
 	</body>
 </html>
