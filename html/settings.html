@@ -69,16 +69,12 @@
 			</div>
 			<div data-role="content" data-theme="d"
 				class="ui-corner-bottom ui-content ui-body-d" role="main">
-				<h3 class="ui-title">メールアドレスとパスワードの登録</h3>
-				<p>メールアドレスによるログインのためにパスワードを設定します。
-					入力されたメールアドレスに登録を完了するためのURLを含んだメールが送信されます。
-					安全のためパスワードは他のサービスとは異なるものにしてください。
-					また、登録されたメールアドレスにはみんなでおでんきプロジェクトからのお知らせが届くことがあります。</p>
-				<form id="setNonce">
+				<h3 class="ui-title">メールアドレスによるログイン</h3>
+				<p></p>
+
+				<form>
 					<input type="email" name="email" placeholder="odenki@example.com"></input><input
-						type="password" name="password" placeholder="空白を除く英数記号8文字以上"></input>
-					<input type="password" name="password2"
-						placeholder="空白を除く英数記号8文字以上"></input>
+						type="password" name="password" placeholder="パスワード（8文字以上）"></input>
 				</form>
 				<a href="#" data-role="button" data-inline="true" data-rel="back"
 					data-theme="c" data-corners="true" data-shadow="true"
@@ -87,7 +83,19 @@
 					class="ui-btn-inner ui-btn-corner-all"><span
 						class="ui-btn-text">もどる</span></span></a> <a href="#" data-inline="true"
 					data-rel="back" data-role="button"
-					onclick='$.post("/api/auth/Email/setNonce", $("#setNonce").serialize());'>登録</a>
+					onclick='$.post("/api/auth/Email/Login", $("#EmailUser form").serialize(), update());'>ログイン</a>
+				<!-- TODO: it should be posted via https link in release version -->
+				<p>メールアドレスを新規にご登録いただくには、確認のためパスワードをもう一度入力してください。
+					に登録を完了するためのURLを含んだメールが送信されます。 安全のためパスワードは他のサービスのものとは異なるものにしてください。
+					登録されたメールアドレスにはみんなでおでんきプロジェクトからのお知らせが届くことがあります。
+					登録いただいたメールアドレスは「みんなでおでんき」へのログイン、通知、パスワード忘れや変更時の確認などのためにのみ用いられ、
+					「みんなでおでんき」以外には通知されません。
+					「みんなでおでんき」はTwitterやGoogleアカウントなど外部サービスのアカウントによるログインも可能なため、
+					同様の他のサービスと同じく原理的には名寄せすることも可能ですが、
+					メールアドレスおよびそれぞれの外部サービスから取得した情報を相互に通知することはありません。</p>
+				<input type="password" name="password2" placeholder="上と同じパスワード"></input>
+				<a href="#" data-inline="true" data-rel="back" data-role="button"
+					onclick='$.post("/api/auth/Email/SetNonce", $("#EmailUser form").serialize(), update());'>メールアドレスの新規登録</a>
 				<!-- TODO: it should be posted via https link in release version -->
 			</div>
 		</div>
@@ -169,56 +177,56 @@
 	<script>
 		lib.ui.makeNavbar("e");
 		lib.ui.makeTab("e");
-		$
-				.ajax({
-					url : "/api/settings",
-					dataType : "json",
-					success : function(data) {
-						if (data.result.OdenkiUser) {
-							$(".OdenkiUser span").text(data.result.OdenkiUser);
-						} else {
-							$(".OdenkiUser span")
-									.text("おでんきユーザーとしてログインしていません。");
-						}
-						if (data.result.EmailUser) {
-							$(".EmailUser span").text("登録済");
-						} else {
-							$(".EmailUser span").text("未登録");
-						}
-						if (data.result.GmailUser) {
-							$(".GmailUser span").text("ログイン済み");
-						} else {
-							$(".GmailUser span").text("未ログイン");
-						}
-						if (data.result.TwitterUser) {
-							$(".TwitterUser span").text("ログイン済み");
-						} else {
-							$(".TwitterUser span").text("未ログイン");
-						}
-
-						$("#gmailLogin textarea").val($.toJSON(data));
-						if (data.result.GmailUser) {
-							$("#gmailLogin .gmail").val(
-									data.result.GmailUser.gmail);
-							$("#gmailLogin .odenkiId").val(
-									data.result.GmailUser.odenkiId);
-						} else {
-							$("#gmailLogin .gmail").val("ログインしていません");
-						}
-						$("#gmailLogin [type='button']").attr(
-								"onclick",
-								"window.location.href='"
-										+ data.result.login_url + "'");
-					},
-					error : function(data) {
-						lib.ui.collapse("#gmailLogin");
-						$("#admin textarea").val($.toJSON(data));
-						$("#emailUser .email").val(data.result.email);
-						$("#emailUser .emailUserId").val(
-								data.result.emailUserId);
-						$("#emailUser").val(data.result.email);
+		function update() {
+			$.ajax({
+				url : "/api/settings",
+				dataType : "json",
+				success : function(data) {
+					if (data.result.OdenkiUser) {
+						$(".OdenkiUser span").text(data.result.OdenkiUser);
+					} else {
+						$(".OdenkiUser span").text("おでんきユーザーとしてログインしていません。");
 					}
-				});
+					if (data.result.EmailUser) {
+						$(".EmailUser span").text("登録済");
+					} else {
+						$(".EmailUser span").text("未登録");
+					}
+					if (data.result.GmailUser) {
+						$(".GmailUser span").text("ログイン済み");
+					} else {
+						$(".GmailUser span").text("未ログイン");
+					}
+					if (data.result.TwitterUser) {
+						$(".TwitterUser span").text("ログイン済み");
+					} else {
+						$(".TwitterUser span").text("未ログイン");
+					}
+
+					$("#gmailLogin textarea").val($.toJSON(data));
+					if (data.result.GmailUser) {
+						$("#gmailLogin .gmail")
+								.val(data.result.GmailUser.gmail);
+						$("#gmailLogin .odenkiId").val(
+								data.result.GmailUser.odenkiId);
+					} else {
+						$("#gmailLogin .gmail").val("ログインしていません");
+					}
+					$("#gmailLogin [type='button']").attr(
+							"onclick",
+							"window.location.href='" + data.result.login_url
+									+ "'");
+				},
+				error : function(data) {
+					lib.ui.collapse("#gmailLogin");
+					$("#admin textarea").val($.toJSON(data));
+					$("#emailUser .email").val(data.result.email);
+					$("#emailUser .emailUserId").val(data.result.emailUserId);
+					$("#emailUser").val(data.result.email);
+				}
+			});
+		}
+		update();
 	</script>
 </body>
 </html>

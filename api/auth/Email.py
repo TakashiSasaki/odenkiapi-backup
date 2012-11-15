@@ -98,31 +98,6 @@ class Email(JsonRpcDispatcher):
 #        assert isinstance(key, ndb.Key)
 #        key.delete()
     
-    def login(self, jrequest, jresponse):
-        assert isinstance(jrequest, JsonRpcRequest)
-        assert isinstance(jresponse, JsonRpcResponse)
-        jresponse.setId()
-        try:
-            email = jrequest.getValue("email")[0]
-            raw_password = jrequest.getValue("password")[0]
-        except Exception:
-            raise InvalidParams("email and password are required for method=login.")
-        try:    
-            email_user = EmailUser.getByEmail(email)
-        except Exception:
-            raise EntityNotFound("EmailUser entity is not found", {"email": email})
-        assert isinstance(email_user, EmailUser)
-        email_user.matchPassword(raw_password) # raises PasswordMismatch if password not matches
-#        email_user.saveToSession()
-        
-        assert email_user.odenkiId is not None
-        odenki_user = OdenkiUser.getByOdenkiId(email_user.odenkiId)
-        odenki_user.saveToSession()
-        EmailUser.deleteFromSession()
-        
-        jresponse.setResultValue("EmailUser", email_user)
-        jresponse.setResultValue("OdenkiUser", odenki_user)
-    
     def deleteNullOdenkiId(self, jrequest, jresponse):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
@@ -162,7 +137,41 @@ class Email(JsonRpcDispatcher):
 #        except EntityNotFound: pass
 #        jresponse.setResult({"OdenkiUser": odenki_user, "EmailUser": email_user})
 
+class Login(JsonRpcDispatcher):
+    
+    def GET(self, jrequest, jresponse):
+        self.POST(jrequest, jresponse)
+    
+    def POST(self, jrequest, jresponse):
+        assert isinstance(jrequest, JsonRpcRequest)
+        assert isinstance(jresponse, JsonRpcResponse)
+        jresponse.setId()
+        try:
+            email = jrequest.getValue("email")[0]
+            raw_password = jrequest.getValue("password")[0]
+        except Exception:
+            raise InvalidParams("email and password are required for method=login.")
+        try:    
+            email_user = EmailUser.getByEmail(email)
+        except Exception:
+            raise EntityNotFound("EmailUser entity is not found", {"email": email})
+        assert isinstance(email_user, EmailUser)
+        email_user.matchPassword(raw_password) # raises PasswordMismatch if password not matches
+#        email_user.saveToSession()
+        
+        assert email_user.odenkiId is not None
+        odenki_user = OdenkiUser.getByOdenkiId(email_user.odenkiId)
+        odenki_user.saveToSession()
+        EmailUser.deleteFromSession()
+        
+        jresponse.setResultValue("EmailUser", email_user)
+        jresponse.setResultValue("OdenkiUser", odenki_user)
+    
+
 class SetNonce(JsonRpcDispatcher):
+    
+    def GET(self, jrequest, jresponse):
+        self.POST(jrequest, jresponse)
 
     def POST(self, jrequest, jresponse):
         """generate a nonce with given password and send the corresponding URL to the user.
@@ -269,11 +278,13 @@ class NonceCallback(JsonRpcDispatcher):
         jresponse.setResultValue(odenki_user.__class__.__name__, odenki_user)
         jresponse.setResultValue(email_user.__class__.__name__, email_user)
         #jresponse.setResultValue("nonce", nonce)
-        jresponse.setRedirectTarget("http://%s/html/auth/Email.html" % jrequest.request.host)
+        jresponse.setRedirectTarget("http://%s/html/settings.html" % jrequest.request.host)
 
 if __name__ == "__main__":
     mapping = []
-    mapping.append(("/api/auth/Email/setNonce", SetNonce))
+    mapping.append(("/api/auth/Email/SetNonce", SetNonce))
+    mapping.append(("/api/auth/Email/Login", Login))
     mapping.append(("/api/auth/Email/[a-zA-Z0-9-]+", NonceCallback))
     mapping.append(("/api/auth/Email", Email))
     run_wsgi_app(mapping)
+
