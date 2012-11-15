@@ -69,7 +69,7 @@ class RedirectedFromGoogle(JsonRpcDispatcher):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
-        jresponse.setRedirectTarget("/html/auth/failed.html")
+        jresponse.setRedirectTarget("/html/error.html")
         #jresponse.setRedirectTarget("/html/auth/index.html")
         current_user = users.get_current_user()
         if current_user is None:

@@ -110,7 +110,7 @@ class OAuthCallback(JsonRpcDispatcher):
         assert isinstance(jrequest, JsonRpcRequest)
         assert isinstance(jresponse, JsonRpcResponse)
         jresponse.setId()
-        jresponse.setRedirectTarget("/html/auth/failed.html")
+        jresponse.setRedirectTarget("/html/auth/error.html")
         try:
             oauth_token = jrequest.getValue("oauth_token")[0]
             oauth_verifier = jrequest.getValue("oauth_verifier")[0]
