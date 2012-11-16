@@ -44,13 +44,17 @@
 				<tr>
 					<td>最大利用時間</td>
 					<td><input readonly="true" placeholder="最大利用時間" value="10"
-						id="outletDuration" data-inline="true"></td>
+						id="outletDuration" data-inline="true"></input></td>
 					<td>分</td>
 				</tr>
 			</table>
 			<a class="notloggedin" data-role="button" href="/html/settings.html"
 				data-ajax="false">みんなでおでんきにログインする</a> <a class="loggedin"
-				data-role="button">このソーシャルコンセントを使う</a>
+				id="invokeApp" data-role="button"><div>このソーシャルコンセントを使う</div>（ソーシャルコンセントアプリを起動します）<div></div></a>
+			開発者向け情報：上のボタンをクリックするとアプリは以下のURLで呼び出されます。
+			実際にアプリを起動するためにはインテントフィルタを書いて下さい。
+			 <input type="text" readonly="true"
+				id="invokeAppUrl"></input>
 		</div>
 	</div>
 	<script>
@@ -58,23 +62,25 @@
 			if (data.result.OdenkiUser) {
 				lib.ui.showElement(".loggedin");
 				lib.ui.hideElement(".notloggedin");
+				$("#outletDuration").val("60");
 				$("#odenkiName").text(data.result.OdenkiUser.odenkiName);
 			} else {
 				lib.ui.hideElement(".loggedin");
 				lib.ui.showElement(".notloggedin");
+				$("#outletDuration").val("10");
 			}
-			if (data.result.Outlet){
+			if (data.result.Outlet) {
 				$("#outletName").val(data.result.Outlet.outletName);
 				$("#outletId").val(data.result.Outlet.outletId);
-				$("#outletDuration").val(data.result.Outlet.outletDuration);
+				//$("#outletDuration").val(data.result.Outlet.outletDuration);
 			}
+			var url = "odenki://android.odenki.org/token?outletId="
+					+ $("#outletId").val() + "&outletDuration="
+					+ $("#outletDuration").val();
+			//alert(url);
+			$("#invokeApp").attr("href", url);
+			$("#invokeAppUrl").val(url);
 		});
-		function notloggedin() {
-			lib.ui.showElement(".notloggedin");
-			lib.ui.hideElement(".loggedin");
-		}
-		function loggedin() {
-		}
 	</script>
 </body>
 </html>
