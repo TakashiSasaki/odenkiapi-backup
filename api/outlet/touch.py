@@ -15,16 +15,20 @@ class _Touch(JsonRpcDispatcher):
         jresponse.setId()
         
         outlet_id = None
+        relay_id = None
+        card_type = None
         card_id = None
         try:
             outlet_id = unicode(jrequest.getValue("outletId")[0])
             assert isinstance(outlet_id, unicode)
+            relay_id = unicode(jrequest.getValue("relayId")[0])
+            assert isinstance(relay_id, unicode)
             card_id = unicode(jrequest.getValue("cardId")[0])
             assert isinstance(card_id, unicode)
             card_type = unicode(jrequest.getValue("cardType")[0])
-            assert isinstance(card_id, unicode)
+            assert isinstance(card_type, unicode)
         except Exception, e:
-            raise InvalidParams({"outletId":None, "cardId":None, "exception": e.__class__.__name__})
+            raise InvalidParams({"outletId":None, "relayId":None, "cardType":None, "cardId":None, "exception": e.__class__.__name__})
         
         try:
             outlet = Outlet.getByOutletId(outlet_id)

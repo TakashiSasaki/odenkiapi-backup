@@ -1,5 +1,5 @@
 application: odenkiapi
-version: python-0017
+version: python-0018
 #runtime: python
 runtime: python27
 api_version: 1
