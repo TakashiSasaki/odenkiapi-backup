@@ -9,6 +9,7 @@ class Outlet(NdbModel):
     SESSION_KEY = "diuijlkanbfyiuguwrqxfc76tfkv"
     
     outletId = ndb.StringProperty()
+    relayId = ndb.StringProperty()
     secret = ndb.StringProperty(indexed=False)
     outletName = ndb.StringProperty(indexed=False)
     cardId = ndb.StringProperty(indexed=False)

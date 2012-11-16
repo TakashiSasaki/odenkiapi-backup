@@ -42,6 +42,12 @@
 					<td></td>
 				</tr>
 				<tr>
+					<td>リレーID</td>
+					<td><input readonly="true" placeholder="リレーID"
+						value="認識できません" id="relayId"></input></td>
+					<td></td>
+				</tr>
+				<tr>
 					<td>最大利用時間</td>
 					<td><input readonly="true" placeholder="最大利用時間" value="10"
 						id="outletDuration" data-inline="true"></input></td>
@@ -50,10 +56,9 @@
 			</table>
 			<a class="notloggedin" data-role="button" href="/html/settings.html"
 				data-ajax="false">みんなでおでんきにログインする</a> <a class="loggedin"
-				id="invokeApp" data-role="button"><div>このソーシャルコンセントを使う</div>（ソーシャルコンセントアプリを起動します）<div></div></a>
-			開発者向け情報：上のボタンをクリックするとアプリは以下のURLで呼び出されます。
-			実際にアプリを起動するためにはインテントフィルタを書いて下さい。
-			 <input type="text" readonly="true"
+				id="invokeApp" data-role="button"><div>このソーシャルコンセントを使う</div>（ソーシャルコンセントアプリを起動します）
+				<div></div></a> 開発者向け情報：上のボタンをクリックするとアプリは以下のURLで呼び出されます。
+			実際にアプリを起動するためにはインテントフィルタを書いて下さい。 <input type="text" readonly="true"
 				id="invokeAppUrl"></input>
 		</div>
 	</div>
@@ -72,11 +77,12 @@
 			if (data.result.Outlet) {
 				$("#outletName").val(data.result.Outlet.outletName);
 				$("#outletId").val(data.result.Outlet.outletId);
+				$("#relayId").val(data.result.Outlet.relayId);
 				//$("#outletDuration").val(data.result.Outlet.outletDuration);
 			}
 			var url = "odenki://android.odenki.org/token?outletId="
 					+ $("#outletId").val() + "&outletDuration="
-					+ $("#outletDuration").val();
+					+ $("#outletDuration").val() + "&relayId=1&signature=3X5Mmvzu";
 			//alert(url);
 			$("#invokeApp").attr("href", url);
 			$("#invokeAppUrl").val(url);
