@@ -47,6 +47,9 @@ handlers:
 - url: /api/debug/([A-Za-z_]+).*
   script: api/debug/\1.py
 
+- url: /api/outlet/([A-Za-z_]+).*
+  script: api/outlet/\1.py
+
 - url: /api/([A-Za-z_]+).*
   script: api/\1.py
 

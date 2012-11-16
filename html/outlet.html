@@ -54,7 +54,7 @@
 		</div>
 	</div>
 	<script>
-		$.getJSON("/api/outlet", {}, function(data) {
+		$.getJSON("/api/outlet/status", {}, function(data) {
 			if (data.result.OdenkiUser) {
 				lib.ui.showElement(".loggedin");
 				lib.ui.hideElement(".notloggedin");
@@ -63,6 +63,11 @@
 				lib.ui.hideElement(".loggedin");
 				lib.ui.showElement(".notloggedin");
 			}
+			if (data.result.Outlet){
+				$("#outletName").val(data.result.Outlet.outletName);
+				$("#outletId").val(data.result.Outlet.outletId);
+				$("#outletDuration").val(data.result.Outlet.outletDuration);
+			}
 		});
 		function notloggedin() {
 			lib.ui.showElement(".notloggedin");
@@ -70,12 +75,6 @@
 		}
 		function loggedin() {
 		}
-		notloggedin();
-
-		var params = getUrlVars();
-		$("#outletName").val(params["outletName"]);
-		$("#outletId").val(params["outletId"]);
-		$("#outletDuration").val(params["outletDuration"]);
 	</script>
 </body>
 </html>
