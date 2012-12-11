@@ -1,6 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Express 2012 for Web
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9742356C-9D03-4AA2-8336-3935E3F404FB}"
+	ProjectSection(SolutionItems) = preProject
+		odenkiapi\html\ApiTest.html = odenkiapi\html\ApiTest.html
+		odenkiapi\js\header.js = odenkiapi\js\header.js
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
