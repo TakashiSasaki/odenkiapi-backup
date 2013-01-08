@@ -6,6 +6,7 @@ from model.Metadata import putMetadata
 from google.appengine.ext import db
 from google.appengine.ext.webapp import RequestHandler, Response, Request
 from urlparse import urlparse
+from model import RawDataNdb
 
 class PostPage(RequestHandler):
 
@@ -25,6 +26,11 @@ class PostPage(RequestHandler):
     def post(self):
         # logging.info("body="+self.request.body)
         self.get()
+
+class _GetLastPostedRawDataHandler(RequestHandler):
+    def get(self):
+        raw_data = RawDataNdb.RawData.getLast()
+        self.response.out.write(raw_data)
 
 class _Path(RequestHandler):
     def get(self):
@@ -81,6 +87,7 @@ class _MyTest(TestCase):
         self.testbed = Testbed()
         self.testbed.activate()
         self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
         
     def tearDown(self):
         self.testbed.deactivate()
@@ -92,6 +99,15 @@ class _MyTest(TestCase):
         self.assertIsInstance(response, webtest.TestResponse)
         self.assertEqual(response.status, "200 OK")
         self.assertEqual(response.headers["Content-Type"], 'text/plain')
+        
+    def testGet2(self):
+        TEST_QUERY = "a=b&c=d&e=f"
+        response = self.test_app.get("/post?" + TEST_QUERY)
+        import webtest
+        self.assertIsInstance(response, webtest.TestResponse)
+        self.assertEqual(response.status, "200 OK")
+        self.assertEqual(response.headers["Content-Type"], 'text/plain')
+        print(response.body)
     
     def test_Path(self):
         response = self.test_app.get("/_Path")
@@ -117,7 +133,7 @@ class _MyTest(TestCase):
         self.assertEqual(response.status, "200 OK")
         self.assertEqual(response.headers["Content-Type"], 'text/html; charset=utf-8')
         self.assertEqual(response.body, "a=b&c=d")
-
+        
 class _TestSemicolonInUrl(TestCase):
     
     def testUrlParse(self):
