@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
 from google.appengine.ext import ndb
-#from google.appengine.ext.webapp import Request
-#from model.Counter import Counter
-#from json import dumps
+# from google.appengine.ext.webapp import Request
+# from model.Counter import Counter
+# from json import dumps
 from logging import debug
-#from model.NdbModel import NdbModel
+# from model.NdbModel import NdbModel
 from model.Columns import Columns
 from model.CsvMixin import CsvMixin
 from lib.DataTableMixin import DataTableMixin
@@ -27,7 +27,7 @@ class RawData(ndb.Model, CsvMixin, DataTableMixin):
     fragment = ndb.StringProperty(indexed=False)
     body = ndb.StringProperty(indexed=False)
 
-    #fieldnames = ["rawDataId", "path", "parameters", "query", "fragment", "body"]
+    # fieldnames = ["rawDataId", "path", "parameters", "query", "fragment", "body"]
     
     @classmethod
     def queryRange(cls, start, end):
@@ -82,7 +82,7 @@ class RawData(ndb.Model, CsvMixin, DataTableMixin):
     
     @classmethod
     def fetchByRawDataId(cls, raw_data_id):
-        q = ndb.Query(kind="RawData").filter(cls.rawDataId==raw_data_id)
+        q = ndb.Query(kind="RawData").filter(cls.rawDataId == raw_data_id)
         keys = q.fetch(limit=2)
         assert len(keys) == 0 or len(keys) == 1
         if len(keys) == 0: return None
@@ -122,7 +122,7 @@ class _TestRawDataNdb(TestCase):
         raw_data.parameters = self.TEST_PARAMETERS
         raw_data.query = self.TEST_QUERY
         raw_data.fragment = self.TEST_FRAGMENT
-        raw_data.body =  self.TEST_BODY
+        raw_data.body = self.TEST_BODY
         raw_data.put()
         
         key = RawData.fetchByRawDataId(self.TEST_RAWDATA_ID)
