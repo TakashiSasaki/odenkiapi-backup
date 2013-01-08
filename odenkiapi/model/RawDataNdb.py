@@ -73,3 +73,57 @@ class RawData(ndb.Model, CsvMixin, DataTableMixin):
             q = q.filter(cls.rawDataId <= end_rawdata_id)
             q = q.filter(cls.rawDataId >= start_rawdata_id)
         return q
+
+    @classmethod
+    def getLast(cls):
+        keys = cls.fetchRecent(1)
+        if len(keys) is 0: return None
+        return keys[0].get()
+    
+    @classmethod
+    def fetchByRawDataId(cls, raw_data_id):
+        q = ndb.Query(kind="RawData").filter(cls.rawDataId==raw_data_id)
+        keys = q.fetch(limit=2)
+        assert len(keys) == 0 or len(keys) == 1
+        if len(keys) == 0: return None
+        return keys[0]
+
+from unittest import TestCase
+class _TestRawDataNdb(TestCase):
+    
+    TEST_RAWDATA_ID = 12345
+    TEST_BODY = "bodybody"
+    TEST_QUERY = "a=b&c=d"
+    TEST_FRAGMENT = "fragmentfragment"
+    TEST_PATH = "/a/b/c"
+    TEST_PARAMETERS = ""
+
+    def setUp(self):
+        TestCase.setUp(self)
+        from google.appengine.ext.testbed import Testbed
+        self.testbed = Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+    
+    def tearDown(self):
+        self.testbed.deactivate()
+        TestCase.tearDown(self)
+        
+    def testGetLast(self):
+        key = RawData.fetchByRawDataId(self.TEST_RAWDATA_ID)
+        if key is not None: key.delete()
+        key = RawData.fetchByRawDataId(self.TEST_RAWDATA_ID)
+        self.assertTrue(key is None)
+        
+        raw_data = RawData()
+        raw_data.rawDataId = self.TEST_RAWDATA_ID 
+        raw_data.path = self.TEST_PATH
+        raw_data.parameters = self.TEST_PARAMETERS
+        raw_data.query = self.TEST_QUERY
+        raw_data.fragment = self.TEST_FRAGMENT
+        raw_data.body =  self.TEST_BODY
+        raw_data.put()
+        
+        key = RawData.fetchByRawDataId(self.TEST_RAWDATA_ID)
+        self.assertTrue(key is not None)
