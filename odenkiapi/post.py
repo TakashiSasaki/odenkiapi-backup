@@ -12,7 +12,7 @@ class PostPage(RequestHandler):
     def get(self):
         self.sender = GetSender(self.request)
         self.raw_data = putRawData(self.request)
-        #self.data_list = putDataList(self.request)
+        # self.data_list = putDataList(self.request)
         self.data_list = Data.storeRequest(self.request)
         self.metadata = putMetadata(self.sender, self.raw_data, self.data_list)
         
@@ -23,7 +23,7 @@ class PostPage(RequestHandler):
             self.response.out.write("field:" + data.field + " string:" + data.string + "\n")
 
     def post(self):
-        #logging.info("body="+self.request.body)
+        # logging.info("body="+self.request.body)
         self.get()
 
 class _Path(RequestHandler):
@@ -57,12 +57,12 @@ class _Body(RequestHandler):
         self.response.out.write(self.request.body)
 
 from google.appengine.ext.webapp import WSGIApplication
-_wsgi_application= WSGIApplication([('/post', PostPage),
+_wsgi_application = WSGIApplication([('/post', PostPage),
                                     ('/_Path', _Path),
                                     ('/_Params.*', _Params),
                                     ('/_Query', _Query),
                                     ('/_Fragment', _Fragment),
-                                    ('/_Body', _Body)], 
+                                    ('/_Body', _Body)],
                                    debug=True)
 
 if __name__ == "__main__":
