@@ -1,5 +1,5 @@
 application: odenkiapi
-version: python-0018
+version: python-0019
 #runtime: python
 runtime: python27
 api_version: 1
@@ -57,6 +57,9 @@ handlers:
   script: record/\1.py
   
 - url: /post
+  script: post.py
+  
+- url: /_.*
   script: post.py
 
 - url: /admin

@@ -4,7 +4,8 @@ from model.RawData import putRawData
 from model.Data import Data
 from model.Metadata import putMetadata
 from google.appengine.ext import db
-from google.appengine.ext.webapp import RequestHandler, Response
+from google.appengine.ext.webapp import RequestHandler, Response, Request
+from urlparse import urlparse
 
 class PostPage(RequestHandler):
 
@@ -25,27 +26,61 @@ class PostPage(RequestHandler):
         #logging.info("body="+self.request.body)
         self.get()
 
+class _Path(RequestHandler):
+    def get(self):
+        from urlparse import urlparse
+        parsed_url = urlparse(self.request.url)
+        self.response.out.write(parsed_url.path)
+
+class _Params(RequestHandler):
+    def get(self):
+        assert isinstance(self.request, Request)
+        from urlparse import urlparse
+        parsed_url = urlparse(self.request.url)
+        self.response.out.write(parsed_url.params)
+        self.response.headers["a"] = "abc"
+
+class _Query(RequestHandler):
+    def get(self):
+        from urlparse import urlparse
+        parsed_url = urlparse(self.request.url)
+        self.response.out.write(parsed_url.query)
+
+class _Fragment(RequestHandler):
+    def get(self):
+        from urlparse import urlparse
+        parsed_url = urlparse(self.request.url)
+        self.response.out.write(parsed_url.fragment)
+
+class _Body(RequestHandler):
+    def get(self):
+        self.response.out.write(self.request.body)
 
 from google.appengine.ext.webapp import WSGIApplication
-wsgi_application= WSGIApplication([('/post', PostPage)], debug=True)
+_wsgi_application= WSGIApplication([('/post', PostPage),
+                                    ('/_Path', _Path),
+                                    ('/_Params.*', _Params),
+                                    ('/_Query', _Query),
+                                    ('/_Fragment', _Fragment),
+                                    ('/_Body', _Body)], 
+                                   debug=True)
 
 if __name__ == "__main__":
     from google.appengine.ext.webapp.util import run_wsgi_app
-    run_wsgi_app(wsgi_application)
+    run_wsgi_app(_wsgi_application)
 
-import unittest
-
-class MyTest(unittest.TestCase):
+from unittest import TestCase
+class _MyTest(TestCase):
 
     def setUp(self):
-        unittest.TestCase.setUp(self)
+        TestCase.setUp(self)
         try:
             import webtest
         except ImportError:
             import setuptools.command.easy_install as easy_install
             easy_install.main(["WebTest"])
             exit()
-        self.test_app = webtest.TestApp(wsgi_application)
+        self.test_app = webtest.TestApp(_wsgi_application)
         from google.appengine.ext.testbed import Testbed
         self.testbed = Testbed()
         self.testbed.activate()
@@ -53,10 +88,57 @@ class MyTest(unittest.TestCase):
         
     def tearDown(self):
         self.testbed.deactivate()
-        unittest.TestCase.tearDown(self)
+        TestCase.tearDown(self)
 
     def testGet(self):
         response = self.test_app.get("/post")
         import webtest
         self.assertIsInstance(response, webtest.TestResponse)
         self.assertEqual(response.status, "200 OK")
+        self.assertEqual(response.headers["Content-Type"], 'text/plain')
+    
+    def test_Path(self):
+        response = self.test_app.get("/_Path")
+        self.assertEqual(response.status, "200 OK")
+        self.assertEqual(response.headers["Content-Type"], 'text/html; charset=utf-8')
+        self.assertEqual(response.body, '/_Path')
+        
+    def test_Params(self):
+        response = self.test_app.request(b"/_Params;ppp?a=b&c=d#e", method=b"GET")
+        self.assertEqual(response.headers["a"], "abc")
+        self.assertEqual(response.status, "200 OK")
+        self.assertEqual(response.headers["Content-Type"], 'text/html; charset=utf-8')
+        self.assertEqual(response.body, "")
+
+    def test_Fragment(self):
+        response = self.test_app.request(b"/_Fragment?a=b&c=d#e", method=b"GET")
+        self.assertEqual(response.status, "200 OK")
+        self.assertEqual(response.headers["Content-Type"], 'text/html; charset=utf-8')
+        self.assertEqual(response.body, "e")
+
+    def test_Query(self):
+        response = self.test_app.request(b"/_Query?a=b&c=d#e", method=b"GET")
+        self.assertEqual(response.status, "200 OK")
+        self.assertEqual(response.headers["Content-Type"], 'text/html; charset=utf-8')
+        self.assertEqual(response.body, "a=b&c=d")
+
+class _TestSemicolonInUrl(TestCase):
+    
+    def testUrlParse(self):
+        """urlparse.urlparse recognizes the semicolon in the given path for http scheme."""
+        self.assertEqual(urlparse("http://localhost/a/b/c;d").params, "d")
+        self.assertEqual(urlparse("file://localhost/a/b/c;d").params, "")
+        self.assertEqual(urlparse("file:///a/b/c;d").params, "")
+
+    def testWebobRequest(self):
+        """It shows a simple usage of WebOb Request class to create a blank request."""
+        import webob
+        request = webob.Request.blank("/a/b/c")
+        self.assertEqual(request.url, "http://localhost/a/b/c")
+
+    def testWebobRequestSemicolon(self):
+        """The semicolon in the given path is URL-encoded UNEXPECTEDLY.""" 
+        import webob
+        request = webob.Request.blank("/a/b/c;d")
+        self.assertEqual(request.url, "http://localhost/a/b/c%3Bd")
+    
