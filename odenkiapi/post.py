@@ -28,27 +28,23 @@ class PostPage(RequestHandler):
 
 class _Path(RequestHandler):
     def get(self):
-        from urlparse import urlparse
         parsed_url = urlparse(self.request.url)
         self.response.out.write(parsed_url.path)
 
 class _Params(RequestHandler):
     def get(self):
         assert isinstance(self.request, Request)
-        from urlparse import urlparse
         parsed_url = urlparse(self.request.url)
         self.response.out.write(parsed_url.params)
         self.response.headers["a"] = "abc"
 
 class _Query(RequestHandler):
     def get(self):
-        from urlparse import urlparse
         parsed_url = urlparse(self.request.url)
         self.response.out.write(parsed_url.query)
 
 class _Fragment(RequestHandler):
     def get(self):
-        from urlparse import urlparse
         parsed_url = urlparse(self.request.url)
         self.response.out.write(parsed_url.fragment)
 
