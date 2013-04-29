@@ -1,0 +1,184 @@
+101.1.113.202 - - [19/Aug/2012:07:44:44 -0700] "GET /html/main.html HTTP/1.0" 304 0 - "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1" "python-0007.odenkiapi.appspot.com" ms=448 cpu_ms=0
+10.13.62.6 - - [19/Aug/2012:07:44:44 -0700] "GET /html/main.html HTTP/1.0" 204 4178 - - "python-0007.odenkiapi.appspot.com" ms=38 cpu_ms=0 cpm_usd=0.001984
+0.2.0.1 - - [19/Aug/2012:07:44:44 -0700] "GET /js/dummy.js HTTP/1.0" 304 0 - - "python-0007.odenkiapi.appspot.com" ms=41 cpu_ms=0
+0.2.0.1 - - [19/Aug/2012:07:44:45 -0700] "GET /css/odenki-theme.min.css HTTP/1.0" 304 0 - - "python-0007.odenkiapi.appspot.com" ms=249 cpu_ms=0
+74.125.178.29 - - [19/Aug/2012:07:44:45 -0700] "GET /html/main.html HTTP/1.0" 200 0 - "Mozilla/5.0 (en-US) AppleWebKit/536.8 (KHTML, like Gecko) Chrome/19.0.1084.36 Safari/536.8 pss-webkit-request" "python-0007.odenkiapi.appspot.com" ms=190 cpu_ms=0
+101.1.113.202 - - [19/Aug/2012:07:44:45 -0700] "GET /css/odenki-theme.min.css HTTP/1.0" 304 0 "http://python-0007.odenkiapi.appspot.com/html/main.html" "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1" "python-0007.odenkiapi.appspot.com" ms=73 cpu_ms=0
+10.13.176.21 - - [19/Aug/2012:07:44:45 -0700] "GET /css/odenki-theme.min.css HTTP/1.0" 204 28006 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.013302
+10.12.163.13 - - [19/Aug/2012:07:44:45 -0700] "GET /js/dummy.js HTTP/1.0" 204 2462 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.001169
+0.2.0.1 - - [19/Aug/2012:07:44:46 -0700] "GET /js/dummy.js HTTP/1.0" 200 0 - - "python-0007.odenkiapi.appspot.com" ms=14 cpu_ms=0
+10.151.25.11 - - [19/Aug/2012:07:44:46 -0700] "GET /html/main.html HTTP/1.0" 204 4179 - - "python-0007.odenkiapi.appspot.com" ms=19 cpu_ms=0 cpm_usd=0.001985
+0.2.0.1 - - [19/Aug/2012:07:44:46 -0700] "GET /css/odenki-theme.min.css HTTP/1.0" 200 0 - - "python-0007.odenkiapi.appspot.com" ms=2 cpu_ms=0
+74.125.178.88 - - [19/Aug/2012:07:44:46 -0700] "GET /css/odenki-theme.min.css HTTP/1.0" 304 0 "http://python-0007.odenkiapi.appspot.com/html/main.html" "Mozilla/5.0 (en-US) AppleWebKit/536.8 (KHTML, like Gecko) Chrome/19.0.1084.36 Safari/536.8 pss-webkit-request" "python-0007.odenkiapi.appspot.com" ms=1 cpu_ms=0
+10.176.201.6 - - [19/Aug/2012:07:44:46 -0700] "GET /css/odenki-theme.min.css HTTP/1.0" 204 28006 - - "python-0007.odenkiapi.appspot.com" ms=1 cpu_ms=0 cpm_usd=0.013302
+101.1.113.202 - - [19/Aug/2012:07:44:46 -0700] "GET /css/images/icons-18-white.png HTTP/1.0" 200 0 "http://python-0007.odenkiapi.appspot.com/css/odenki-theme.min.css" "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1" "python-0007.odenkiapi.appspot.com" ms=22 cpu_ms=0
+101.1.113.202 - - [19/Aug/2012:07:44:46 -0700] "GET /css/images/ajax-loader.gif HTTP/1.0" 200 0 "http://python-0007.odenkiapi.appspot.com/css/odenki-theme.min.css" "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1" "python-0007.odenkiapi.appspot.com" ms=22 cpu_ms=0
+74.125.178.29 - - [19/Aug/2012:07:44:46 -0700] "GET /js/dummy.js HTTP/1.0" 304 0 "http://python-0007.odenkiapi.appspot.com/html/main.html" "Mozilla/5.0 (en-US) AppleWebKit/536.8 (KHTML, like Gecko) Chrome/19.0.1084.36 Safari/536.8 pss-webkit-request" "python-0007.odenkiapi.appspot.com" ms=1 cpu_ms=0
+10.176.72.20 - - [19/Aug/2012:07:44:46 -0700] "GET /js/dummy.js HTTP/1.0" 204 2462 - - "python-0007.odenkiapi.appspot.com" ms=1 cpu_ms=0 cpm_usd=0.001169
+74.125.178.88 - - [19/Aug/2012:07:44:46 -0700] "GET /css/images/ajax-loader.gif HTTP/1.0" 200 0 "http://python-0007.odenkiapi.appspot.com/html/main.html" "Mozilla/5.0 (en-US) AppleWebKit/536.8 (KHTML, like Gecko) Chrome/19.0.1084.36 Safari/536.8 pss-webkit-request" "python-0007.odenkiapi.appspot.com" ms=1 cpu_ms=0
+74.125.178.29 - - [19/Aug/2012:07:44:46 -0700] "GET /css/images/icons-18-white.png HTTP/1.0" 304 0 "http://python-0007.odenkiapi.appspot.com/html/main.html" "Mozilla/5.0 (en-US) AppleWebKit/536.8 (KHTML, like Gecko) Chrome/19.0.1084.36 Safari/536.8 pss-webkit-request" "python-0007.odenkiapi.appspot.com" ms=1 cpu_ms=0
+10.150.255.20 - - [19/Aug/2012:07:44:46 -0700] "GET /css/images/icons-18-white.png HTTP/1.0" 204 2030 - - "python-0007.odenkiapi.appspot.com" ms=1 cpu_ms=0 cpm_usd=0.000964
+10.13.62.6 - - [19/Aug/2012:07:44:47 -0700] "GET /css/images/icons-18-white.png HTTP/1.0" 204 2030 - - "python-0007.odenkiapi.appspot.com" ms=24 cpu_ms=0 cpm_usd=0.000964
+10.13.176.21 - - [19/Aug/2012:07:44:47 -0700] "GET /css/images/ajax-loader.gif HTTP/1.0" 204 8047 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.003822
+10.150.172.34 - - [19/Aug/2012:07:44:47 -0700] "GET /css/images/ajax-loader.gif HTTP/1.0" 204 8047 - - "python-0007.odenkiapi.appspot.com" ms=1 cpu_ms=0 cpm_usd=0.003822
+101.1.113.202 - - [19/Aug/2012:07:44:47 -0700] "GET /favicon.ico HTTP/1.0" 404 0 - "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1" "python-0007.odenkiapi.appspot.com" ms=22 cpu_ms=0
+10.12.166.20 - - [19/Aug/2012:07:44:47 -0700] "GET /favicon.ico HTTP/1.0" 404 0 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0
+101.1.113.202 - - [19/Aug/2012:07:45:51 -0700] "GET /html/community.html HTTP/1.0" 200 0 "http://python-0007.odenkiapi.appspot.com/html/main.html" "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1" "python-0007.odenkiapi.appspot.com" ms=24 cpu_ms=0
+10.12.90.38 - - [19/Aug/2012:07:45:52 -0700] "GET /html/community.html HTTP/1.0" 204 3872 - - "python-0007.odenkiapi.appspot.com" ms=25 cpu_ms=0 cpm_usd=0.001839
+74.125.178.88 - - [19/Aug/2012:07:45:52 -0700] "GET /html/community.html HTTP/1.0" 304 0 - "Mozilla/5.0 (en-US) AppleWebKit/536.8 (KHTML, like Gecko) Chrome/19.0.1084.36 Safari/536.8 pss-webkit-request" "python-0007.odenkiapi.appspot.com" ms=1 cpu_ms=0
+10.150.172.34 - - [19/Aug/2012:07:45:52 -0700] "GET /html/community.html HTTP/1.0" 204 3869 - - "python-0007.odenkiapi.appspot.com" ms=1 cpu_ms=0 cpm_usd=0.001838
+0.2.0.1 - - [19/Aug/2012:07:45:53 -0700] "GET /css/odenki-theme.min.css HTTP/1.0" 200 0 - - "python-0007.odenkiapi.appspot.com" ms=72 cpu_ms=0
+101.1.113.202 - - [19/Aug/2012:07:45:57 -0700] "GET /html/input.html HTTP/1.0" 304 0 "http://python-0007.odenkiapi.appspot.com/html/community.html" "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1" "python-0007.odenkiapi.appspot.com" ms=29 cpu_ms=0
+10.12.44.33 - - [19/Aug/2012:07:45:57 -0700] "GET /html/input.html HTTP/1.0" 204 3746 - - "python-0007.odenkiapi.appspot.com" ms=106 cpu_ms=0 cpm_usd=0.001779
+74.125.178.88 - - [19/Aug/2012:07:45:57 -0700] "GET /html/input.html HTTP/1.0" 200 0 - "Mozilla/5.0 (en-US) AppleWebKit/536.8 (KHTML, like Gecko) Chrome/19.0.1084.36 Safari/536.8 pss-webkit-request" "python-0007.odenkiapi.appspot.com" ms=7 cpu_ms=0
+10.150.8.11 - - [19/Aug/2012:07:45:58 -0700] "GET /html/input.html HTTP/1.0" 204 3748 - - "python-0007.odenkiapi.appspot.com" ms=33 cpu_ms=0 cpm_usd=0.001780
+10.12.151.21 - - [19/Aug/2012:07:46:00 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.001835
+101.1.113.202 - - [19/Aug/2012:07:46:24 -0700] "GET /html/myself.html HTTP/1.0" 304 0 - "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1" "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0
+10.12.107.25 - - [19/Aug/2012:07:46:24 -0700] "GET /html/myself.html HTTP/1.0" 204 3827 - - "python-0007.odenkiapi.appspot.com" ms=26 cpu_ms=0 cpm_usd=0.001818
+74.125.178.88 - - [19/Aug/2012:07:46:24 -0700] "GET /html/myself.html HTTP/1.0" 304 0 - "Mozilla/5.0 (en-US) AppleWebKit/536.8 (KHTML, like Gecko) Chrome/19.0.1084.36 Safari/536.8 pss-webkit-request" "python-0007.odenkiapi.appspot.com" ms=62 cpu_ms=0
+10.176.38.18 - - [19/Aug/2012:07:46:25 -0700] "GET /html/myself.html HTTP/1.0" 204 3709 - - "python-0007.odenkiapi.appspot.com" ms=64 cpu_ms=0 cpm_usd=0.001762
+10.12.166.20 - - [19/Aug/2012:07:46:42 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=22 cpu_ms=0 cpm_usd=0.002093
+0.2.0.1 - - [19/Aug/2012:07:46:42 -0700] "GET /js/dummy.js HTTP/1.0" 200 0 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0
+10.12.142.14 - - [19/Aug/2012:07:50:04 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=25 cpu_ms=0 cpm_usd=0.002093
+10.13.73.9 - - [19/Aug/2012:07:50:06 -0700] "GET /css/images/ajax-loader.gif HTTP/1.0" 204 8047 - - "python-0007.odenkiapi.appspot.com" ms=22 cpu_ms=0 cpm_usd=0.003822
+10.12.163.13 - - [19/Aug/2012:07:50:06 -0700] "GET /css/images/icons-18-white.png HTTP/1.0" 204 2030 - - "python-0007.odenkiapi.appspot.com" ms=23 cpu_ms=0 cpm_usd=0.000964
+125.199.120.206 - - [19/Aug/2012:07:50:06 -0700] "GET /favicon.ico HTTP/1.0" 404 0 - "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1" "python-0007.odenkiapi.appspot.com" ms=26 cpu_ms=0
+10.12.211.4 - - [19/Aug/2012:07:50:06 -0700] "GET /favicon.ico HTTP/1.0" 404 0 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0
+10.12.149.24 - - [19/Aug/2012:07:50:16 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=175 cpu_ms=0 cpm_usd=0.001835
+10.12.40.12 - - [19/Aug/2012:07:50:18 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=23 cpu_ms=0 cpm_usd=0.001814
+10.12.214.21 - - [19/Aug/2012:07:50:20 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=77 cpu_ms=0 cpm_usd=0.001835
+10.13.73.9 - - [19/Aug/2012:07:50:21 -0700] "GET /html/input.html HTTP/1.0" 204 3739 - - "python-0007.odenkiapi.appspot.com" ms=22 cpu_ms=0 cpm_usd=0.001776
+10.12.184.21 - - [19/Aug/2012:07:50:24 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=24 cpu_ms=0 cpm_usd=0.001814
+10.12.152.21 - - [19/Aug/2012:07:50:25 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=22 cpu_ms=0 cpm_usd=0.001835
+10.13.147.19 - - [19/Aug/2012:07:50:26 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=114 cpu_ms=0 cpm_usd=0.001814
+10.12.89.21 - - [19/Aug/2012:07:50:28 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=54 cpu_ms=0 cpm_usd=0.002093
+10.12.150.23 - - [19/Aug/2012:07:50:28 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.002093
+10.13.134.1 - - [19/Aug/2012:07:50:31 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=65 cpu_ms=0 cpm_usd=0.001835
+10.12.211.4 - - [19/Aug/2012:07:50:33 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=228 cpu_ms=0 cpm_usd=0.002093
+10.12.17.18 - - [19/Aug/2012:07:50:36 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=33 cpu_ms=0 cpm_usd=0.001835
+10.12.125.1 - - [19/Aug/2012:07:50:37 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=26 cpu_ms=0 cpm_usd=0.001814
+10.12.25.18 - - [19/Aug/2012:07:50:40 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=43 cpu_ms=0 cpm_usd=0.001835
+10.12.149.24 - - [19/Aug/2012:07:50:42 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=23 cpu_ms=0 cpm_usd=0.002093
+10.12.150.23 - - [19/Aug/2012:07:51:09 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.001814
+10.12.165.22 - - [19/Aug/2012:07:51:12 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=30 cpu_ms=0 cpm_usd=0.002093
+10.12.142.14 - - [19/Aug/2012:07:51:36 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=45 cpu_ms=0 cpm_usd=0.001835
+10.12.89.21 - - [19/Aug/2012:07:51:37 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=85 cpu_ms=0 cpm_usd=0.001814
+10.12.166.20 - - [19/Aug/2012:07:51:39 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=26 cpu_ms=0 cpm_usd=0.001835
+10.12.136.23 - - [19/Aug/2012:07:51:41 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.001814
+10.12.166.20 - - [19/Aug/2012:07:51:44 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.002093
+10.13.73.9 - - [19/Aug/2012:07:51:47 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=36 cpu_ms=0 cpm_usd=0.001835
+10.12.214.21 - - [19/Aug/2012:07:51:48 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.001814
+10.12.17.18 - - [19/Aug/2012:07:51:49 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=285 cpu_ms=0 cpm_usd=0.001814
+10.12.40.12 - - [19/Aug/2012:07:51:50 -0700] "GET /html/input.html HTTP/1.0" 204 3739 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.001776
+10.13.147.19 - - [19/Aug/2012:07:51:54 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=34 cpu_ms=0 cpm_usd=0.001835
+10.13.134.1 - - [19/Aug/2012:07:51:57 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=131 cpu_ms=0 cpm_usd=0.002093
+10.12.211.4 - - [19/Aug/2012:07:52:01 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.001835
+10.12.150.23 - - [19/Aug/2012:07:52:04 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=24 cpu_ms=0 cpm_usd=0.001814
+10.12.44.33 - - [19/Aug/2012:07:52:07 -0700] "GET /html/input.html HTTP/1.0" 204 3739 - - "python-0007.odenkiapi.appspot.com" ms=82 cpu_ms=0 cpm_usd=0.001776
+10.12.149.24 - - [19/Aug/2012:07:52:09 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=23 cpu_ms=0 cpm_usd=0.001814
+10.12.142.14 - - [19/Aug/2012:07:52:12 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=26 cpu_ms=0 cpm_usd=0.001835
+10.13.43.22 - - [19/Aug/2012:07:52:14 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=28 cpu_ms=0 cpm_usd=0.002093
+10.13.147.19 - - [19/Aug/2012:07:52:48 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=22 cpu_ms=0 cpm_usd=0.002093
+10.13.147.19 - - [19/Aug/2012:07:53:08 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=22 cpu_ms=0 cpm_usd=0.001814
+10.13.103.9 - - [19/Aug/2012:07:53:09 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.001835
+10.12.165.22 - - [19/Aug/2012:07:53:10 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.002093
+10.13.175.4 - - [19/Aug/2012:07:53:20 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=82 cpu_ms=0 cpm_usd=0.001814
+10.13.147.19 - - [19/Aug/2012:07:53:22 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.002093
+10.13.134.1 - - [19/Aug/2012:07:53:24 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.001814
+10.12.25.18 - - [19/Aug/2012:07:53:25 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.002093
+10.12.165.22 - - [19/Aug/2012:07:53:28 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.001814
+10.12.43.13 - - [19/Aug/2012:07:53:39 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.002093
+10.12.149.24 - - [19/Aug/2012:07:55:59 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=31 cpu_ms=0 cpm_usd=0.001814
+10.12.153.2 - - [19/Aug/2012:07:55:59 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.001814
+10.12.125.1 - - [19/Aug/2012:07:56:00 -0700] "GET /html/input.html HTTP/1.0" 204 3739 - - "python-0007.odenkiapi.appspot.com" ms=33 cpu_ms=0 cpm_usd=0.001776
+10.13.72.26 - - [19/Aug/2012:07:56:01 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=28 cpu_ms=0 cpm_usd=0.001835
+10.12.214.21 - - [19/Aug/2012:07:56:04 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=23 cpu_ms=0 cpm_usd=0.002093
+10.12.211.4 - - [19/Aug/2012:07:56:07 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.002093
+10.12.152.21 - - [19/Aug/2012:07:56:08 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.001835
+10.12.25.18 - - [19/Aug/2012:07:56:09 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=23 cpu_ms=0 cpm_usd=0.002093
+10.13.73.9 - - [19/Aug/2012:07:56:12 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=25 cpu_ms=0 cpm_usd=0.001835
+10.12.155.3 - - [19/Aug/2012:07:56:14 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.002093
+10.13.86.35 - - [19/Aug/2012:07:56:18 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=108 cpu_ms=0 cpm_usd=0.001835
+10.12.149.24 - - [19/Aug/2012:07:56:18 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=97 cpu_ms=0 cpm_usd=0.001835
+10.12.158.37 - - [19/Aug/2012:07:56:20 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=59 cpu_ms=0 cpm_usd=0.001814
+10.13.117.12 - - [19/Aug/2012:07:56:20 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=29 cpu_ms=0 cpm_usd=0.002093
+10.12.166.20 - - [19/Aug/2012:07:56:21 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=54 cpu_ms=0 cpm_usd=0.002093
+10.13.62.6 - - [19/Aug/2012:07:56:28 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.001835
+10.12.142.14 - - [19/Aug/2012:07:56:30 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.002093
+10.13.43.22 - - [19/Aug/2012:07:57:44 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.002093
+10.13.43.22 - - [19/Aug/2012:07:57:47 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.001835
+10.12.211.4 - - [19/Aug/2012:07:57:49 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=22 cpu_ms=0 cpm_usd=0.002093
+10.12.25.18 - - [19/Aug/2012:07:57:51 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.001814
+10.12.166.20 - - [19/Aug/2012:07:57:54 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=163 cpu_ms=0 cpm_usd=0.002093
+10.12.149.24 - - [19/Aug/2012:07:58:39 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=212 cpu_ms=0 cpm_usd=0.002093
+10.12.152.21 - - [19/Aug/2012:07:58:41 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.001835
+10.12.163.13 - - [19/Aug/2012:07:58:43 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.001814
+10.12.151.21 - - [19/Aug/2012:07:58:44 -0700] "GET /html/input.html HTTP/1.0" 204 3739 - - "python-0007.odenkiapi.appspot.com" ms=46 cpu_ms=0 cpm_usd=0.001776
+10.12.166.20 - - [19/Aug/2012:07:58:46 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.002093
+10.12.210.4 - - [19/Aug/2012:08:00:27 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=37 cpu_ms=0 cpm_usd=0.002093
+10.13.72.26 - - [19/Aug/2012:08:04:03 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=215 cpu_ms=0 cpm_usd=0.002093
+10.13.176.21 - - [19/Aug/2012:08:04:10 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=50 cpu_ms=0 cpm_usd=0.001835
+10.12.142.14 - - [19/Aug/2012:08:04:12 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=22 cpu_ms=0 cpm_usd=0.002093
+74.125.178.26 - - [19/Aug/2012:09:40:33 -0700] "GET /html/main.html HTTP/1.0" 200 0 - "Mozilla/5.0 (en-US) AppleWebKit/536.8 (KHTML, like Gecko) Chrome/19.0.1084.36 Safari/536.8 pss-webkit-request" "python-0007.odenkiapi.appspot.com" ms=383 cpu_ms=0
+10.13.147.19 - - [19/Aug/2012:09:40:33 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=510 cpu_ms=0 cpm_usd=0.002093
+220.156.242.161 - - [19/Aug/2012:09:40:34 -0700] "GET /favicon.ico HTTP/1.0" 404 0 - "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1" "python-0007.odenkiapi.appspot.com" ms=49 cpu_ms=0
+10.13.43.22 - - [19/Aug/2012:09:40:34 -0700] "GET /favicon.ico HTTP/1.0" 404 0 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0
+10.176.201.6 - - [19/Aug/2012:09:40:34 -0700] "GET /html/main.html HTTP/1.0" 204 4297 - - "python-0007.odenkiapi.appspot.com" ms=1 cpu_ms=0 cpm_usd=0.002041
+10.12.208.20 - - [19/Aug/2012:09:40:36 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=22 cpu_ms=0 cpm_usd=0.002093
+10.12.89.21 - - [19/Aug/2012:10:22:00 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=211 cpu_ms=0 cpm_usd=0.002093
+0.2.0.1 - - [19/Aug/2012:10:22:01 -0700] "GET /js/dummy.js HTTP/1.0" 200 0 - - "python-0007.odenkiapi.appspot.com" ms=22 cpu_ms=0
+10.13.117.12 - - [19/Aug/2012:10:22:03 -0700] "GET /css/images/ajax-loader.gif HTTP/1.0" 204 8047 - - "python-0007.odenkiapi.appspot.com" ms=22 cpu_ms=0 cpm_usd=0.003822
+210.157.228.254 - - [19/Aug/2012:10:22:03 -0700] "GET /css/images/ajax-loader.gif HTTP/1.0" 200 0 "http://1-ps.googleusercontent.com/x/s.odenkiapi.appspot.com/python-0007.odenkiapi.appspot.com/css/odenki-theme.min.css.pagespeed.ce.ylmegw4Zzg.css" "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1" "python-0007.odenkiapi.appspot.com" ms=22 cpu_ms=0
+10.13.117.12 - - [19/Aug/2012:10:22:03 -0700] "GET /css/images/icons-18-white.png HTTP/1.0" 204 2030 - - "python-0007.odenkiapi.appspot.com" ms=22 cpu_ms=0 cpm_usd=0.000964
+210.157.228.254 - - [19/Aug/2012:10:22:03 -0700] "GET /favicon.ico HTTP/1.0" 404 0 - "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1" "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0
+10.13.109.21 - - [19/Aug/2012:10:22:04 -0700] "GET /favicon.ico HTTP/1.0" 404 0 - - "python-0007.odenkiapi.appspot.com" ms=23 cpu_ms=0
+10.12.237.10 - - [19/Aug/2012:10:22:04 -0700] "GET /css/images/ajax-loader.gif HTTP/1.0" 204 8047 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.003822
+10.13.109.21 - - [19/Aug/2012:11:17:08 -0700] "GET /html/main.html HTTP/1.0" 204 4288 - - "python-0007.odenkiapi.appspot.com" ms=217 cpu_ms=0 cpm_usd=0.002037
+10.176.165.8 - - [19/Aug/2012:11:17:08 -0700] "GET /html/main.html HTTP/1.0" 204 4288 - - "python-0007.odenkiapi.appspot.com" ms=61 cpu_ms=0 cpm_usd=0.002037
+10.12.44.33 - - [19/Aug/2012:11:17:08 -0700] "GET /css/odenki-theme.min.css HTTP/1.0" 204 28006 - - "python-0007.odenkiapi.appspot.com" ms=22 cpu_ms=0 cpm_usd=0.013302
+10.13.65.30 - - [19/Aug/2012:11:17:13 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.001835
+74.125.178.80 - - [19/Aug/2012:11:17:13 -0700] "GET /html/community.html HTTP/1.0" 304 0 - "Mozilla/5.0 (en-US) AppleWebKit/536.8 (KHTML, like Gecko) Chrome/19.0.1084.36 Safari/536.8 pss-webkit-request" "python-0007.odenkiapi.appspot.com" ms=1 cpu_ms=0
+10.177.105.16 - - [19/Aug/2012:11:17:13 -0700] "GET /html/community.html HTTP/1.0" 204 3869 - - "python-0007.odenkiapi.appspot.com" ms=1 cpu_ms=0 cpm_usd=0.001838
+10.13.134.1 - - [19/Aug/2012:11:17:15 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.002093
+27.253.197.160 - - [19/Aug/2012:11:21:16 -0700] "GET / HTTP/1.0" 500 0 - "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.81 Safari/537.1" "python-0007.odenkiapi.appspot.com" ms=2192 cpu_ms=770 loading_request=1 instance=00c61b117ccf4b0497768f55217cf96efee2a5a4
+10.12.142.14 - - [19/Aug/2012:11:21:17 -0700] "GET / HTTP/1.0" 204 0 - - "python-0007.odenkiapi.appspot.com" ms=82 cpu_ms=0
+27.253.197.160 - - [19/Aug/2012:11:21:17 -0700] "GET /favicon.ico HTTP/1.0" 404 0 - "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.81 Safari/537.1" "python-0007.odenkiapi.appspot.com" ms=26 cpu_ms=0
+10.12.136.23 - - [19/Aug/2012:11:21:17 -0700] "GET /favicon.ico HTTP/1.0" 404 0 - - "python-0007.odenkiapi.appspot.com" ms=29 cpu_ms=0
+10.13.147.19 - - [19/Aug/2012:11:21:54 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=77 cpu_ms=0 cpm_usd=0.002093
+27.253.197.160 - - [19/Aug/2012:11:21:58 -0700] "GET / HTTP/1.0" 500 0 - "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.81 Safari/537.1" "python-0007.odenkiapi.appspot.com" ms=25 cpu_ms=23 instance=00c61b117ccf4b0497768f55217cf96efee2a5a4
+10.12.150.23 - - [19/Aug/2012:11:21:58 -0700] "GET / HTTP/1.0" 204 0 - - "python-0007.odenkiapi.appspot.com" ms=25 cpu_ms=0
+27.253.197.160 - - [19/Aug/2012:11:21:58 -0700] "GET /favicon.ico HTTP/1.0" 404 0 - "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.81 Safari/537.1" "python-0007.odenkiapi.appspot.com" ms=34 cpu_ms=0
+10.12.107.25 - - [19/Aug/2012:11:21:59 -0700] "GET /favicon.ico HTTP/1.0" 404 0 - - "python-0007.odenkiapi.appspot.com" ms=147 cpu_ms=0
+10.13.72.26 - - [19/Aug/2012:11:21:59 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=21 cpu_ms=0 cpm_usd=0.001835
+10.12.25.18 - - [19/Aug/2012:11:22:01 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=23 cpu_ms=0 cpm_usd=0.001814
+74.125.178.16 - - [19/Aug/2012:11:22:01 -0700] "GET /html/myself.html HTTP/1.0" 200 0 - "Mozilla/5.0 (en-US) AppleWebKit/536.8 (KHTML, like Gecko) Chrome/19.0.1084.36 Safari/536.8 pss-webkit-request" "python-0007.odenkiapi.appspot.com" ms=1 cpu_ms=0
+10.150.248.37 - - [19/Aug/2012:11:22:02 -0700] "GET /html/myself.html HTTP/1.0" 204 3829 - - "python-0007.odenkiapi.appspot.com" ms=1 cpu_ms=0 cpm_usd=0.001819
+10.12.25.18 - - [19/Aug/2012:11:22:03 -0700] "GET /html/input.html HTTP/1.0" 204 3739 - - "python-0007.odenkiapi.appspot.com" ms=121 cpu_ms=0 cpm_usd=0.001776
+74.125.178.16 - - [19/Aug/2012:11:22:03 -0700] "GET /html/input.html HTTP/1.0" 304 0 - "Mozilla/5.0 (en-US) AppleWebKit/536.8 (KHTML, like Gecko) Chrome/19.0.1084.36 Safari/536.8 pss-webkit-request" "python-0007.odenkiapi.appspot.com" ms=85 cpu_ms=0
+10.177.63.2 - - [19/Aug/2012:11:22:03 -0700] "GET /html/input.html HTTP/1.0" 204 3747 - - "python-0007.odenkiapi.appspot.com" ms=1 cpu_ms=0 cpm_usd=0.001780
+10.12.107.25 - - [19/Aug/2012:11:22:05 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=56 cpu_ms=0 cpm_usd=0.002093
+10.150.155.12 - - [19/Aug/2012:22:13:01 -0700] "GET /html/main.html HTTP/1.0" 204 4288 - - "python-0007.odenkiapi.appspot.com" ms=875 cpu_ms=0 cpm_usd=0.002037
+10.12.210.4 - - [19/Aug/2012:22:13:01 -0700] "GET /html/main.html HTTP/1.0" 204 4288 - - "python-0007.odenkiapi.appspot.com" ms=982 cpu_ms=0 cpm_usd=0.002037
+10.13.147.19 - - [19/Aug/2012:22:13:01 -0700] "GET /css/odenki-theme.min.css HTTP/1.0" 204 28006 - - "python-0007.odenkiapi.appspot.com" ms=737 cpu_ms=0 cpm_usd=0.013302
+0.2.0.1 - - [19/Aug/2012:22:13:01 -0700] "GET /js/dummy.js HTTP/1.0" 200 0 - - "python-0007.odenkiapi.appspot.com" ms=161 cpu_ms=0
+10.12.151.21 - - [19/Aug/2012:22:13:03 -0700] "GET /css/images/ajax-loader.gif HTTP/1.0" 204 8047 - - "python-0007.odenkiapi.appspot.com" ms=434 cpu_ms=0 cpm_usd=0.003822
+10.13.43.22 - - [19/Aug/2012:22:13:03 -0700] "GET /css/images/icons-18-white.png HTTP/1.0" 204 2030 - - "python-0007.odenkiapi.appspot.com" ms=416 cpu_ms=0 cpm_usd=0.000964
+210.157.228.254 - - [19/Aug/2012:22:13:04 -0700] "GET /favicon.ico HTTP/1.0" 404 0 - "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1" "python-0007.odenkiapi.appspot.com" ms=27 cpu_ms=0
+10.13.117.12 - - [19/Aug/2012:22:13:04 -0700] "GET /favicon.ico HTTP/1.0" 404 0 - - "python-0007.odenkiapi.appspot.com" ms=27 cpu_ms=0
+10.13.43.22 - - [19/Aug/2012:22:13:05 -0700] "GET /html/myself.html HTTP/1.0" 204 3820 - - "python-0007.odenkiapi.appspot.com" ms=37 cpu_ms=0 cpm_usd=0.001814
+10.177.75.13 - - [19/Aug/2012:22:13:05 -0700] "GET /html/myself.html HTTP/1.0" 204 3701 - - "python-0007.odenkiapi.appspot.com" ms=8 cpu_ms=0 cpm_usd=0.001758
+10.151.19.20 - - [19/Aug/2012:22:13:05 -0700] "GET /css/odenki-theme.min.css HTTP/1.0" 204 28006 - - "python-0007.odenkiapi.appspot.com" ms=11 cpu_ms=0 cpm_usd=0.013302
+10.12.150.23 - - [19/Aug/2012:22:13:08 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=255 cpu_ms=0 cpm_usd=0.001835
+10.150.110.42 - - [19/Aug/2012:22:13:08 -0700] "GET /html/community.html HTTP/1.0" 204 3863 - - "python-0007.odenkiapi.appspot.com" ms=165 cpu_ms=0 cpm_usd=0.001835
+10.12.166.20 - - [19/Aug/2012:22:13:09 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=101 cpu_ms=0 cpm_usd=0.002093
+10.12.152.21 - - [19/Aug/2012:22:13:18 -0700] "GET /html/input.html HTTP/1.0" 204 3739 - - "python-0007.odenkiapi.appspot.com" ms=182 cpu_ms=0 cpm_usd=0.001776
+10.177.75.13 - - [19/Aug/2012:22:13:18 -0700] "GET /html/input.html HTTP/1.0" 204 3739 - - "python-0007.odenkiapi.appspot.com" ms=102 cpu_ms=0 cpm_usd=0.001776
+10.12.150.23 - - [19/Aug/2012:22:13:20 -0700] "GET /html/main.html HTTP/1.0" 204 4407 - - "python-0007.odenkiapi.appspot.com" ms=328 cpu_ms=0 cpm_usd=0.002093
+133.71.106.185 - - [21/Aug/2012:05:09:51 -0700] "GET /html/myself.html HTTP/1.1" 200 0 - "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.79 Safari/537.1" "python-0007.odenkiapi.appspot.com" ms=751 cpu_ms=0
+133.71.106.185 - - [21/Aug/2012:05:09:52 -0700] "GET /css/odenki-theme.min.css HTTP/1.1" 200 0 "http://python-0007.odenkiapi.appspot.com/html/myself.html" "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.79 Safari/537.1" "python-0007.odenkiapi.appspot.com" ms=24 cpu_ms=0
+133.71.106.185 - - [21/Aug/2012:05:09:54 -0700] "GET /css/images/ajax-loader.gif HTTP/1.1" 200 0 "http://python-0007.odenkiapi.appspot.com/html/myself.html" "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.79 Safari/537.1" "python-0007.odenkiapi.appspot.com" ms=512 cpu_ms=0
+133.71.106.185 - - [21/Aug/2012:05:09:54 -0700] "GET /css/images/icons-18-white.png HTTP/1.1" 200 0 "http://python-0007.odenkiapi.appspot.com/html/myself.html" "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.79 Safari/537.1" "python-0007.odenkiapi.appspot.com" ms=351 cpu_ms=0
+133.71.106.185 - - [21/Aug/2012:05:09:55 -0700] "GET /favicon.ico HTTP/1.1" 404 0 - "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.79 Safari/537.1" "python-0007.odenkiapi.appspot.com" ms=601 cpu_ms=0
+210.157.228.254 - - [21/Aug/2012:17:58:09 -0700] "GET /html/main.html HTTP/1.1" 200 0 "http://python-0007.odenkiapi.appspot.com/html/input.html" "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1" "python-0007.odenkiapi.appspot.com" ms=816 cpu_ms=0
+210.157.228.254 - - [21/Aug/2012:17:58:10 -0700] "GET /css/odenki-theme.min.css HTTP/1.1" 200 0 "http://python-0007.odenkiapi.appspot.com/html/main.html" "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1" "python-0007.odenkiapi.appspot.com" ms=159 cpu_ms=0
+210.157.228.254 - - [21/Aug/2012:17:58:10 -0700] "GET /js/dummy.js HTTP/1.1" 200 0 "http://python-0007.odenkiapi.appspot.com/html/main.html" "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1" "python-0007.odenkiapi.appspot.com" ms=110 cpu_ms=0
