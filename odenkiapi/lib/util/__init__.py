@@ -23,4 +23,3 @@ def isEqualIfExists(o1, o2, a):
     if not hasattr(o2, a): return False
     if o1.a != o2.a: return False
     return True
-
